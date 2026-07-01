@@ -100,6 +100,7 @@ INSERT INTO menu_items (id, name, display_name, path, icon, order_index) VALUES
     (gen_random_uuid(), 'dashboard', 'Dashboard', '/dashboard', 'bi-speedometer2', 1),
     (gen_random_uuid(), 'profile', 'Profile', '/profile', 'bi-person-circle', 2),
     (gen_random_uuid(), 'users', 'Users', '/users', 'bi-people', 900),
+    (gen_random_uuid(), 'gift-lists', 'Gift Lists', '/gift-lists', 'bi-gift', 50),
     (gen_random_uuid(), 'roles', 'Roles', '/roles', 'bi-shield-lock', 901),
     (gen_random_uuid(), 'menus', 'Menus', '/menus', 'bi-list-ul', 902),
     (gen_random_uuid(), 'audits', 'Audit Trails', '/audits', 'bi-journal-text', 904)
@@ -149,7 +150,19 @@ INSERT INTO permissions (id, name, display_name, resource, action) VALUES
     (gen_random_uuid(), 'view_profile', 'View Profile', 'profile', 'view'),
     (gen_random_uuid(), 'update_profile', 'Update Profile', 'profile', 'update'),
     (gen_random_uuid(), 'update_password_profile', 'Update Password Profile', 'profile', 'update_password'),
-    (gen_random_uuid(), 'delete_profile', 'Delete Profile', 'profile', 'delete')
+    (gen_random_uuid(), 'delete_profile', 'Delete Profile', 'profile', 'delete'),
+
+    -- Gift permissions
+    (gen_random_uuid(), 'list_gift_lists', 'List Gift Lists', 'gift_lists', 'list'),
+    (gen_random_uuid(), 'create_gift_lists', 'Create Gift Lists', 'gift_lists', 'create'),
+    (gen_random_uuid(), 'view_gift_lists', 'View Gift List Detail', 'gift_lists', 'view'),
+    (gen_random_uuid(), 'update_gift_lists', 'Update Gift Lists', 'gift_lists', 'update'),
+    (gen_random_uuid(), 'delete_gift_lists', 'Delete Gift Lists', 'gift_lists', 'delete'),
+    (gen_random_uuid(), 'list_gift_items', 'List Gift Items', 'gift_items', 'list'),
+    (gen_random_uuid(), 'create_gift_items', 'Create Gift Items', 'gift_items', 'create'),
+    (gen_random_uuid(), 'update_gift_items', 'Update Gift Items', 'gift_items', 'update'),
+    (gen_random_uuid(), 'delete_gift_items', 'Delete Gift Items', 'gift_items', 'delete'),
+    (gen_random_uuid(), 'list_gift_reservations', 'List Gift Reservations', 'gift_reservations', 'list')
 ON CONFLICT (name) DO NOTHING;
 
 -- Assign all permissions to admin role

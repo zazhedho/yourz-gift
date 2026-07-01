@@ -27,6 +27,18 @@ func TestJSONAndStringHelpers(t *testing.T) {
 	if got := TitleCase("jane doe"); got != "Jane Doe" {
 		t.Fatalf("unexpected title case: %q", got)
 	}
+	if got := StringOrDefault("  ", "fallback"); got != "fallback" {
+		t.Fatalf("unexpected default string: %q", got)
+	}
+	if got := URLHost("https://example.com/path?q=1"); got != "example.com" {
+		t.Fatalf("unexpected url host: %q", got)
+	}
+	if got := URLHost("not a url"); got != "" {
+		t.Fatalf("expected empty host for invalid URL, got %q", got)
+	}
+	if got := RandomCode(12, "ABC123"); len(got) != 12 {
+		t.Fatalf("expected 12-char random code, got %q", got)
+	}
 	if got := CreateUUID(); got == "" {
 		t.Fatal("expected uuid")
 	}

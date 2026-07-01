@@ -1,8 +1,8 @@
 {
   "info": {
     "_postman_id": "8a22c5f4-87f9-4c31-a3b5-8f7c6d1cf7f1",
-    "name": "Starter Kit API",
-    "description": "Full Postman collection for the starter-kit service. Login first to populate access_token and refresh_token collection variables. Auth responses use access_token; there is no legacy data.token field.",
+    "name": "Yourz Gift API",
+    "description": "Full Postman collection for the Yourz Gift service. Login first to populate access_token and refresh_token collection variables. Auth responses use access_token; there is no legacy data.token field.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -90,6 +90,22 @@
     },
     {
       "key": "google_id_token",
+      "value": ""
+    },
+    {
+      "key": "gift_list_id",
+      "value": ""
+    },
+    {
+      "key": "gift_share_code",
+      "value": ""
+    },
+    {
+      "key": "gift_item_id",
+      "value": ""
+    },
+    {
+      "key": "gift_reservation_id",
       "value": ""
     }
   ],
@@ -1498,6 +1514,531 @@
         }
       ],
       "description": "Runtime configs can be changed without code changes. To test auth flows, list auth configs, copy the config id into {{config_id}}, then update value to \"true\" or \"false\"."
+    },
+    {
+      "name": "Gift Lists",
+      "item": [
+        {
+          "name": "Create Gift List",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/gift-lists",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "gift-lists"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Birthday Gift Ideas\",\n  \"description\": \"Gift list for friends and family\",\n  \"occasion_type\": \"birthday\",\n  \"cover_image_url\": \"https://example.com/cover.jpg\",\n  \"shipping_note\": \"Send to the address shared privately.\",\n  \"visibility\": \"public\",\n  \"reservation_visibility\": \"immediately\"\n}"
+            },
+            "description": "Create an owner-managed gift list. Requires `gift_lists:create` permission."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = {};",
+                  "try { jsonData = pm.response.json(); } catch (e) {}",
+                  "if (jsonData && jsonData.data) {",
+                  "  if (jsonData.data.id) pm.collectionVariables.set('gift_list_id', jsonData.data.id);",
+                  "  if (jsonData.data.share_code) pm.collectionVariables.set('gift_share_code', jsonData.data.share_code);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List My Gift Lists",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/gift-lists?page=1&limit=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "gift-lists"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "List gift lists owned by the authenticated user. Requires `gift_lists:list` permission."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Gift List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/gift-lists/{{gift_list_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "gift-lists",
+                "{{gift_list_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Get an owned gift list by ID. Requires `gift_lists:view` permission."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Gift List",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/gift-lists/{{gift_list_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "gift-lists",
+                "{{gift_list_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Birthday Gift Ideas\",\n  \"description\": \"Updated gift list description\",\n  \"shipping_note\": \"Updated delivery note\",\n  \"visibility\": \"public\",\n  \"is_active\": true\n}"
+            },
+            "description": "Update an owned gift list. Requires `gift_lists:update` permission."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Gift Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/gift-lists/{{gift_list_id}}/items",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "gift-lists",
+                "{{gift_list_id}}",
+                "items"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Coffee Grinder\",\n  \"description\": \"Manual burr grinder\",\n  \"product_url\": \"https://example.com/grinder\",\n  \"image_url\": \"https://example.com/grinder.jpg\",\n  \"price\": 450000,\n  \"currency\": \"IDR\",\n  \"quantity\": 1,\n  \"priority\": 1\n}"
+            },
+            "description": "Create an item under an owned gift list. Requires `gift_items:create` permission."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = {};",
+                  "try { jsonData = pm.response.json(); } catch (e) {}",
+                  "if (jsonData && jsonData.data && jsonData.data.id) {",
+                  "  pm.collectionVariables.set('gift_item_id', jsonData.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Gift Items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/gift-lists/{{gift_list_id}}/items",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "gift-lists",
+                "{{gift_list_id}}",
+                "items"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "List active items for an owned gift list. Add `?archived=true` to include archived items. Requires `gift_items:list` permission."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Gift Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/gift-items/{{gift_item_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "gift-items",
+                "{{gift_item_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Coffee Grinder Pro\",\n  \"description\": \"Updated item description\",\n  \"price\": 475000,\n  \"quantity\": 1,\n  \"priority\": 2,\n  \"is_active\": true,\n  \"is_archived\": false\n}"
+            },
+            "description": "Update an owned gift item. Requires `gift_items:update` permission."
+          },
+          "response": []
+        },
+        {
+          "name": "Reorder Gift Items",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/gift-lists/{{gift_list_id}}/items/reorder",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "gift-lists",
+                "{{gift_list_id}}",
+                "items",
+                "reorder"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"id\": \"{{gift_item_id}}\",\n      \"priority\": 1\n    }\n  ]\n}"
+            },
+            "description": "Update item priorities for an owned gift list. Requires `gift_items:update` permission."
+          },
+          "response": []
+        },
+        {
+          "name": "List Gift Reservations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/gift-lists/{{gift_list_id}}/reservations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "gift-lists",
+                "{{gift_list_id}}",
+                "reservations"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "List reservations for an owned gift list. Requires `gift_reservations:list` permission."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Public Gift List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/public/gift-lists/{{gift_share_code}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "public",
+                "gift-lists",
+                "{{gift_share_code}}"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Public endpoint. Returns public list metadata and availability counts by share code."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Public Gift Items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/public/gift-lists/{{gift_share_code}}/items",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "public",
+                "gift-lists",
+                "{{gift_share_code}}",
+                "items"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Public endpoint. Returns active, non-archived gift items with quantity availability."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Public Reservation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/public/gift-lists/{{gift_share_code}}/items/{{gift_item_id}}/reservations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "public",
+                "gift-lists",
+                "{{gift_share_code}}",
+                "items",
+                "{{gift_item_id}}",
+                "reservations"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guest_email\": \"guest@example.com\",\n  \"guest_name\": \"Guest Name\",\n  \"quantity\": 1,\n  \"note\": \"Hope you like it\",\n  \"show_name\": true\n}"
+            },
+            "description": "Public endpoint. Reserves available quantity with row locking; returns 409 when quantity is no longer available."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = {};",
+                  "try { jsonData = pm.response.json(); } catch (e) {}",
+                  "if (jsonData && jsonData.data && jsonData.data.id) {",
+                  "  pm.collectionVariables.set('gift_reservation_id', jsonData.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Gift Item",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/gift-items/{{gift_item_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "gift-items",
+                "{{gift_item_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Delete an owned gift item. Requires `gift_items:delete` permission."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Gift List",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/gift-lists/{{gift_list_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "gift-lists",
+                "{{gift_list_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Delete an owned gift list. Requires `gift_lists:delete` permission."
+          },
+          "response": []
+        }
+      ],
+      "description": "Owner-managed gift list APIs plus public read/reservation flow. Run Login first so `access_token` is populated for owner endpoints."
     },
     {
       "name": "Audit Trails",

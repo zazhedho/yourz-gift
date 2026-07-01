@@ -11,6 +11,7 @@ import (
 	permissioncache "yourz-gift/internal/cache/permission"
 	appConfigHandler "yourz-gift/internal/handlers/http/appconfig"
 	auditHandler "yourz-gift/internal/handlers/http/audit"
+	giftHandler "yourz-gift/internal/handlers/http/gift"
 	locationHandler "yourz-gift/internal/handlers/http/location"
 	menuHandler "yourz-gift/internal/handlers/http/menu"
 	permissionHandler "yourz-gift/internal/handlers/http/permission"
@@ -23,6 +24,7 @@ import (
 	appConfigRepo "yourz-gift/internal/repositories/appconfig"
 	auditRepo "yourz-gift/internal/repositories/audit"
 	authRepo "yourz-gift/internal/repositories/auth"
+	giftRepo "yourz-gift/internal/repositories/gift"
 	locationRepo "yourz-gift/internal/repositories/location"
 	menuRepo "yourz-gift/internal/repositories/menu"
 	otpRepo "yourz-gift/internal/repositories/otp"
@@ -33,6 +35,7 @@ import (
 	userRepo "yourz-gift/internal/repositories/user"
 	appConfigSvc "yourz-gift/internal/services/appconfig"
 	auditSvc "yourz-gift/internal/services/audit"
+	giftSvc "yourz-gift/internal/services/gift"
 	locationSvc "yourz-gift/internal/services/location"
 	menuSvc "yourz-gift/internal/services/menu"
 	otpSvc "yourz-gift/internal/services/otp"
@@ -314,5 +317,41 @@ func (r *Routes) LocationRoutes() {
 	{
 		locationPriv.POST("/sync", mdw.PermissionMiddleware("locations", "sync"), h.Sync)
 		locationPriv.GET("/sync/:id", mdw.PermissionMiddleware("locations", "sync"), h.GetSyncJob)
+	}
+}
+
+func (r *Routes) GiftRoutes() {
+	listRepo := giftRepo.NewGiftListRepo(r.DB)
+	itemRepo := giftRepo.NewGiftItemRepo(r.DB)
+	reservationRepo := giftRepo.NewGiftReservationRepo(r.DB)
+	svc := giftSvc.NewGiftService(listRepo, itemRepo, reservationRepo)
+	h := giftHandler.NewGiftHandler(svc, r.auditService())
+	pRepo := r.permissionRepo()
+	mdw := r.middleware(pRepo)
+
+	public := r.App.Group("/api/public/gift-lists")
+	{
+		public.GET("/:code", h.GetPublicList)
+		public.GET("/:code/items", h.GetPublicItems)
+		public.POST("/:code/items/:item_id/reservations", h.CreatePublicReservation)
+	}
+
+	lists := r.App.Group("/api/gift-lists").Use(mdw.AuthMiddleware())
+	{
+		lists.GET("", mdw.PermissionMiddleware("gift_lists", "list"), h.GetLists)
+		lists.POST("", mdw.PermissionMiddleware("gift_lists", "create"), h.CreateList)
+		lists.GET("/:id", mdw.PermissionMiddleware("gift_lists", "view"), h.GetList)
+		lists.PUT("/:id", mdw.PermissionMiddleware("gift_lists", "update"), h.UpdateList)
+		lists.DELETE("/:id", mdw.PermissionMiddleware("gift_lists", "delete"), h.DeleteList)
+		lists.GET("/:list_id/items", mdw.PermissionMiddleware("gift_items", "list"), h.GetItems)
+		lists.POST("/:list_id/items", mdw.PermissionMiddleware("gift_items", "create"), h.CreateItem)
+		lists.POST("/:list_id/items/reorder", mdw.PermissionMiddleware("gift_items", "update"), h.ReorderItems)
+		lists.GET("/:list_id/reservations", mdw.PermissionMiddleware("gift_reservations", "list"), h.GetReservations)
+	}
+
+	items := r.App.Group("/api/gift-items").Use(mdw.AuthMiddleware())
+	{
+		items.PUT("/:id", mdw.PermissionMiddleware("gift_items", "update"), h.UpdateItem)
+		items.DELETE("/:id", mdw.PermissionMiddleware("gift_items", "delete"), h.DeleteItem)
 	}
 }

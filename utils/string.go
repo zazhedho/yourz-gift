@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"crypto/rand"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -39,6 +41,39 @@ func StringOrDefault(value string, fallback string) string {
 		return fallback
 	}
 	return value
+}
+
+func URLHost(raw string) string {
+	if strings.TrimSpace(raw) == "" {
+		return ""
+	}
+
+	parsed, err := url.Parse(raw)
+	if err != nil {
+		return ""
+	}
+	return parsed.Hostname()
+}
+
+func RandomCode(length int, alphabet string) string {
+	if length <= 0 || alphabet == "" {
+		return ""
+	}
+
+	buf := make([]byte, length)
+	if _, err := rand.Read(buf); err != nil {
+		fallback := strings.ToUpper(strings.ReplaceAll(CreateUUID(), "-", ""))
+		if len(fallback) < length {
+			return fallback
+		}
+		return fallback[:length]
+	}
+
+	out := make([]byte, length)
+	for i, b := range buf {
+		out[i] = alphabet[int(b)%len(alphabet)]
+	}
+	return string(out)
 }
 
 func NormalizeKey(value string) string {

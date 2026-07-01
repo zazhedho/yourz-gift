@@ -1,6 +1,6 @@
-# Starter Kit
+# Yourz Gift Backend
 
-Backend starter template for Go services with:
+Backend service for generic gift lists and reservations:
 - Gin HTTP router
 - PostgreSQL via GORM
 - JWT authentication
@@ -8,13 +8,13 @@ Backend starter template for Go services with:
 - runtime application configurations from database
 - optional Redis-based session management and rate limiting
 
-This repository is intended to be the foundation for future projects. The current structure is generic on purpose and should be extended by adding new business modules on top of the existing patterns.
+The main business module is a public gift-list flow: owners manage lists and items after login, while guests can view public lists and reserve available item quantities without an account.
 
 ## Core Principles
 
 ### Permission-First RBAC
 
-RBAC in this starter kit is designed with these rules:
+RBAC in this backend is designed with these rules:
 - `permission` is the runtime source of truth for access control
 - `role` is a label and a grouping mechanism for permissions
 - `superadmin` is the only exception and bypasses permission checks
@@ -41,7 +41,7 @@ Built-in auth feature flags:
 - `auth.register_otp_enabled`: require OTP verification for public registration
 - `auth.password_reset_email_enabled`: send password reset tokens through the email sender instead of returning a development token in the API response
 
-The starter kit now includes a typed helper on top of `app_configs`, so services do not need to parse raw strings manually for common cases such as:
+This backend includes a typed helper on top of `app_configs`, so services do not need to parse raw strings manually for common cases such as:
 - `GetString`
 - `GetBool`
 - `GetInt`
@@ -79,12 +79,17 @@ System modules currently included:
 - Locations
 - Sessions when Redis is enabled
 
+Business modules currently included:
+- Gift lists
+- Gift items
+- Gift reservations
+
 ## Project Structure
 
 Main backend layout:
 
 ```text
-starter-kit/
+yourz-gift/
 ├── infrastructure/
 ├── internal/
 │   ├── domain/
@@ -208,10 +213,65 @@ The current route set includes:
 - `GET /api/audits`
 - `GET /api/audit/:id`
 
+- `GET /api/gift-lists`
+- `POST /api/gift-lists`
+- `GET /api/gift-lists/:id`
+- `PUT /api/gift-lists/:id`
+- `DELETE /api/gift-lists/:id`
+- `GET /api/gift-lists/:list_id/items`
+- `POST /api/gift-lists/:list_id/items`
+- `POST /api/gift-lists/:list_id/items/reorder`
+- `GET /api/gift-lists/:list_id/reservations`
+- `PUT /api/gift-items/:id`
+- `DELETE /api/gift-items/:id`
+
+- `GET /api/public/gift-lists/:code`
+- `GET /api/public/gift-lists/:code/items`
+- `POST /api/public/gift-lists/:code/items/:item_id/reservations`
+
 Additional session routes are registered only when Redis is available:
 - `GET /api/user/sessions`
 - `DELETE /api/user/session/:session_id`
 - `POST /api/user/sessions/revoke-others`
+
+## Gift List MVP Flow
+
+Gift list terminology is intentionally generic. Wedding, birthday, baby shower, housewarming, holiday, and custom lists all use the same tables and endpoints.
+
+Core tables:
+- `gift_lists`: owner, title, description, occasion type, public share code, cover image, shipping note, visibility, reservation visibility
+- `gift_items`: list, product URL, image URL, price, currency, quantity, priority, active/archive flags
+- `gift_reservations`: item, guest email/name, quantity, note, name visibility, status
+
+Owner flow:
+1. Login and use the returned `access_token`.
+2. Create a gift list with `POST /api/gift-lists`.
+3. Create items with `POST /api/gift-lists/:list_id/items`.
+4. Share the returned `share_code` with guests.
+5. View reservations with `GET /api/gift-lists/:list_id/reservations`.
+
+Public guest flow:
+1. Open `GET /api/public/gift-lists/:code`.
+2. Load items with `GET /api/public/gift-lists/:code/items`.
+3. Reserve an item with `POST /api/public/gift-lists/:code/items/:item_id/reservations`.
+
+Reservation rules:
+- reservation quantity cannot exceed remaining item quantity
+- reservation writes use a database transaction and row lock
+- public reservation currently creates `confirmed` reservations directly
+- no email confirmation, guest edit/cancel, purchased, or received workflow is included in the MVP
+
+Public reservation example:
+
+```json
+{
+  "guest_email": "guest@example.com",
+  "guest_name": "Guest Name",
+  "quantity": 1,
+  "note": "Hope you like it",
+  "show_name": true
+}
+```
 
 Location architecture:
 - PostgreSQL is the source of truth for provinces, cities, districts, and villages
@@ -222,7 +282,7 @@ Location architecture:
 
 ## Module Seed Helper
 
-To avoid writing menu and permission seed SQL manually for every new module, the starter kit includes a helper command:
+To avoid writing menu and permission seed SQL manually for every new module, this backend includes a helper command:
 
 ```bash
 go run ./cmd/module-seed \

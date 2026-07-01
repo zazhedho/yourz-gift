@@ -2,6 +2,7 @@ package response
 
 import (
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -36,8 +37,12 @@ func TestErrorHelpersHideInternalDetails(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected response.Errors, got %#v", got.Error)
 	}
-	if errBody.Code != http.StatusInternalServerError || errBody.Message != "Something went wrong. Please contact support with the log ID." {
+	if errBody.Code != http.StatusInternalServerError {
 		t.Fatalf("unexpected error body: %+v", errBody)
+	}
+	if !strings.Contains(errBody.Message, "Something went wrong. Please contact support with the log ID:") ||
+		!strings.Contains(errBody.Message, logID.String()) {
+		t.Fatalf("expected traceable public error with log ID, got %+v", errBody)
 	}
 	if got.Message != "Something went wrong" {
 		t.Fatalf("unexpected internal server error title: %+v", got)

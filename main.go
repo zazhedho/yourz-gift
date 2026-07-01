@@ -99,6 +99,7 @@ func main() {
 	routes.AppConfigRoutes()
 	routes.AuditRoutes()
 	routes.LocationRoutes()
+	routes.GiftRoutes()
 
 	// Register session routes if Redis is available
 	if redisClient != nil {
