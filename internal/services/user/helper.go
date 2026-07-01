@@ -5,11 +5,11 @@ import (
 	"errors"
 	"net/mail"
 	"regexp"
-	domainuser "starter-kit/internal/domain/user"
-	"starter-kit/internal/dto"
-	interfacerole "starter-kit/internal/interfaces/role"
-	"starter-kit/utils"
 	"strings"
+	domainuser "yourz-gift/internal/domain/user"
+	"yourz-gift/internal/dto"
+	interfacerole "yourz-gift/internal/interfaces/role"
+	"yourz-gift/utils"
 )
 
 var (

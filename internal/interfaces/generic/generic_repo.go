@@ -2,7 +2,7 @@ package interfacegeneric
 
 import (
 	"context"
-	"starter-kit/pkg/filter"
+	"yourz-gift/pkg/filter"
 )
 
 type GenericRepository[T any] interface {

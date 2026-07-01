@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	interfacereset "starter-kit/internal/interfaces/reset"
-	"starter-kit/pkg/config"
-	"starter-kit/pkg/mailer"
-	"starter-kit/utils"
 	"strings"
 	"time"
+	interfacereset "yourz-gift/internal/interfaces/reset"
+	"yourz-gift/pkg/config"
+	"yourz-gift/pkg/mailer"
+	"yourz-gift/utils"
 
 	"github.com/redis/go-redis/v9"
 )

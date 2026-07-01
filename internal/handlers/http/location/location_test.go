@@ -8,11 +8,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"starter-kit/internal/authscope"
-	"starter-kit/internal/dto"
-	servicelocation "starter-kit/internal/services/location"
-	"starter-kit/utils"
 	"testing"
+	"yourz-gift/internal/authscope"
+	"yourz-gift/internal/dto"
+	servicelocation "yourz-gift/internal/services/location"
+	"yourz-gift/utils"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

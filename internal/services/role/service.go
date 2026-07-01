@@ -3,17 +3,17 @@ package servicerole
 import (
 	"context"
 	"errors"
-	"starter-kit/internal/authscope"
-	permissioncache "starter-kit/internal/cache/permission"
-	domainrole "starter-kit/internal/domain/role"
-	"starter-kit/internal/dto"
-	interfacemenu "starter-kit/internal/interfaces/menu"
-	interfacepermission "starter-kit/internal/interfaces/permission"
-	interfacerole "starter-kit/internal/interfaces/role"
-	serviceshared "starter-kit/internal/services/shared"
-	"starter-kit/pkg/filter"
-	"starter-kit/utils"
 	"time"
+	"yourz-gift/internal/authscope"
+	permissioncache "yourz-gift/internal/cache/permission"
+	domainrole "yourz-gift/internal/domain/role"
+	"yourz-gift/internal/dto"
+	interfacemenu "yourz-gift/internal/interfaces/menu"
+	interfacepermission "yourz-gift/internal/interfaces/permission"
+	interfacerole "yourz-gift/internal/interfaces/role"
+	serviceshared "yourz-gift/internal/services/shared"
+	"yourz-gift/pkg/filter"
+	"yourz-gift/utils"
 )
 
 type RoleService struct {

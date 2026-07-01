@@ -2,9 +2,9 @@ package interfacepermission
 
 import (
 	"context"
-	domainpermission "starter-kit/internal/domain/permission"
-	"starter-kit/internal/dto"
-	"starter-kit/pkg/filter"
+	domainpermission "yourz-gift/internal/domain/permission"
+	"yourz-gift/internal/dto"
+	"yourz-gift/pkg/filter"
 )
 
 type ServicePermissionInterface interface {

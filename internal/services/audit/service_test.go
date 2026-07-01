@@ -3,10 +3,10 @@ package serviceaudit
 import (
 	"context"
 	"errors"
-	domainaudit "starter-kit/internal/domain/audit"
-	"starter-kit/pkg/filter"
 	"strings"
 	"testing"
+	domainaudit "yourz-gift/internal/domain/audit"
+	"yourz-gift/pkg/filter"
 )
 
 type auditRepoMock struct {

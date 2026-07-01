@@ -3,11 +3,11 @@ package serviceshared
 import (
 	"context"
 	"errors"
-	"starter-kit/internal/authscope"
-	domainmenu "starter-kit/internal/domain/menu"
-	domainpermission "starter-kit/internal/domain/permission"
-	"starter-kit/pkg/filter"
 	"testing"
+	"yourz-gift/internal/authscope"
+	domainmenu "yourz-gift/internal/domain/menu"
+	domainpermission "yourz-gift/internal/domain/permission"
+	"yourz-gift/pkg/filter"
 )
 
 func TestResolveAccessibleMenus_IncludesParentAndPreservesActiveOrder(t *testing.T) {

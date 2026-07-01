@@ -2,10 +2,10 @@ package repositorylocation
 
 import (
 	"context"
-	domainlocation "starter-kit/internal/domain/location"
-	interfacelocation "starter-kit/internal/interfaces/location"
-	"starter-kit/utils"
 	"time"
+	domainlocation "yourz-gift/internal/domain/location"
+	interfacelocation "yourz-gift/internal/interfaces/location"
+	"yourz-gift/utils"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"

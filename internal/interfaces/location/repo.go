@@ -1,7 +1,7 @@
 package interfacelocation
 
 import "context"
-import domainlocation "starter-kit/internal/domain/location"
+import domainlocation "yourz-gift/internal/domain/location"
 
 type RepoLocationInterface interface {
 	ListProvinces(ctx context.Context) ([]domainlocation.Province, error)

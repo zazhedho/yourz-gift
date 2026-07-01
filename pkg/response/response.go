@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
-	"starter-kit/pkg/messages"
+	"yourz-gift/pkg/messages"
 
 	"github.com/google/uuid"
 )

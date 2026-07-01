@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"starter-kit/utils"
+	"yourz-gift/utils"
 
 	"github.com/gin-gonic/gin"
 )

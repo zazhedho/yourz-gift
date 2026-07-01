@@ -2,11 +2,11 @@ package serviceshared
 
 import (
 	"context"
-	"starter-kit/internal/authscope"
-	domainmenu "starter-kit/internal/domain/menu"
-	domainpermission "starter-kit/internal/domain/permission"
-	interfacepermission "starter-kit/internal/interfaces/permission"
 	"strings"
+	"yourz-gift/internal/authscope"
+	domainmenu "yourz-gift/internal/domain/menu"
+	domainpermission "yourz-gift/internal/domain/permission"
+	interfacepermission "yourz-gift/internal/interfaces/permission"
 )
 
 func ResolveAccessibleMenus(activeMenus []domainmenu.MenuItem, resources []string) []domainmenu.MenuItem {

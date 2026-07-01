@@ -7,12 +7,12 @@ import (
 	"net/http"
 	"reflect"
 
-	"starter-kit/internal/authscope"
-	domainlocation "starter-kit/internal/domain/location"
-	"starter-kit/internal/dto"
 	"strings"
 	"testing"
 	"time"
+	"yourz-gift/internal/authscope"
+	domainlocation "yourz-gift/internal/domain/location"
+	"yourz-gift/internal/dto"
 
 	"gorm.io/gorm"
 )

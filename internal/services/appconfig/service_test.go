@@ -3,11 +3,11 @@ package serviceappconfig
 import (
 	"context"
 	"errors"
-	domainappconfig "starter-kit/internal/domain/appconfig"
-	"starter-kit/internal/dto"
-	"starter-kit/pkg/filter"
 	"testing"
 	"time"
+	domainappconfig "yourz-gift/internal/domain/appconfig"
+	"yourz-gift/internal/dto"
+	"yourz-gift/pkg/filter"
 
 	"gorm.io/gorm"
 )

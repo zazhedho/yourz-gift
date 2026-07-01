@@ -3,12 +3,12 @@ package handleraudit
 import (
 	"fmt"
 	"net/http"
-	interfaceaudit "starter-kit/internal/interfaces/audit"
-	"starter-kit/pkg/filter"
-	"starter-kit/pkg/logger"
-	"starter-kit/pkg/messages"
-	"starter-kit/pkg/response"
-	"starter-kit/utils"
+	interfaceaudit "yourz-gift/internal/interfaces/audit"
+	"yourz-gift/pkg/filter"
+	"yourz-gift/pkg/logger"
+	"yourz-gift/pkg/messages"
+	"yourz-gift/pkg/response"
+	"yourz-gift/utils"
 
 	"github.com/gin-gonic/gin"
 )

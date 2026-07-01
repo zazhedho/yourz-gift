@@ -12,7 +12,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 
-	domainuser "starter-kit/internal/domain/user"
+	domainuser "yourz-gift/internal/domain/user"
 )
 
 func TestJSONAndStringHelpers(t *testing.T) {

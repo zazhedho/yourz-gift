@@ -3,9 +3,9 @@ package database
 import (
 	"context"
 	"fmt"
-	"starter-kit/pkg/logger"
-	"starter-kit/utils"
 	"time"
+	"yourz-gift/pkg/logger"
+	"yourz-gift/utils"
 
 	"github.com/redis/go-redis/v9"
 )

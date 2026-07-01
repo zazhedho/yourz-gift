@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"starter-kit/internal/dto"
-	"starter-kit/pkg/logger"
-	"starter-kit/utils"
 	"time"
+	"yourz-gift/internal/dto"
+	"yourz-gift/pkg/logger"
+	"yourz-gift/utils"
 
 	"github.com/redis/go-redis/v9"
 )

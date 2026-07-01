@@ -3,10 +3,10 @@ package repositoryauth
 import (
 	"context"
 	"errors"
-	domainauth "starter-kit/internal/domain/auth"
-	interfaceauth "starter-kit/internal/interfaces/auth"
-	repositorygeneric "starter-kit/internal/repositories/generic"
 	"time"
+	domainauth "yourz-gift/internal/domain/auth"
+	interfaceauth "yourz-gift/internal/interfaces/auth"
+	repositorygeneric "yourz-gift/internal/repositories/generic"
 
 	"gorm.io/gorm"
 )

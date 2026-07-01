@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	domainsession "starter-kit/internal/domain/session"
 	"testing"
 	"time"
+	domainsession "yourz-gift/internal/domain/session"
 
 	redismock "github.com/go-redis/redismock/v9"
 	"github.com/redis/go-redis/v9"

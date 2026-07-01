@@ -3,11 +3,11 @@ package servicemenu
 import (
 	"context"
 	"errors"
-	domainmenu "starter-kit/internal/domain/menu"
-	domainpermission "starter-kit/internal/domain/permission"
-	"starter-kit/internal/dto"
-	"starter-kit/pkg/filter"
 	"testing"
+	domainmenu "yourz-gift/internal/domain/menu"
+	domainpermission "yourz-gift/internal/domain/permission"
+	"yourz-gift/internal/dto"
+	"yourz-gift/pkg/filter"
 )
 
 type menuRepoTestDouble struct {

@@ -9,9 +9,9 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	domainuser "starter-kit/internal/domain/user"
+	domainuser "yourz-gift/internal/domain/user"
 
-	"starter-kit/pkg/filter"
+	"yourz-gift/pkg/filter"
 )
 
 func newDryRunDB(t *testing.T) *gorm.DB {

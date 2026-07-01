@@ -3,9 +3,9 @@ package handlerpermission
 import (
 	"errors"
 	"net/http"
-	"starter-kit/pkg/messages"
-	"starter-kit/pkg/response"
 	"strings"
+	"yourz-gift/pkg/messages"
+	"yourz-gift/pkg/response"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"

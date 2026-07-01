@@ -1,10 +1,10 @@
 package mailer
 
 import (
-	"starter-kit/utils"
 	"strings"
 	"testing"
 	"time"
+	"yourz-gift/utils"
 )
 
 func TestNewBrevoSenderFromEnvValidatesRequiredConfig(t *testing.T) {

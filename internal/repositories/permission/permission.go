@@ -2,11 +2,11 @@ package repositorypermission
 
 import (
 	"context"
-	domainpermission "starter-kit/internal/domain/permission"
-	interfacepermission "starter-kit/internal/interfaces/permission"
-	repositorygeneric "starter-kit/internal/repositories/generic"
-	"starter-kit/pkg/filter"
-	"starter-kit/utils"
+	domainpermission "yourz-gift/internal/domain/permission"
+	interfacepermission "yourz-gift/internal/interfaces/permission"
+	repositorygeneric "yourz-gift/internal/repositories/generic"
+	"yourz-gift/pkg/filter"
+	"yourz-gift/utils"
 
 	"gorm.io/gorm"
 )

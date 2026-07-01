@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"reflect"
 
-	"starter-kit/pkg/logger"
-	"starter-kit/pkg/messages"
-	"starter-kit/pkg/response"
-	"starter-kit/utils"
+	"yourz-gift/pkg/logger"
+	"yourz-gift/pkg/messages"
+	"yourz-gift/pkg/response"
+	"yourz-gift/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

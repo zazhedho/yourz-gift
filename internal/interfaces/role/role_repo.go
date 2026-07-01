@@ -2,8 +2,8 @@ package interfacerole
 
 import (
 	"context"
-	domainrole "starter-kit/internal/domain/role"
-	interfacegeneric "starter-kit/internal/interfaces/generic"
+	domainrole "yourz-gift/internal/domain/role"
+	interfacegeneric "yourz-gift/internal/interfaces/generic"
 )
 
 type RepoRoleInterface interface {

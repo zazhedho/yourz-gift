@@ -3,11 +3,11 @@ package servicesession
 import (
 	"context"
 	"fmt"
-	domainsession "starter-kit/internal/domain/session"
-	domainuser "starter-kit/internal/domain/user"
-	interfacesession "starter-kit/internal/interfaces/session"
-	"starter-kit/utils"
 	"time"
+	domainsession "yourz-gift/internal/domain/session"
+	domainuser "yourz-gift/internal/domain/user"
+	interfacesession "yourz-gift/internal/interfaces/session"
+	"yourz-gift/utils"
 
 	"github.com/google/uuid"
 )

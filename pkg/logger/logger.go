@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"starter-kit/utils"
+	"yourz-gift/utils"
 
 	"log/slog"
 

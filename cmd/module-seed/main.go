@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"starter-kit/pkg/moduleseed"
 	"strings"
+	"yourz-gift/pkg/moduleseed"
 )
 
 func main() {

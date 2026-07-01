@@ -1,4 +1,4 @@
-module starter-kit
+module yourz-gift
 
 go 1.26.3
 

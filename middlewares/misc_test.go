@@ -8,8 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"starter-kit/internal/authscope"
-	"starter-kit/utils"
+	"yourz-gift/internal/authscope"
+	"yourz-gift/utils"
 )
 
 func TestCORSHandlesOptionsAndSetsHeaders(t *testing.T) {

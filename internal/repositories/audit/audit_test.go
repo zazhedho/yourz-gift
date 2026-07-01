@@ -8,7 +8,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"starter-kit/pkg/filter"
+	"yourz-gift/pkg/filter"
 )
 
 func newDryRunDB(t *testing.T) *gorm.DB {

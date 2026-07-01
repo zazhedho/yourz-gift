@@ -7,12 +7,12 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
-	"starter-kit/internal/authscope"
-	domainaudit "starter-kit/internal/domain/audit"
-	domainmenu "starter-kit/internal/domain/menu"
-	"starter-kit/internal/dto"
-	"starter-kit/pkg/filter"
 	"testing"
+	"yourz-gift/internal/authscope"
+	domainaudit "yourz-gift/internal/domain/audit"
+	domainmenu "yourz-gift/internal/domain/menu"
+	"yourz-gift/internal/dto"
+	"yourz-gift/pkg/filter"
 
 	"github.com/gin-gonic/gin"
 )
