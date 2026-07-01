@@ -1,0 +1,72 @@
+import { Link, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+
+import Button from '../../components/common/Button'
+import ErrorBanner from '../../components/common/ErrorBanner'
+import FormField from '../../components/common/FormField'
+import GoogleIdentityButton from '../../components/common/GoogleIdentityButton'
+import useAuth from '../../hooks/useAuth'
+import useRegisterStatus from '../../hooks/useRegisterStatus'
+import { getGoogleClientId } from '../../utils/runtimeConfig'
+
+const Login = () => {
+  const auth = useAuth()
+  const { enabled: registerEnabled } = useRegisterStatus()
+  const navigate = useNavigate()
+  const [form, setForm] = useState({ identifier: '', password: '' })
+  const [googleError, setGoogleError] = useState('')
+  const [googleSubmitting, setGoogleSubmitting] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const googleClientId = getGoogleClientId()
+
+  const update = (event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }))
+
+  const submit = async (event) => {
+    event.preventDefault()
+    setSubmitting(true)
+    const ok = await auth.login(form)
+    setSubmitting(false)
+    if (ok) navigate('/app/lists', { replace: true })
+  }
+
+  const handleGoogleCredential = async (idToken) => {
+    setGoogleError('')
+    setGoogleSubmitting(true)
+    const ok = await auth.googleLogin(idToken)
+    setGoogleSubmitting(false)
+    if (ok) navigate('/app/lists', { replace: true })
+  }
+
+  return (
+    <main className="auth-page">
+      <section className="surface auth-card">
+        <h1 className="page-title">Sign in</h1>
+        <p className="page-subtitle">Manage gift lists and reservations.</p>
+        <ErrorBanner message={auth.error || googleError} />
+        {googleClientId ? (
+          <GoogleIdentityButton
+            disabled={submitting || googleSubmitting}
+            label="Continue with Google"
+            onCredential={handleGoogleCredential}
+            onError={setGoogleError}
+            text="signin_with"
+          />
+        ) : null}
+        <form className="form" onSubmit={submit}>
+          <FormField label="Email or phone">
+            <input className="input" name="identifier" onChange={update} required value={form.identifier} />
+          </FormField>
+          <FormField label="Password">
+            <input className="input" name="password" onChange={update} required type="password" value={form.password} />
+          </FormField>
+          <Button isLoading={submitting} type="submit">Login</Button>
+        </form>
+        {registerEnabled !== false ? (
+          <p className="meta">No account yet? <Link to="/register">Create one</Link>.</p>
+        ) : null}
+      </section>
+    </main>
+  )
+}
+
+export default Login

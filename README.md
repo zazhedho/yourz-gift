@@ -273,6 +273,31 @@ Public reservation example:
 }
 ```
 
+## Frontend
+
+The frontend MVP lives in `frontend/`.
+
+Setup:
+
+```bash
+cd frontend
+npm install
+cp .env.example .env
+npm run dev
+```
+
+Default frontend URL:
+- `http://localhost:5173`
+
+Required environment:
+- `VITE_API_URL=http://localhost:8080/api`
+
+Useful routes:
+- `/login`
+- `/register`
+- `/app/lists`
+- `/g/:share_code`
+
 Location architecture:
 - PostgreSQL is the source of truth for provinces, cities, districts, and villages
 - Redis is used only as runtime cache
