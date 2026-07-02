@@ -62,6 +62,18 @@ type GiftReservationCreate struct {
 	ShowName   *bool  `json:"show_name" binding:"omitempty"`
 }
 
+type GiftFriendRequest struct {
+	Email string `json:"email" binding:"required,email,max=255"`
+}
+
+type GiftFriendResponse struct {
+	Id     string `json:"id"`
+	UserId string `json:"user_id"`
+	Name   string `json:"name"`
+	Email  string `json:"email"`
+	Status string `json:"status"`
+}
+
 type GiftListPublicResponse struct {
 	Id                    string `json:"id"`
 	Title                 string `json:"title"`

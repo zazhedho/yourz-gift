@@ -61,3 +61,21 @@ CREATE TABLE IF NOT EXISTS gift_reservations (
 CREATE INDEX IF NOT EXISTS idx_gift_reservations_item_id ON gift_reservations(item_id);
 CREATE INDEX IF NOT EXISTS idx_gift_reservations_guest_email ON gift_reservations(guest_email);
 CREATE INDEX IF NOT EXISTS idx_gift_reservations_active_status ON gift_reservations(item_id, status) WHERE deleted_at IS NULL;
+
+CREATE TABLE IF NOT EXISTS gift_friends (
+    id UUID PRIMARY KEY,
+    requester_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    addressee_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    status VARCHAR(24) NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP,
+    CONSTRAINT gift_friends_no_self CHECK (requester_id <> addressee_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_gift_friends_requester ON gift_friends(requester_id);
+CREATE INDEX IF NOT EXISTS idx_gift_friends_addressee ON gift_friends(addressee_id);
+CREATE INDEX IF NOT EXISTS idx_gift_friends_status ON gift_friends(status) WHERE deleted_at IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_gift_friends_unique_pair
+ON gift_friends (LEAST(requester_id, addressee_id), GREATEST(requester_id, addressee_id))
+WHERE deleted_at IS NULL;

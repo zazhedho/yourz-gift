@@ -13,6 +13,7 @@ type RepoGiftListInterface interface {
 
 	GetListByShareCode(ctx context.Context, code string) (domaingift.GiftList, error)
 	GetListsByOwner(ctx context.Context, ownerId string, params filter.BaseParams) ([]domaingift.GiftList, int64, error)
+	GetListsByFriendOwners(ctx context.Context, ownerId string, params filter.BaseParams) ([]domaingift.GiftList, int64, error)
 }
 
 type RepoGiftItemInterface interface {
@@ -28,4 +29,12 @@ type RepoGiftReservationInterface interface {
 	GetReservedQuantities(ctx context.Context, itemIds []string) (map[string]int, error)
 	CreateReservationWithAvailability(ctx context.Context, reservation domaingift.GiftReservation) error
 	GetReservationsByList(ctx context.Context, listId string) ([]domaingift.GiftReservation, error)
+}
+
+type RepoGiftFriendInterface interface {
+	interfacegeneric.GenericRepository[domaingift.GiftFriend]
+
+	FindBetweenUsers(ctx context.Context, userId, otherUserId string) (domaingift.GiftFriend, error)
+	GetFriends(ctx context.Context, userId string, params filter.BaseParams) ([]dto.GiftFriendResponse, int64, error)
+	GetPendingRequests(ctx context.Context, userId string, params filter.BaseParams) ([]dto.GiftFriendResponse, int64, error)
 }

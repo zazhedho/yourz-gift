@@ -1,10 +1,12 @@
 package handlergift
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"yourz-gift/internal/authscope"
 	domainaudit "yourz-gift/internal/domain/audit"
+	domaingift "yourz-gift/internal/domain/gift"
 	"yourz-gift/internal/dto"
 	handlercommon "yourz-gift/internal/handlers/http/common"
 	interfaceaudit "yourz-gift/internal/interfaces/audit"
@@ -63,6 +65,28 @@ func (h *GiftHandler) GetLists(ctx *gin.Context) {
 		return
 	}
 	data, total, err := h.Service.GetOwnerLists(ctx.Request.Context(), ownerId, params)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, response.InternalServerError(logId))
+		return
+	}
+	ctx.JSON(http.StatusOK, response.PaginationResponse(http.StatusOK, int(total), params.Page, params.Limit, logId, data))
+}
+
+func (h *GiftHandler) GetFriendLists(ctx *gin.Context) {
+	ownerId, ok := ownerID(ctx)
+	if !ok {
+		unauthorized(ctx)
+		return
+	}
+	logId := utils.GenerateLogId(ctx)
+	params, err := filter.GetBaseParams(ctx, "created_at", "desc", 20)
+	if err != nil {
+		res := response.Response(http.StatusBadRequest, messages.InvalidRequest, logId, nil)
+		res.Error = response.Errors{Code: http.StatusBadRequest, Message: "invalid query parameters"}
+		ctx.JSON(http.StatusBadRequest, res)
+		return
+	}
+	data, total, err := h.Service.GetFriendLists(ctx.Request.Context(), ownerId, params)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, response.InternalServerError(logId))
 		return
@@ -211,6 +235,49 @@ func (h *GiftHandler) CreatePublicReservation(ctx *gin.Context) {
 	writeGiftResult(ctx, http.StatusCreated, "Gift item reserved successfully", data, err)
 }
 
+func (h *GiftHandler) RequestFriend(ctx *gin.Context) {
+	ownerId, ok := ownerID(ctx)
+	if !ok {
+		unauthorized(ctx)
+		return
+	}
+	var req dto.GiftFriendRequest
+	logId := utils.GenerateLogId(ctx)
+	if !handlercommon.BindJSON(ctx, logId, "[GiftHandler][RequestFriend]", &req) {
+		return
+	}
+	data, err := h.Service.RequestFriend(ctx.Request.Context(), ownerId, req)
+	h.writeMutationAudit(ctx, domainaudit.ActionCreate, "gift_friend", data.Id, "Requested gift friend", nil, data, err)
+	writeGiftResult(ctx, http.StatusCreated, "Friend request sent successfully", data, err)
+}
+
+func (h *GiftHandler) GetFriends(ctx *gin.Context) {
+	h.writeFriendPage(ctx, h.Service.GetFriends, "Get friends successfully")
+}
+
+func (h *GiftHandler) GetPendingFriendRequests(ctx *gin.Context) {
+	h.writeFriendPage(ctx, h.Service.GetPendingFriendRequests, "Get friend requests successfully")
+}
+
+func (h *GiftHandler) AcceptFriend(ctx *gin.Context) {
+	h.updateFriendStatus(ctx, domainaudit.ActionUpdate, "Accepted friend request", h.Service.AcceptFriend)
+}
+
+func (h *GiftHandler) RejectFriend(ctx *gin.Context) {
+	h.updateFriendStatus(ctx, domainaudit.ActionUpdate, "Rejected friend request", h.Service.RejectFriend)
+}
+
+func (h *GiftHandler) DeleteFriend(ctx *gin.Context) {
+	ownerId, ok := ownerID(ctx)
+	if !ok {
+		unauthorized(ctx)
+		return
+	}
+	err := h.Service.DeleteFriend(ctx.Request.Context(), ownerId, ctx.Param("id"))
+	h.writeMutationAudit(ctx, domainaudit.ActionDelete, "gift_friend", ctx.Param("id"), "Deleted friend", nil, nil, err)
+	writeGiftResult(ctx, http.StatusOK, "Friend deleted successfully", nil, err)
+}
+
 func ownerID(ctx *gin.Context) (string, bool) {
 	scope := authscope.FromContext(ctx.Request.Context())
 	return scope.UserID, scope.UserID != ""
@@ -236,6 +303,10 @@ func writeGiftResult(ctx *gin.Context, status int, message string, data interfac
 		res := response.Response(http.StatusForbidden, "Forbidden", logId, nil)
 		res.Error = response.Errors{Code: http.StatusForbidden, Message: "forbidden"}
 		ctx.JSON(http.StatusForbidden, res)
+	case errors.Is(err, servicegift.ErrFriendSelf):
+		res := response.Response(http.StatusBadRequest, "Invalid friend request", logId, nil)
+		res.Error = response.Errors{Code: http.StatusBadRequest, Message: "cannot add yourself as friend"}
+		ctx.JSON(http.StatusBadRequest, res)
 	case errors.Is(err, repositorygift.ErrInsufficientQuantity):
 		res := response.Response(http.StatusConflict, "Insufficient item quantity", logId, nil)
 		res.Error = response.Errors{Code: http.StatusConflict, Message: "insufficient item quantity"}
@@ -260,4 +331,46 @@ func (h *GiftHandler) writeMutationAudit(ctx *gin.Context, action, resource, res
 		event.ErrorMessage = err.Error()
 	}
 	h.WriteAudit(ctx, event)
+}
+
+func (h *GiftHandler) writeFriendPage(
+	ctx *gin.Context,
+	load func(context.Context, string, filter.BaseParams) ([]dto.GiftFriendResponse, int64, error),
+	message string,
+) {
+	ownerId, ok := ownerID(ctx)
+	if !ok {
+		unauthorized(ctx)
+		return
+	}
+	logId := utils.GenerateLogId(ctx)
+	params, err := filter.GetBaseParams(ctx, "created_at", "desc", 20)
+	if err != nil {
+		res := response.Response(http.StatusBadRequest, messages.InvalidRequest, logId, nil)
+		res.Error = response.Errors{Code: http.StatusBadRequest, Message: "invalid query parameters"}
+		ctx.JSON(http.StatusBadRequest, res)
+		return
+	}
+	data, total, err := load(ctx.Request.Context(), ownerId, params)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, response.InternalServerError(logId))
+		return
+	}
+	ctx.JSON(http.StatusOK, response.PaginationResponse(http.StatusOK, int(total), params.Page, params.Limit, logId, data))
+}
+
+func (h *GiftHandler) updateFriendStatus(
+	ctx *gin.Context,
+	action string,
+	message string,
+	update func(context.Context, string, string) (domaingift.GiftFriend, error),
+) {
+	ownerId, ok := ownerID(ctx)
+	if !ok {
+		unauthorized(ctx)
+		return
+	}
+	data, err := update(ctx.Request.Context(), ownerId, ctx.Param("id"))
+	h.writeMutationAudit(ctx, action, "gift_friend", ctx.Param("id"), message, nil, data, err)
+	writeGiftResult(ctx, http.StatusOK, message, data, err)
 }

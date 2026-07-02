@@ -9,30 +9,41 @@ import (
 	domaingift "yourz-gift/internal/domain/gift"
 	"yourz-gift/internal/dto"
 	interfacegift "yourz-gift/internal/interfaces/gift"
+	interfaceuser "yourz-gift/internal/interfaces/user"
 	"yourz-gift/pkg/filter"
 	"yourz-gift/utils"
+
+	"gorm.io/gorm"
 )
 
 var (
 	ErrForbiddenGiftAccess = errors.New("gift resource does not belong to user")
 	ErrGiftListNotPublic   = errors.New("gift list is not public")
+	ErrFriendSelf          = errors.New("cannot add yourself as friend")
+	ErrFriendServiceConfig = errors.New("friend service is not configured")
 )
 
 type GiftService struct {
 	ListRepo        interfacegift.RepoGiftListInterface
 	ItemRepo        interfacegift.RepoGiftItemInterface
 	ReservationRepo interfacegift.RepoGiftReservationInterface
+	FriendRepo      interfacegift.RepoGiftFriendInterface
+	UserRepo        interfaceuser.RepoUserInterface
 }
 
 func NewGiftService(
 	listRepo interfacegift.RepoGiftListInterface,
 	itemRepo interfacegift.RepoGiftItemInterface,
 	reservationRepo interfacegift.RepoGiftReservationInterface,
+	friendRepo interfacegift.RepoGiftFriendInterface,
+	userRepo interfaceuser.RepoUserInterface,
 ) *GiftService {
 	return &GiftService{
 		ListRepo:        listRepo,
 		ItemRepo:        itemRepo,
 		ReservationRepo: reservationRepo,
+		FriendRepo:      friendRepo,
+		UserRepo:        userRepo,
 	}
 }
 
@@ -210,6 +221,84 @@ func (s *GiftService) GetReservations(ctx context.Context, ownerId, listId strin
 	return s.ReservationRepo.GetReservationsByList(ctx, listId)
 }
 
+func (s *GiftService) GetFriendLists(ctx context.Context, ownerId string, params filter.BaseParams) ([]domaingift.GiftList, int64, error) {
+	return s.ListRepo.GetListsByFriendOwners(ctx, ownerId, params)
+}
+
+func (s *GiftService) RequestFriend(ctx context.Context, userId string, req dto.GiftFriendRequest) (domaingift.GiftFriend, error) {
+	if s.FriendRepo == nil || s.UserRepo == nil {
+		return domaingift.GiftFriend{}, ErrFriendServiceConfig
+	}
+	target, err := s.UserRepo.GetByEmail(ctx, utils.SanitizeEmail(req.Email))
+	if err != nil {
+		return domaingift.GiftFriend{}, err
+	}
+	if target.Id == userId {
+		return domaingift.GiftFriend{}, ErrFriendSelf
+	}
+	existing, err := s.FriendRepo.FindBetweenUsers(ctx, userId, target.Id)
+	if err == nil {
+		if existing.Status == domaingift.FriendStatusRejected {
+			existing.RequesterId = userId
+			existing.AddresseeId = target.Id
+			existing.Status = domaingift.FriendStatusPending
+			existing.UpdatedAt = new(time.Now())
+			return existing, s.FriendRepo.Update(ctx, existing)
+		}
+		return existing, nil
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return domaingift.GiftFriend{}, err
+	}
+	friend := domaingift.GiftFriend{
+		Id:          utils.CreateUUID(),
+		RequesterId: userId,
+		AddresseeId: target.Id,
+		Status:      domaingift.FriendStatusPending,
+		CreatedAt:   time.Now(),
+	}
+	if err := s.FriendRepo.Store(ctx, friend); err != nil {
+		return domaingift.GiftFriend{}, err
+	}
+	return friend, nil
+}
+
+func (s *GiftService) GetFriends(ctx context.Context, userId string, params filter.BaseParams) ([]dto.GiftFriendResponse, int64, error) {
+	if s.FriendRepo == nil {
+		return nil, 0, ErrFriendServiceConfig
+	}
+	return s.FriendRepo.GetFriends(ctx, userId, params)
+}
+
+func (s *GiftService) GetPendingFriendRequests(ctx context.Context, userId string, params filter.BaseParams) ([]dto.GiftFriendResponse, int64, error) {
+	if s.FriendRepo == nil {
+		return nil, 0, ErrFriendServiceConfig
+	}
+	return s.FriendRepo.GetPendingRequests(ctx, userId, params)
+}
+
+func (s *GiftService) AcceptFriend(ctx context.Context, userId, friendId string) (domaingift.GiftFriend, error) {
+	return s.updateFriendStatus(ctx, userId, friendId, domaingift.FriendStatusAccepted)
+}
+
+func (s *GiftService) RejectFriend(ctx context.Context, userId, friendId string) (domaingift.GiftFriend, error) {
+	return s.updateFriendStatus(ctx, userId, friendId, domaingift.FriendStatusRejected)
+}
+
+func (s *GiftService) DeleteFriend(ctx context.Context, userId, friendId string) error {
+	if s.FriendRepo == nil {
+		return ErrFriendServiceConfig
+	}
+	friend, err := s.FriendRepo.GetByID(ctx, friendId)
+	if err != nil {
+		return err
+	}
+	if friend.RequesterId != userId && friend.AddresseeId != userId {
+		return ErrForbiddenGiftAccess
+	}
+	return s.FriendRepo.Delete(ctx, friendId)
+}
+
 func (s *GiftService) GetPublicList(ctx context.Context, shareCode string) (dto.GiftListPublicResponse, error) {
 	list, err := s.getPublicList(ctx, shareCode)
 	if err != nil {
@@ -291,6 +380,25 @@ func (s *GiftService) getPublicList(ctx context.Context, shareCode string) (doma
 		return domaingift.GiftList{}, ErrGiftListNotPublic
 	}
 	return list, nil
+}
+
+func (s *GiftService) updateFriendStatus(ctx context.Context, userId, friendId, status string) (domaingift.GiftFriend, error) {
+	if s.FriendRepo == nil {
+		return domaingift.GiftFriend{}, ErrFriendServiceConfig
+	}
+	friend, err := s.FriendRepo.GetByID(ctx, friendId)
+	if err != nil {
+		return domaingift.GiftFriend{}, err
+	}
+	if friend.AddresseeId != userId || friend.Status != domaingift.FriendStatusPending {
+		return domaingift.GiftFriend{}, ErrForbiddenGiftAccess
+	}
+	friend.Status = status
+	friend.UpdatedAt = new(time.Now())
+	if err := s.FriendRepo.Update(ctx, friend); err != nil {
+		return domaingift.GiftFriend{}, err
+	}
+	return friend, nil
 }
 
 func (s *GiftService) getOwnerItem(ctx context.Context, ownerId, itemId string) (domaingift.GiftItem, error) {

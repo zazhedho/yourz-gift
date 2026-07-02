@@ -326,7 +326,9 @@ func (r *Routes) GiftRoutes() {
 	listRepo := giftRepo.NewGiftListRepo(r.DB)
 	itemRepo := giftRepo.NewGiftItemRepo(r.DB)
 	reservationRepo := giftRepo.NewGiftReservationRepo(r.DB)
-	svc := giftSvc.NewGiftService(listRepo, itemRepo, reservationRepo)
+	friendRepo := giftRepo.NewGiftFriendRepo(r.DB)
+	uRepo := userRepo.NewUserRepo(r.DB)
+	svc := giftSvc.NewGiftService(listRepo, itemRepo, reservationRepo, friendRepo, uRepo)
 	h := giftHandler.NewGiftHandler(svc, r.auditService())
 	pRepo := r.permissionRepo()
 	mdw := r.middleware(pRepo)
@@ -342,6 +344,7 @@ func (r *Routes) GiftRoutes() {
 	{
 		lists.GET("", mdw.PermissionMiddleware("gift_lists", "list"), h.GetLists)
 		lists.POST("", mdw.PermissionMiddleware("gift_lists", "create"), h.CreateList)
+		lists.GET("/friends", mdw.PermissionMiddleware("gift_lists", "list"), h.GetFriendLists)
 		lists.GET("/:id", mdw.PermissionMiddleware("gift_lists", "view"), h.GetList)
 		lists.PUT("/:id", mdw.PermissionMiddleware("gift_lists", "update"), h.UpdateList)
 		lists.DELETE("/:id", mdw.PermissionMiddleware("gift_lists", "delete"), h.DeleteList)
@@ -355,6 +358,16 @@ func (r *Routes) GiftRoutes() {
 	{
 		items.PUT("/:id", mdw.PermissionMiddleware("gift_items", "update"), h.UpdateItem)
 		items.DELETE("/:id", mdw.PermissionMiddleware("gift_items", "delete"), h.DeleteItem)
+	}
+
+	friends := r.App.Group("/api/friends").Use(mdw.AuthMiddleware())
+	{
+		friends.GET("", mdw.PermissionMiddleware("friends", "list"), h.GetFriends)
+		friends.GET("/requests", mdw.PermissionMiddleware("friends", "list"), h.GetPendingFriendRequests)
+		friends.POST("/request", mdw.PermissionMiddleware("friends", "create"), h.RequestFriend)
+		friends.POST("/:id/accept", mdw.PermissionMiddleware("friends", "update"), h.AcceptFriend)
+		friends.POST("/:id/reject", mdw.PermissionMiddleware("friends", "update"), h.RejectFriend)
+		friends.DELETE("/:id", mdw.PermissionMiddleware("friends", "delete"), h.DeleteFriend)
 	}
 }
 

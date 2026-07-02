@@ -83,6 +83,25 @@ func (f *fakeGiftService) ReorderItems(context.Context, string, string, dto.Gift
 func (f *fakeGiftService) GetReservations(context.Context, string, string) ([]domaingift.GiftReservation, error) {
 	return nil, nil
 }
+func (f *fakeGiftService) GetFriendLists(context.Context, string, filter.BaseParams) ([]domaingift.GiftList, int64, error) {
+	return nil, 0, nil
+}
+func (f *fakeGiftService) RequestFriend(context.Context, string, dto.GiftFriendRequest) (domaingift.GiftFriend, error) {
+	return domaingift.GiftFriend{}, nil
+}
+func (f *fakeGiftService) GetFriends(context.Context, string, filter.BaseParams) ([]dto.GiftFriendResponse, int64, error) {
+	return nil, 0, nil
+}
+func (f *fakeGiftService) GetPendingFriendRequests(context.Context, string, filter.BaseParams) ([]dto.GiftFriendResponse, int64, error) {
+	return nil, 0, nil
+}
+func (f *fakeGiftService) AcceptFriend(context.Context, string, string) (domaingift.GiftFriend, error) {
+	return domaingift.GiftFriend{}, nil
+}
+func (f *fakeGiftService) RejectFriend(context.Context, string, string) (domaingift.GiftFriend, error) {
+	return domaingift.GiftFriend{}, nil
+}
+func (f *fakeGiftService) DeleteFriend(context.Context, string, string) error { return nil }
 func (f *fakeGiftService) GetPublicList(context.Context, string) (dto.GiftListPublicResponse, error) {
 	if f.publicListErr != nil {
 		return dto.GiftListPublicResponse{}, f.publicListErr

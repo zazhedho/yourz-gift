@@ -15,20 +15,21 @@ const GiftList = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [view, setView] = useState('mine')
   const navigate = useNavigate()
 
   const loadLists = useCallback(async () => {
     setLoading(true)
     setError('')
     try {
-      const response = await giftService.listLists()
+      const response = view === 'friends' ? await giftService.listFriendLists() : await giftService.listLists()
       setLists(getListData(response))
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to load gift lists'))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [view])
 
   useEffect(() => {
     loadLists()
@@ -62,8 +63,8 @@ const GiftList = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '20px' }}>
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
           <div className="segmented-control">
-            <button className="active-pink">My lists</button>
-            <button>Friends</button>
+            <button className={view === 'mine' ? 'active-pink' : ''} onClick={() => setView('mine')} type="button">My lists</button>
+            <button className={view === 'friends' ? 'active-pink' : ''} onClick={() => setView('friends')} type="button">Friends</button>
           </div>
           <div className="segmented-control">
             <button className="active-dark">Current</button>
@@ -79,14 +80,14 @@ const GiftList = () => {
       {/* List count indicator */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', fontSize: '12px', fontWeight: 700, color: 'var(--color-shade-50)', letterSpacing: '1px' }}>
         <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f43f5e' }}></span>
-        CURRENT & UPCOMING ({lists.length})
+        {view === 'friends' ? 'FRIENDS' : 'CURRENT & UPCOMING'} ({lists.length})
       </div>
 
       {lists.length === 0 ? (
         <EmptyState
-          action={<Link className="button" style={{ background: '#10b981', color: 'white' }} to="/app/lists/new">Create your first list</Link>}
-          message="Create a list, add gift items, and share it with your guests."
-          title="No gift lists yet"
+          action={view === 'friends' ? null : <Link className="button" style={{ background: '#10b981', color: 'white' }} to="/app/lists/new">Create your first list</Link>}
+          message={view === 'friends' ? 'Accepted friends with active public lists will show here.' : 'Create a list, add gift items, and share it with your guests.'}
+          title={view === 'friends' ? 'No friend lists yet' : 'No gift lists yet'}
         />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -116,7 +117,7 @@ const GiftList = () => {
                 </div>
                 <div>
                   <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 700, textShadow: '0 1px 3px rgba(0,0,0,0.3)', letterSpacing: '-0.02em' }}>{list.title}</h2>
-                  <p style={{ margin: '4px 0 0 0', fontSize: '15px', opacity: 0.9, textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>By You</p>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '15px', opacity: 0.9, textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{view === 'friends' ? 'By Friend' : 'By You'}</p>
                 </div>
               </div>
               
@@ -124,13 +125,17 @@ const GiftList = () => {
                   <button onClick={() => copyLink(list.share_code)} title="Copy Public Link" style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background 0.2s' }}>
                     <Copy size={16} />
                   </button>
-                  <button onClick={() => navigate(`/app/lists/${list.id}/edit`)} title="Edit List" style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background 0.2s' }}>
-                    <Edit2 size={16} />
-                  </button>
-                  <button onClick={() => remove(list.id)} title="Delete List" style={{ background: 'rgba(244,63,94,0.15)', backdropFilter: 'blur(4px)', border: '1px solid rgba(244,63,94,0.3)', color: 'white', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background 0.2s' }}>
-                    <Trash2 size={16} />
-                  </button>
-                  <Link to={`/app/lists/${list.id}`} className="button" style={{ 
+                  {view === 'mine' ? (
+                    <>
+                      <button onClick={() => navigate(`/app/lists/${list.id}/edit`)} title="Edit List" style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background 0.2s' }}>
+                        <Edit2 size={16} />
+                      </button>
+                      <button onClick={() => remove(list.id)} title="Delete List" style={{ background: 'rgba(244,63,94,0.15)', backdropFilter: 'blur(4px)', border: '1px solid rgba(244,63,94,0.3)', color: 'white', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background 0.2s' }}>
+                        <Trash2 size={16} />
+                      </button>
+                    </>
+                  ) : null}
+                  <Link to={view === 'friends' ? `/g/${list.share_code}` : `/app/lists/${list.id}`} className="button" style={{ 
                     background: 'rgba(255,255,255,0.2)', 
                     backdropFilter: 'blur(8px)', 
                     border: '1px solid rgba(255,255,255,0.4)', 
@@ -141,7 +146,7 @@ const GiftList = () => {
                     minHeight: '40px',
                     fontWeight: 500
                   }}>
-                    View Wish List <ChevronRight size={18} style={{ marginLeft: '4px' }} />
+                    {view === 'friends' ? 'Open Public List' : 'View Wish List'} <ChevronRight size={18} style={{ marginLeft: '4px' }} />
                   </Link>
               </div>
             </article>

@@ -20,6 +20,14 @@ type ServiceGiftInterface interface {
 	DeleteItem(ctx context.Context, ownerId, itemId string) error
 	ReorderItems(ctx context.Context, ownerId, listId string, req dto.GiftItemReorder) error
 	GetReservations(ctx context.Context, ownerId, listId string) ([]domaingift.GiftReservation, error)
+	GetFriendLists(ctx context.Context, ownerId string, params filter.BaseParams) ([]domaingift.GiftList, int64, error)
+
+	RequestFriend(ctx context.Context, userId string, req dto.GiftFriendRequest) (domaingift.GiftFriend, error)
+	GetFriends(ctx context.Context, userId string, params filter.BaseParams) ([]dto.GiftFriendResponse, int64, error)
+	GetPendingFriendRequests(ctx context.Context, userId string, params filter.BaseParams) ([]dto.GiftFriendResponse, int64, error)
+	AcceptFriend(ctx context.Context, userId, friendId string) (domaingift.GiftFriend, error)
+	RejectFriend(ctx context.Context, userId, friendId string) (domaingift.GiftFriend, error)
+	DeleteFriend(ctx context.Context, userId, friendId string) error
 
 	GetPublicList(ctx context.Context, shareCode string) (dto.GiftListPublicResponse, error)
 	GetPublicItems(ctx context.Context, shareCode string) ([]dto.GiftItemPublicResponse, error)

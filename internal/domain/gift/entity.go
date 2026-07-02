@@ -12,6 +12,10 @@ const (
 
 	ReservationStatusConfirmed = "confirmed"
 	ReservationStatusCanceled  = "canceled"
+
+	FriendStatusPending  = "pending"
+	FriendStatusAccepted = "accepted"
+	FriendStatusRejected = "rejected"
 )
 
 func (GiftList) TableName() string {
@@ -73,4 +77,18 @@ type GiftReservation struct {
 	CreatedAt  time.Time      `json:"created_at,omitempty" gorm:"column:created_at"`
 	UpdatedAt  *time.Time     `json:"updated_at,omitempty" gorm:"column:updated_at"`
 	DeletedAt  gorm.DeletedAt `json:"-" gorm:"index"`
+}
+
+func (GiftFriend) TableName() string {
+	return "gift_friends"
+}
+
+type GiftFriend struct {
+	Id          string         `json:"id" gorm:"column:id;primaryKey"`
+	RequesterId string         `json:"requester_id" gorm:"column:requester_id"`
+	AddresseeId string         `json:"addressee_id" gorm:"column:addressee_id"`
+	Status      string         `json:"status" gorm:"column:status"`
+	CreatedAt   time.Time      `json:"created_at,omitempty" gorm:"column:created_at"`
+	UpdatedAt   *time.Time     `json:"updated_at,omitempty" gorm:"column:updated_at"`
+	DeletedAt   gorm.DeletedAt `json:"-" gorm:"index"`
 }

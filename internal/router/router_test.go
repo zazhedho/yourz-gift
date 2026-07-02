@@ -100,10 +100,17 @@ func TestGiftRoutesRegisterNestedListRoutes(t *testing.T) {
 
 	for _, want := range []string{
 		"GET /api/gift-lists/:id",
+		"GET /api/gift-lists/friends",
 		"GET /api/gift-lists/:id/items",
 		"POST /api/gift-lists/:id/items",
 		"POST /api/gift-lists/:id/items/reorder",
 		"GET /api/gift-lists/:id/reservations",
+		"GET /api/friends",
+		"GET /api/friends/requests",
+		"POST /api/friends/request",
+		"POST /api/friends/:id/accept",
+		"POST /api/friends/:id/reject",
+		"DELETE /api/friends/:id",
 	} {
 		if !registered[want] {
 			t.Fatalf("expected route %s to be registered", want)

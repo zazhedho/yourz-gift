@@ -21,7 +21,7 @@ func TestBuildItemResponsesCalculatesRemaining(t *testing.T) {
 		}},
 		reserved: map[string]int{"item-1": 2},
 	}
-	svc := NewGiftService(fakeGiftListRepo{fake}, fakeGiftItemRepo{fake}, fakeGiftReservationRepo{fake})
+	svc := NewGiftService(fakeGiftListRepo{fake}, fakeGiftItemRepo{fake}, fakeGiftReservationRepo{fake}, nil, nil)
 
 	got, err := svc.buildItemResponses(context.Background(), "list-1", false)
 	if err != nil {
@@ -45,7 +45,7 @@ func TestGetPublicListRejectsPrivateList(t *testing.T) {
 		Visibility: domaingift.ListVisibilityPrivate,
 		IsActive:   true,
 	}}
-	svc := NewGiftService(fakeGiftListRepo{fake}, fakeGiftItemRepo{fake}, fakeGiftReservationRepo{fake})
+	svc := NewGiftService(fakeGiftListRepo{fake}, fakeGiftItemRepo{fake}, fakeGiftReservationRepo{fake}, nil, nil)
 
 	_, err := svc.GetPublicList(context.Background(), "ABC12345")
 	if !errors.Is(err, ErrGiftListNotPublic) {
@@ -69,7 +69,7 @@ func TestCreatePublicReservationDefaultsShowName(t *testing.T) {
 			IsArchived: false,
 		},
 	}
-	svc := NewGiftService(fakeGiftListRepo{fake}, fakeGiftItemRepo{fake}, fakeGiftReservationRepo{fake})
+	svc := NewGiftService(fakeGiftListRepo{fake}, fakeGiftItemRepo{fake}, fakeGiftReservationRepo{fake}, nil, nil)
 
 	got, err := svc.CreatePublicReservation(context.Background(), "ABC12345", "item-1", dto.GiftReservationCreate{
 		GuestEmail: "TEST@Example.COM",
@@ -86,16 +86,41 @@ func TestCreatePublicReservationDefaultsShowName(t *testing.T) {
 	}
 }
 
+func TestGetFriendListsUsesAcceptedFriends(t *testing.T) {
+	fake := &fakeGiftRepo{
+		friendLists: []domaingift.GiftList{{
+			Id:       "list-2",
+			OwnerId:  "friend-1",
+			Title:    "Friend birthday",
+			IsActive: true,
+		}},
+	}
+	svc := NewGiftService(fakeGiftListRepo{fake}, fakeGiftItemRepo{fake}, fakeGiftReservationRepo{fake}, fakeGiftFriendRepo{fake}, nil)
+
+	got, total, err := svc.GetFriendLists(context.Background(), "user-1", filter.BaseParams{Limit: 20})
+	if err != nil {
+		t.Fatalf("GetFriendLists error = %v", err)
+	}
+	if total != 1 {
+		t.Fatalf("total = %d, want 1", total)
+	}
+	if got[0].OwnerId != "friend-1" {
+		t.Fatalf("owner = %q, want friend-1", got[0].OwnerId)
+	}
+}
+
 type fakeGiftRepo struct {
-	list     domaingift.GiftList
-	item     domaingift.GiftItem
-	items    []domaingift.GiftItem
-	reserved map[string]int
+	list        domaingift.GiftList
+	item        domaingift.GiftItem
+	items       []domaingift.GiftItem
+	friendLists []domaingift.GiftList
+	reserved    map[string]int
 }
 
 type fakeGiftListRepo struct{ *fakeGiftRepo }
 type fakeGiftItemRepo struct{ *fakeGiftRepo }
 type fakeGiftReservationRepo struct{ *fakeGiftRepo }
+type fakeGiftFriendRepo struct{ *fakeGiftRepo }
 
 func (f fakeGiftListRepo) Store(context.Context, domaingift.GiftList) error { return nil }
 func (f fakeGiftListRepo) GetByID(context.Context, string) (domaingift.GiftList, error) {
@@ -112,6 +137,9 @@ func (f fakeGiftListRepo) GetListByShareCode(context.Context, string) (domaingif
 }
 func (f fakeGiftListRepo) GetListsByOwner(context.Context, string, filter.BaseParams) ([]domaingift.GiftList, int64, error) {
 	return nil, 0, nil
+}
+func (f fakeGiftListRepo) GetListsByFriendOwners(context.Context, string, filter.BaseParams) ([]domaingift.GiftList, int64, error) {
+	return f.friendLists, int64(len(f.friendLists)), nil
 }
 
 func (f fakeGiftItemRepo) Store(context.Context, domaingift.GiftItem) error { return nil }
@@ -153,4 +181,24 @@ func (f fakeGiftReservationRepo) CreateReservationWithAvailability(context.Conte
 }
 func (f fakeGiftReservationRepo) GetReservationsByList(context.Context, string) ([]domaingift.GiftReservation, error) {
 	return nil, nil
+}
+
+func (f fakeGiftFriendRepo) Store(context.Context, domaingift.GiftFriend) error { return nil }
+func (f fakeGiftFriendRepo) GetByID(context.Context, string) (domaingift.GiftFriend, error) {
+	return domaingift.GiftFriend{}, nil
+}
+func (f fakeGiftFriendRepo) GetAll(context.Context, filter.BaseParams) ([]domaingift.GiftFriend, int64, error) {
+	return nil, 0, nil
+}
+func (f fakeGiftFriendRepo) Update(context.Context, domaingift.GiftFriend) error { return nil }
+func (f fakeGiftFriendRepo) Delete(context.Context, string) error                { return nil }
+func (f fakeGiftFriendRepo) SoftDelete(context.Context, string, string) error    { return nil }
+func (f fakeGiftFriendRepo) FindBetweenUsers(context.Context, string, string) (domaingift.GiftFriend, error) {
+	return domaingift.GiftFriend{}, nil
+}
+func (f fakeGiftFriendRepo) GetFriends(context.Context, string, filter.BaseParams) ([]dto.GiftFriendResponse, int64, error) {
+	return nil, 0, nil
+}
+func (f fakeGiftFriendRepo) GetPendingRequests(context.Context, string, filter.BaseParams) ([]dto.GiftFriendResponse, int64, error) {
+	return nil, 0, nil
 }

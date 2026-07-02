@@ -215,6 +215,7 @@ The current route set includes:
 
 - `GET /api/gift-lists`
 - `POST /api/gift-lists`
+- `GET /api/gift-lists/friends`
 - `GET /api/gift-lists/:id`
 - `PUT /api/gift-lists/:id`
 - `DELETE /api/gift-lists/:id`
@@ -228,6 +229,13 @@ The current route set includes:
 - `GET /api/public/gift-lists/:code`
 - `GET /api/public/gift-lists/:code/items`
 - `POST /api/public/gift-lists/:code/items/:item_id/reservations`
+
+- `GET /api/friends`
+- `GET /api/friends/requests`
+- `POST /api/friends/request`
+- `POST /api/friends/:id/accept`
+- `POST /api/friends/:id/reject`
+- `DELETE /api/friends/:id`
 
 - `POST /api/media/upload`
 

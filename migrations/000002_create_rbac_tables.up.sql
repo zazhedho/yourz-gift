@@ -163,7 +163,11 @@ INSERT INTO permissions (id, name, display_name, resource, action) VALUES
     (gen_random_uuid(), 'create_gift_items', 'Create Gift Items', 'gift_items', 'create'),
     (gen_random_uuid(), 'update_gift_items', 'Update Gift Items', 'gift_items', 'update'),
     (gen_random_uuid(), 'delete_gift_items', 'Delete Gift Items', 'gift_items', 'delete'),
-    (gen_random_uuid(), 'list_gift_reservations', 'List Gift Reservations', 'gift_reservations', 'list')
+    (gen_random_uuid(), 'list_gift_reservations', 'List Gift Reservations', 'gift_reservations', 'list'),
+    (gen_random_uuid(), 'list_friends', 'List Friends', 'friends', 'list'),
+    (gen_random_uuid(), 'create_friends', 'Create Friend Requests', 'friends', 'create'),
+    (gen_random_uuid(), 'update_friends', 'Update Friend Requests', 'friends', 'update'),
+    (gen_random_uuid(), 'delete_friends', 'Delete Friends', 'friends', 'delete')
 ON CONFLICT (name) DO NOTHING;
 
 -- Assign all permissions to admin role
@@ -228,7 +232,11 @@ AND p.name IN (
     'create_gift_items',
     'update_gift_items',
     'delete_gift_items',
-    'list_gift_reservations'
+    'list_gift_reservations',
+    'list_friends',
+    'create_friends',
+    'update_friends',
+    'delete_friends'
 )
 ON CONFLICT DO NOTHING;
 

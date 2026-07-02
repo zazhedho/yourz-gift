@@ -19,12 +19,14 @@ describe('giftService', () => {
 
   it('uses owner gift list endpoints', () => {
     giftService.listLists()
+    giftService.listFriendLists()
     giftService.createList({ title: 'Birthday' })
     giftService.getList('list-1')
     giftService.updateList('list-1', { title: 'Updated' })
     giftService.deleteList('list-1')
 
     expect(api.get).toHaveBeenCalledWith('/gift-lists', { params: { page: 1, limit: 50 } })
+    expect(api.get).toHaveBeenCalledWith('/gift-lists/friends', { params: { page: 1, limit: 50 } })
     expect(api.post).toHaveBeenCalledWith('/gift-lists', { title: 'Birthday' })
     expect(api.get).toHaveBeenCalledWith('/gift-lists/list-1')
     expect(api.put).toHaveBeenCalledWith('/gift-lists/list-1', { title: 'Updated' })
