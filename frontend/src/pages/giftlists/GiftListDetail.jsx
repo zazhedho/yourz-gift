@@ -1,4 +1,4 @@
-import { Copy, Plus, Trash2 } from 'lucide-react'
+import { Copy, Plus, Trash2, Edit2, ExternalLink, Package, Users, Tag, CheckCircle2 } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -46,6 +46,7 @@ const GiftListDetail = () => {
   const copyLink = async () => {
     await navigator.clipboard.writeText(`${window.location.origin}/g/${list.share_code}`)
     setNotice('Public link copied')
+    setTimeout(() => setNotice(''), 3000)
   }
 
   const deleteItem = async (itemId) => {
@@ -63,80 +64,195 @@ const GiftListDetail = () => {
   if (!list) return <RetryState message="Gift list not found" onRetry={load} />
 
   return (
-    <section>
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">{list.title}</h1>
-          <p className="page-subtitle">{list.description || 'No description'}</p>
-          <p className="meta">Share code: <strong>{list.share_code}</strong></p>
-        </div>
-        <div className="actions">
-          <Button variant="ghost" onClick={copyLink}><Copy size={16} /> Copy link</Button>
-          <Link className="button button--ghost" to={`/app/lists/${listId}/edit`}>Edit list</Link>
-          <Link className="button button--primary" to={`/app/lists/${listId}/items/new`}><Plus size={16} /> Add item</Link>
+    <section style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '80px' }}>
+      
+      {/* Immersive Header */}
+      <div style={{ 
+        position: 'relative', 
+        borderRadius: 'var(--radius-xl)', 
+        overflow: 'hidden',
+        marginBottom: '40px',
+        background: list.cover_image_url ? `url(${list.cover_image_url}) center/cover` : 'linear-gradient(135deg, #f43f5e 0%, #3b82f6 100%)',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+      }}>
+        <div style={{ 
+          background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%)',
+          padding: '60px 40px 40px',
+          color: 'white',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '24px'
+        }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+              <span style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)', padding: '4px 12px', borderRadius: '99px', fontSize: '13px', fontWeight: 600, letterSpacing: '0.5px' }}>
+                {list.occasion_type?.toUpperCase() || 'EVENT'}
+              </span>
+              {list.is_active && (
+                <span style={{ background: '#10b981', padding: '4px 12px', borderRadius: '99px', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <CheckCircle2 size={14} /> Active
+                </span>
+              )}
+            </div>
+            <h1 style={{ fontSize: '42px', fontWeight: 800, margin: '0 0 12px 0', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>{list.title}</h1>
+            <p style={{ fontSize: '18px', opacity: 0.9, maxWidth: '600px', margin: 0, textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{list.description || 'No description provided'}</p>
+          </div>
+          
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center', marginTop: '16px' }}>
+            <div style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)', padding: '12px 20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <span style={{ opacity: 0.7, fontSize: '14px' }}>Share Code:</span>
+              <strong style={{ fontSize: '18px', letterSpacing: '1px' }}>{list.share_code}</strong>
+              <button onClick={copyLink} style={{ background: 'white', color: 'black', border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginLeft: '8px' }} title="Copy Link">
+                <Copy size={14} />
+              </button>
+            </div>
+            
+            <Link to={`/app/lists/${listId}/edit`} className="button" style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(4px)', color: 'white', border: '1px solid rgba(255,255,255,0.3)', minHeight: '48px', borderRadius: '12px' }}>
+              <Edit2 size={16} style={{ marginRight: '6px' }} /> Edit List
+            </Link>
+          </div>
         </div>
       </div>
-      <ErrorBanner message={notice} />
 
-      <div className="grid" style={{ gridTemplateColumns: 'minmax(0, 1.4fr) minmax(280px, 0.8fr)' }}>
-        <section className="surface">
-          <h2>Items</h2>
+      {notice && (
+        <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', color: '#059669', padding: '16px 24px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '32px', fontWeight: 600 }}>
+          <CheckCircle2 size={20} /> {notice}
+        </div>
+      )}
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '32px', alignItems: 'start' }}>
+        
+        {/* Left Column: Items */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Package size={24} color="var(--color-primary)" />
+              Gift Items <span style={{ background: 'var(--color-surface-hover)', padding: '2px 10px', borderRadius: '99px', fontSize: '14px', color: 'var(--color-shade-50)' }}>{items.length}</span>
+            </h2>
+            <Link className="button" to={`/app/lists/${listId}/items/new`} style={{ background: 'var(--color-primary)', color: 'white', borderRadius: '99px', padding: '0 20px', minHeight: '40px' }}>
+              <Plus size={18} style={{ marginRight: '4px' }} /> Add Item
+            </Link>
+          </div>
+
           {items.length === 0 ? (
-            <EmptyState
-              action={<Link className="button button--primary" to={`/app/lists/${listId}/items/new`}>Add first item</Link>}
-              message="Guests need visible items before they can reserve."
-              title="No items yet"
-            />
+            <div className="surface" style={{ padding: '48px 32px', textAlign: 'center', borderRadius: 'var(--radius-xl)' }}>
+              <div style={{ width: '64px', height: '64px', background: 'var(--color-surface-hover)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                <Package size={32} color="var(--color-shade-40)" />
+              </div>
+              <h3 style={{ fontSize: '20px', margin: '0 0 8px 0' }}>No items yet</h3>
+              <p className="muted" style={{ margin: '0 0 24px 0' }}>Guests need visible items before they can reserve.</p>
+              <Link className="button" to={`/app/lists/${listId}/items/new`} style={{ background: 'var(--color-primary)', color: 'white' }}>Add first item</Link>
+            </div>
           ) : (
-            <div className="grid">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {items.map((item) => (
-                <article className="card" key={item.id}>
-                  <div>
-                    <h3 className="card__title">{item.name}</h3>
-                    <p className="meta">{item.currency || 'IDR'} {item.price ?? '-'} - qty {item.quantity}</p>
+                <article key={item.id} style={{ 
+                  display: 'flex', 
+                  background: 'rgba(255, 255, 255, 0.6)', 
+                  backdropFilter: 'blur(16px)',
+                  border: '1px solid rgba(255,255,255,0.8)',
+                  borderRadius: '20px', 
+                  padding: '16px',
+                  gap: '20px',
+                  boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
+                  transition: 'transform 0.2s, box-shadow 0.2s'
+                }} className="item-card">
+                  
+                  <div style={{ 
+                    width: '100px', 
+                    height: '100px', 
+                    borderRadius: '12px', 
+                    background: item.image_url ? `url(${item.image_url}) center/cover` : 'var(--color-surface-hover)',
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    {!item.image_url && <Package size={32} color="var(--color-shade-30)" />}
                   </div>
-                  <p className="muted">{item.description || 'No description'}</p>
-                  <div className="actions">
-                    <button className="button button--ghost button--compact" onClick={() => editItem(item)} type="button">Edit</button>
-                    <button className="button button--danger button--compact" onClick={() => deleteItem(item.id)} type="button">
-                      <Trash2 size={14} /> Delete
-                    </button>
+                  
+                  <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <h3 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: 600 }}>{item.name}</h3>
+                        {!item.is_active && (
+                          <span style={{ fontSize: '11px', background: 'var(--color-shade-10)', padding: '2px 8px', borderRadius: '4px', color: 'var(--color-shade-50)', fontWeight: 600 }}>INACTIVE</span>
+                        )}
+                      </div>
+                      <p style={{ margin: 0, fontSize: '14px', color: 'var(--color-shade-50)', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {item.description || 'No description'}
+                      </p>
+                    </div>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-primary)', fontWeight: 700 }}>
+                        <Tag size={16} /> {item.currency || 'IDR'} {item.price ?? '-'}
+                        <span style={{ color: 'var(--color-shade-40)', fontWeight: 500, fontSize: '13px', marginLeft: '4px' }}>&times; {item.quantity}</span>
+                      </div>
+                      
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button onClick={() => editItem(item)} style={{ background: 'white', border: '1px solid var(--color-hairline)', borderRadius: '8px', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--color-ink)' }}>
+                          <Edit2 size={16} />
+                        </button>
+                        <button onClick={() => deleteItem(item.id)} style={{ background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: '8px', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#e11d48' }}>
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </article>
               ))}
             </div>
           )}
-        </section>
+        </div>
 
-        <section className="surface">
-          <h2>Reservations</h2>
-          {reservations.length === 0 ? (
-            <p className="muted">No reservations yet.</p>
-          ) : (
-            <table className="reservation-table">
-              <thead>
-                <tr>
-                  <th>Guest</th>
-                  <th>Qty</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
+        {/* Right Column: Reservations */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <h2 style={{ fontSize: '24px', fontWeight: 700, margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Users size={24} color="var(--color-primary)" />
+            Reservations <span style={{ background: 'var(--color-surface-hover)', padding: '2px 10px', borderRadius: '99px', fontSize: '14px', color: 'var(--color-shade-50)' }}>{reservations.length}</span>
+          </h2>
+
+          <div className="surface" style={{ padding: '24px', borderRadius: 'var(--radius-xl)' }}>
+            {reservations.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '32px 0' }}>
+                <Users size={32} color="var(--color-shade-30)" style={{ margin: '0 auto 12px' }} />
+                <p className="muted" style={{ margin: 0 }}>No guests have reserved items yet.</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {reservations.map((reservation) => (
-                  <tr key={reservation.id}>
-                    <td>
-                      <strong>{reservation.guest_name || reservation.guest_email}</strong>
-                      <div className="meta">{reservation.item_name || reservation.item_id}</div>
-                    </td>
-                    <td>{reservation.quantity}</td>
-                    <td>{reservation.status}</td>
-                  </tr>
+                  <div key={reservation.id} style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between',
+                    padding: '16px',
+                    background: 'var(--color-surface-hover)',
+                    borderRadius: '12px'
+                  }}>
+                    <div>
+                      <strong style={{ display: 'block', fontSize: '16px', marginBottom: '2px' }}>{reservation.guest_name || reservation.guest_email}</strong>
+                      <div style={{ fontSize: '13px', color: 'var(--color-shade-50)' }}>{reservation.item_name || reservation.item_id}</div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-primary)' }}>Qty: {reservation.quantity}</div>
+                      <div style={{ fontSize: '12px', fontWeight: 600, color: '#10b981', textTransform: 'uppercase', marginTop: '2px' }}>{reservation.status}</div>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          )}
-        </section>
+              </div>
+            )}
+          </div>
+        </div>
+        
       </div>
+      
+      <style dangerouslySetInnerHTML={{__html: `
+        .item-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 10px 25px rgba(0,0,0,0.06) !important;
+        }
+      `}} />
     </section>
   )
 }
