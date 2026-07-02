@@ -92,6 +92,7 @@ INSERT INTO roles (id, name, display_name, description, is_system) VALUES
     (gen_random_uuid(), 'superadmin', 'Super Administrator', 'Full system access with highest privileges', TRUE),
     (gen_random_uuid(), 'admin', 'Administrator', 'Full system access', TRUE),
     (gen_random_uuid(), 'staff', 'Staff', 'Staff access with limited permissions', TRUE),
+    (gen_random_uuid(), 'member', 'Member', 'Gift list owner access', TRUE),
     (gen_random_uuid(), 'viewer', 'Viewer', 'Read-only access', TRUE)
 ON CONFLICT (name) DO NOTHING;
 
@@ -209,6 +210,26 @@ FROM roles r
 CROSS JOIN permissions p
 WHERE r.name = 'viewer'
 AND p.name IN ('view_profile', 'view_dashboard')
+ON CONFLICT DO NOTHING;
+
+-- Publicly registered users own gift lists, so member can manage gift resources.
+INSERT INTO role_permissions (role_id, permission_id)
+SELECT r.id, p.id
+FROM roles r
+CROSS JOIN permissions p
+WHERE r.name = 'member'
+AND p.name IN (
+    'list_gift_lists',
+    'create_gift_lists',
+    'view_gift_lists',
+    'update_gift_lists',
+    'delete_gift_lists',
+    'list_gift_items',
+    'create_gift_items',
+    'update_gift_items',
+    'delete_gift_items',
+    'list_gift_reservations'
+)
 ON CONFLICT DO NOTHING;
 
 -- Assign all permissions to superadmin role

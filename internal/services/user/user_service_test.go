@@ -264,7 +264,7 @@ func TestRegisterUserNormalizesEmailToLowercase(t *testing.T) {
 		UserRepo:      &userRepoMock{},
 		BlacklistRepo: &authRepoMock{},
 		RoleRepo: &roleRepoUserMock{roles: map[string]domainrole.Role{
-			utils.RoleViewer: {Id: "role-viewer", Name: utils.RoleViewer},
+			utils.RoleMember: {Id: "role-member", Name: utils.RoleMember},
 		}},
 		PermissionRepo: &permissionRepoUserMock{},
 	}
@@ -281,6 +281,9 @@ func TestRegisterUserNormalizesEmailToLowercase(t *testing.T) {
 
 	if user.Email != "jane.doe@example.com" {
 		t.Fatalf("expected normalized lowercase email, got %s", user.Email)
+	}
+	if user.Role != utils.RoleMember {
+		t.Fatalf("expected member role, got %s", user.Role)
 	}
 }
 
@@ -616,7 +619,7 @@ func TestLoginWithGoogleReturnsExistingUser(t *testing.T) {
 	}
 }
 
-func TestLoginWithGoogleCreatesNewViewerUser(t *testing.T) {
+func TestLoginWithGoogleCreatesNewMemberUser(t *testing.T) {
 	originalVerifier := googleIDTokenVerifier
 	googleIDTokenVerifier = func(_ context.Context, idToken string) (googleTokenInfo, error) {
 		return googleTokenInfo{
@@ -634,7 +637,7 @@ func TestLoginWithGoogleCreatesNewViewerUser(t *testing.T) {
 		UserRepo:      userRepo,
 		BlacklistRepo: &authRepoMock{},
 		RoleRepo: &roleRepoUserMock{roles: map[string]domainrole.Role{
-			utils.RoleViewer: {Id: "role-viewer", Name: utils.RoleViewer},
+			utils.RoleMember: {Id: "role-member", Name: utils.RoleMember},
 		}},
 		PermissionRepo: &permissionRepoUserMock{},
 	}
@@ -649,8 +652,8 @@ func TestLoginWithGoogleCreatesNewViewerUser(t *testing.T) {
 	if user.Email != "new.user@example.com" {
 		t.Fatalf("expected normalized email, got %s", user.Email)
 	}
-	if user.Role != utils.RoleViewer {
-		t.Fatalf("expected viewer role, got %s", user.Role)
+	if user.Role != utils.RoleMember {
+		t.Fatalf("expected member role, got %s", user.Role)
 	}
 	if userRepo.user.Password == "" {
 		t.Fatal("expected generated password hash for google user")

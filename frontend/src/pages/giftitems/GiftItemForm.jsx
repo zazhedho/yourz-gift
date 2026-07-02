@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Button from '../../components/common/Button'
 import ErrorBanner from '../../components/common/ErrorBanner'
 import FormField from '../../components/common/FormField'
+import ImageUploadField from '../../components/common/ImageUploadField'
 import giftService from '../../services/giftService'
 import { getErrorMessage } from '../../services/api'
 
@@ -42,6 +43,7 @@ const GiftItemForm = () => {
     const { checked, name, type, value } = event.target
     setForm((current) => ({ ...current, [name]: type === 'checkbox' ? checked : value }))
   }
+  const updateField = (name, value) => setForm((current) => ({ ...current, [name]: value }))
 
   const submit = async (event) => {
     event.preventDefault()
@@ -97,9 +99,12 @@ const GiftItemForm = () => {
           <FormField label="Product URL">
             <input className="input" name="product_url" onChange={update} value={form.product_url} />
           </FormField>
-          <FormField label="Image URL">
-            <input className="input" name="image_url" onChange={update} value={form.image_url} />
-          </FormField>
+          <ImageUploadField
+            folder="gift-items"
+            label="Item image"
+            onChange={(url) => updateField('image_url', url)}
+            value={form.image_url}
+          />
         </div>
         <div className="form-grid">
           <FormField label="Price">

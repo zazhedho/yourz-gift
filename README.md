@@ -229,6 +229,8 @@ The current route set includes:
 - `GET /api/public/gift-lists/:code/items`
 - `POST /api/public/gift-lists/:code/items/:item_id/reservations`
 
+- `POST /api/media/upload`
+
 Additional session routes are registered only when Redis is available:
 - `GET /api/user/sessions`
 - `DELETE /api/user/session/:session_id`

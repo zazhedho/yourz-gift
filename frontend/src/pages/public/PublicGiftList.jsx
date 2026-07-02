@@ -8,6 +8,7 @@ import Loading from '../../components/common/Loading'
 import RetryState from '../../components/common/RetryState'
 import giftService from '../../services/giftService'
 import { getErrorMessage, getListData, getResponseData } from '../../services/api'
+import { formatOccasion } from '../../utils/giftDisplay'
 import ReservationForm from './ReservationForm'
 
 const formatPrice = (item) => {
@@ -59,7 +60,7 @@ const PublicGiftList = () => {
     <main className="public-page">
       <section className="public-hero">
         <div className="public-hero__copy">
-          <p className="meta">Gift list - {list.occasion_type || 'custom'}</p>
+          <p className="meta">{formatOccasion(list.occasion_type)}</p>
           <h1 className="public-title">{list.title}</h1>
           <p className="public-description">{list.description || 'Choose a gift and reserve it for the owner.'}</p>
           {list.shipping_note ? <p className="public-description">{list.shipping_note}</p> : null}

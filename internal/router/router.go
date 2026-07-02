@@ -8,11 +8,13 @@ import (
 	"gorm.io/gorm"
 
 	"yourz-gift/infrastructure/database"
+	mediaInfra "yourz-gift/infrastructure/media"
 	permissioncache "yourz-gift/internal/cache/permission"
 	appConfigHandler "yourz-gift/internal/handlers/http/appconfig"
 	auditHandler "yourz-gift/internal/handlers/http/audit"
 	giftHandler "yourz-gift/internal/handlers/http/gift"
 	locationHandler "yourz-gift/internal/handlers/http/location"
+	mediaHandler "yourz-gift/internal/handlers/http/media"
 	menuHandler "yourz-gift/internal/handlers/http/menu"
 	permissionHandler "yourz-gift/internal/handlers/http/permission"
 	roleHandler "yourz-gift/internal/handlers/http/role"
@@ -353,5 +355,19 @@ func (r *Routes) GiftRoutes() {
 	{
 		items.PUT("/:id", mdw.PermissionMiddleware("gift_items", "update"), h.UpdateItem)
 		items.DELETE("/:id", mdw.PermissionMiddleware("gift_items", "delete"), h.DeleteItem)
+	}
+}
+
+func (r *Routes) MediaRoutes() {
+	storageProvider, err := mediaInfra.InitStorage()
+	if err != nil {
+		logger.WriteLog(logger.LogLevelError, "MediaRoutes; storage init failed: "+err.Error())
+	}
+	h := mediaHandler.NewMediaHandler(storageProvider)
+	mdw := r.middleware(r.permissionRepo())
+
+	media := r.App.Group("/api/media").Use(mdw.AuthMiddleware())
+	{
+		media.POST("/upload", h.UploadImage)
 	}
 }

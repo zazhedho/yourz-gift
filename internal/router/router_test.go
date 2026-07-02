@@ -110,3 +110,19 @@ func TestGiftRoutesRegisterNestedListRoutes(t *testing.T) {
 		}
 	}
 }
+
+func TestMediaRoutesRegisterUploadRoute(t *testing.T) {
+	routes := NewRoutes()
+	routes.DB = newRouterDryRunDB(t)
+
+	routes.MediaRoutes()
+
+	registered := map[string]bool{}
+	for _, route := range routes.App.Routes() {
+		registered[route.Method+" "+route.Path] = true
+	}
+
+	if !registered["POST /api/media/upload"] {
+		t.Fatal("expected media upload route to be registered")
+	}
+}

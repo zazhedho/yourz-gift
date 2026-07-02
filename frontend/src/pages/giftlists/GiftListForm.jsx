@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Gift, Cake, Heart, Baby, Home, PartyPopper, Globe, Lock, Clock, User } from 'lucide-react'
 
 import Button from '../../components/common/Button'
 import ErrorBanner from '../../components/common/ErrorBanner'
 import FormField from '../../components/common/FormField'
+import ImageUploadField from '../../components/common/ImageUploadField'
 import Loading from '../../components/common/Loading'
 import giftService from '../../services/giftService'
 import { getErrorMessage, getResponseData } from '../../services/api'
@@ -50,6 +52,7 @@ const GiftListForm = () => {
     const { checked, name, type, value } = event.target
     setForm((current) => ({ ...current, [name]: type === 'checkbox' ? checked : value }))
   }
+  const updateField = (name, value) => setForm((current) => ({ ...current, [name]: value }))
 
   const submit = async (event) => {
     event.preventDefault()
@@ -75,59 +78,91 @@ const GiftListForm = () => {
   if (loading) return <Loading label="Loading gift list" />
 
   return (
-    <section className="surface">
-      <div className="page-header">
+    <section className="surface" style={{ padding: '32px' }}>
+      <div className="page-header" style={{ marginBottom: '32px', borderBottom: '1px solid var(--color-hairline-light)', paddingBottom: '24px' }}>
         <div>
-          <h1 className="page-title">{editing ? 'Edit gift list' : 'New gift list'}</h1>
-          <p className="page-subtitle">Use one flow for birthdays, weddings, housewarmings, holidays, or custom occasions.</p>
+          <h1 className="page-title" style={{ fontSize: '32px' }}>{editing ? 'Edit Gift List' : 'Create New Gift List'}</h1>
+          <p className="page-subtitle">Personalize your list for birthdays, weddings, or any custom occasion.</p>
         </div>
-        <Link className="button button--ghost" to={editing ? `/app/lists/${listId}` : '/app/lists'}>Cancel</Link>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <Link className="button button--ghost" to={editing ? `/app/lists/${listId}` : '/app/lists'}>Cancel</Link>
+          <Button isLoading={submitting} type="submit" onClick={submit} className="button button--primary">{editing ? 'Save changes' : 'Create list'}</Button>
+        </div>
       </div>
+      
       <ErrorBanner message={error} />
-      <form className="form" onSubmit={submit}>
-        <div className="form-grid">
-          <FormField label="Title">
-            <input className="input" name="title" onChange={update} required value={form.title} />
-          </FormField>
-          <FormField label="Occasion">
-            <select className="select" name="occasion_type" onChange={update} value={form.occasion_type}>
-              <option value="custom">Custom</option>
-              <option value="birthday">Birthday</option>
-              <option value="wedding">Wedding</option>
-              <option value="baby_shower">Baby shower</option>
-              <option value="housewarming">Housewarming</option>
-              <option value="holiday">Holiday</option>
-            </select>
-          </FormField>
+      
+      <form className="form" onSubmit={submit} style={{ display: 'grid', gap: '32px' }}>
+        
+        {/* Basic Info Section */}
+        <div style={{ background: 'var(--color-canvas-cream)', padding: '24px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-hairline-light)' }}>
+          <h3 style={{ marginTop: 0, marginBottom: '16px', fontSize: '18px', fontWeight: 600, color: 'var(--color-ink)' }}>Basic Information</h3>
+          <div className="form-grid">
+            <FormField label="Title">
+              <input className="input" name="title" onChange={update} required value={form.title} placeholder="e.g. My 25th Birthday" />
+            </FormField>
+            <FormField label="Occasion">
+              <select className="select" name="occasion_type" onChange={update} value={form.occasion_type}>
+                <button><selectedcontent></selectedcontent></button>
+                <option value="custom"><Gift size={18} aria-hidden="true" /> Custom</option>
+                <option value="birthday"><Cake size={18} aria-hidden="true" /> Birthday</option>
+                <option value="wedding"><Heart size={18} aria-hidden="true" /> Wedding</option>
+                <option value="baby_shower"><Baby size={18} aria-hidden="true" /> Baby shower</option>
+                <option value="housewarming"><Home size={18} aria-hidden="true" /> Housewarming</option>
+                <option value="holiday"><PartyPopper size={18} aria-hidden="true" /> Holiday</option>
+              </select>
+            </FormField>
+          </div>
+          <div style={{ marginTop: '16px' }}>
+            <FormField label="Description">
+              <textarea className="textarea" name="description" onChange={update} value={form.description} placeholder="Tell your friends what this list is for..." />
+            </FormField>
+          </div>
         </div>
-        <FormField label="Description">
-          <textarea className="textarea" name="description" onChange={update} value={form.description} />
-        </FormField>
-        <FormField label="Cover image URL">
-          <input className="input" name="cover_image_url" onChange={update} value={form.cover_image_url} />
-        </FormField>
-        <FormField label="Shipping note">
-          <textarea className="textarea" name="shipping_note" onChange={update} value={form.shipping_note} />
-        </FormField>
-        <div className="form-grid">
-          <FormField label="Visibility">
-            <select className="select" name="visibility" onChange={update} value={form.visibility}>
-              <option value="public">Public</option>
-              <option value="private">Private</option>
-            </select>
-          </FormField>
-          <FormField label="Reservation visibility">
-            <select className="select" name="reservation_visibility" onChange={update} value={form.reservation_visibility}>
-              <option value="immediately">Immediately</option>
-              <option value="owner_only">Owner only</option>
-            </select>
-          </FormField>
+
+        {/* Media & Shipping Section */}
+        <div style={{ background: 'var(--color-canvas-cream)', padding: '24px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-hairline-light)' }}>
+          <h3 style={{ marginTop: 0, marginBottom: '16px', fontSize: '18px', fontWeight: 600, color: 'var(--color-ink)' }}>Media & Shipping</h3>
+        <ImageUploadField
+          folder="gift-lists"
+          label="Cover image"
+          onChange={(url) => updateField('cover_image_url', url)}
+          value={form.cover_image_url}
+        />
+          <div style={{ marginTop: '16px' }}>
+            <FormField label="Shipping note">
+              <textarea className="textarea" name="shipping_note" onChange={update} value={form.shipping_note} placeholder="Any specific instructions for delivery?" />
+            </FormField>
+          </div>
         </div>
-        <label className="checkbox-row">
-          <input checked={form.is_active} name="is_active" onChange={update} type="checkbox" />
-          Active
-        </label>
-        <Button isLoading={submitting} type="submit">{editing ? 'Save changes' : 'Create list'}</Button>
+
+        {/* Settings Section */}
+        <div style={{ background: 'var(--color-canvas-cream)', padding: '24px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-hairline-light)' }}>
+          <h3 style={{ marginTop: 0, marginBottom: '16px', fontSize: '18px', fontWeight: 600, color: 'var(--color-ink)' }}>Settings</h3>
+          <div className="form-grid">
+            <FormField label="Visibility">
+              <select className="select" name="visibility" onChange={update} value={form.visibility}>
+                <button><selectedcontent></selectedcontent></button>
+                <option value="public"><Globe size={18} aria-hidden="true" /> Public</option>
+                <option value="private"><Lock size={18} aria-hidden="true" /> Private</option>
+              </select>
+            </FormField>
+            <FormField label="Reservation visibility">
+              <select className="select" name="reservation_visibility" onChange={update} value={form.reservation_visibility}>
+                <button><selectedcontent></selectedcontent></button>
+                <option value="immediately"><Clock size={18} aria-hidden="true" /> Immediately</option>
+                <option value="owner_only"><User size={18} aria-hidden="true" /> Owner only</option>
+              </select>
+            </FormField>
+          </div>
+          <div style={{ marginTop: '20px' }}>
+            <label className="checkbox-row" style={{ fontWeight: 500, cursor: 'pointer' }}>
+              <input checked={form.is_active} name="is_active" onChange={update} type="checkbox" style={{ accentColor: 'var(--color-primary)', width: '18px', height: '18px' }} />
+              List is Active
+            </label>
+          </div>
+        </div>
+        
       </form>
     </section>
   )

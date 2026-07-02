@@ -1,26 +1,44 @@
 :root {
-  --color-ink: #000000;
+  interpolate-size: allow-keywords;
+  --color-ink: #0f172a;
   --color-on-dark: #ffffff;
-  --color-canvas-night: #000000;
-  --color-canvas-night-elevated: #0a0a0a;
+  --color-canvas-night: #020617;
+  --color-canvas-night-elevated: #0f172a;
   --color-canvas-light: #ffffff;
-  --color-canvas-cream: #fbfbf5;
-  --color-surface-dark: #1e2c31;
-  --color-shade-30: #d4d4d8;
-  --color-shade-40: #a1a1aa;
-  --color-shade-50: #71717a;
-  --color-shade-60: #52525b;
-  --color-shade-70: #3f3f46;
-  --color-hairline-light: #e4e4e7;
-  --color-hairline-dark: #1e2c31;
-  --color-aloe-10: #c1fbd4;
-  --color-pistachio-10: #d4f9e0;
-  --color-link-mint: #99b3ad;
-  --radius-xs: 4px;
-  --radius-sm: 5px;
-  --radius-md: 8px;
+  --color-canvas-cream: #f8fafc;
+  --color-surface-dark: #1e293b;
+  --color-shade-30: #cbd5e1;
+  --color-shade-40: #94a3b8;
+  --color-shade-50: #64748b;
+  --color-shade-60: #475569;
+  --color-shade-70: #334155;
+  --color-hairline-light: #e2e8f0;
+  --color-hairline-dark: #334155;
+  
+  /* Vibrant Accents */
+  --color-primary: #6366f1;
+  --color-primary-hover: #4f46e5;
+  --color-secondary: #ec4899;
+  --color-accent: #8b5cf6;
+  --color-success: #10b981;
+  --color-danger: #f43f5e;
+  
+  /* Gradients */
+  --gradient-main: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  --gradient-surface: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%);
+  --gradient-bg: linear-gradient(135deg, #f0fdfa 0%, #e0e7ff 100%);
+  
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
   --radius-pill: 9999px;
-  --shadow-soft: 0 18px 44px rgba(0, 0, 0, 0.08);
-  --font-display: "NeueHaasGrotesk Display", Helvetica, Arial, sans-serif;
+  
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.4);
+  
+  --font-display: "Outfit", "Inter Variable", Inter, Helvetica, Arial, sans-serif;
   --font-body: "Inter Variable", Inter, Helvetica, Arial, sans-serif;
 }
