@@ -86,3 +86,27 @@ func TestRouteGroupsRegisterWithDryRunDB(t *testing.T) {
 		}
 	}
 }
+
+func TestGiftRoutesRegisterNestedListRoutes(t *testing.T) {
+	routes := NewRoutes()
+	routes.DB = newRouterDryRunDB(t)
+
+	routes.GiftRoutes()
+
+	registered := map[string]bool{}
+	for _, route := range routes.App.Routes() {
+		registered[route.Method+" "+route.Path] = true
+	}
+
+	for _, want := range []string{
+		"GET /api/gift-lists/:id",
+		"GET /api/gift-lists/:id/items",
+		"POST /api/gift-lists/:id/items",
+		"POST /api/gift-lists/:id/items/reorder",
+		"GET /api/gift-lists/:id/reservations",
+	} {
+		if !registered[want] {
+			t.Fatalf("expected route %s to be registered", want)
+		}
+	}
+}

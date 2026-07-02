@@ -343,10 +343,10 @@ func (r *Routes) GiftRoutes() {
 		lists.GET("/:id", mdw.PermissionMiddleware("gift_lists", "view"), h.GetList)
 		lists.PUT("/:id", mdw.PermissionMiddleware("gift_lists", "update"), h.UpdateList)
 		lists.DELETE("/:id", mdw.PermissionMiddleware("gift_lists", "delete"), h.DeleteList)
-		lists.GET("/:list_id/items", mdw.PermissionMiddleware("gift_items", "list"), h.GetItems)
-		lists.POST("/:list_id/items", mdw.PermissionMiddleware("gift_items", "create"), h.CreateItem)
-		lists.POST("/:list_id/items/reorder", mdw.PermissionMiddleware("gift_items", "update"), h.ReorderItems)
-		lists.GET("/:list_id/reservations", mdw.PermissionMiddleware("gift_reservations", "list"), h.GetReservations)
+		lists.GET("/:id/items", mdw.PermissionMiddleware("gift_items", "list"), h.GetItems)
+		lists.POST("/:id/items", mdw.PermissionMiddleware("gift_items", "create"), h.CreateItem)
+		lists.POST("/:id/items/reorder", mdw.PermissionMiddleware("gift_items", "update"), h.ReorderItems)
+		lists.GET("/:id/reservations", mdw.PermissionMiddleware("gift_reservations", "list"), h.GetReservations)
 	}
 
 	items := r.App.Group("/api/gift-items").Use(mdw.AuthMiddleware())

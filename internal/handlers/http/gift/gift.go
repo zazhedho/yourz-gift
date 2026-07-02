@@ -120,7 +120,8 @@ func (h *GiftHandler) CreateItem(ctx *gin.Context) {
 	if !handlercommon.BindJSON(ctx, logId, "[GiftHandler][CreateItem]", &req) {
 		return
 	}
-	data, err := h.Service.CreateItem(ctx.Request.Context(), ownerId, ctx.Param("list_id"), req)
+	listId := ctx.Param("id")
+	data, err := h.Service.CreateItem(ctx.Request.Context(), ownerId, listId, req)
 	h.writeMutationAudit(ctx, domainaudit.ActionCreate, "gift_item", data.Id, "Created gift item", nil, data, err)
 	writeGiftResult(ctx, http.StatusCreated, "Gift item created successfully", data, err)
 }
@@ -131,7 +132,7 @@ func (h *GiftHandler) GetItems(ctx *gin.Context) {
 		unauthorized(ctx)
 		return
 	}
-	data, err := h.Service.GetOwnerItems(ctx.Request.Context(), ownerId, ctx.Param("list_id"), ctx.Query("archived") == "true")
+	data, err := h.Service.GetOwnerItems(ctx.Request.Context(), ownerId, ctx.Param("id"), ctx.Query("archived") == "true")
 	writeGiftResult(ctx, http.StatusOK, "Get gift items successfully", data, err)
 }
 
@@ -173,8 +174,9 @@ func (h *GiftHandler) ReorderItems(ctx *gin.Context) {
 	if !handlercommon.BindJSON(ctx, logId, "[GiftHandler][ReorderItems]", &req) {
 		return
 	}
-	err := h.Service.ReorderItems(ctx.Request.Context(), ownerId, ctx.Param("list_id"), req)
-	h.writeMutationAudit(ctx, domainaudit.ActionUpdate, "gift_item", ctx.Param("list_id"), "Reordered gift items", nil, req, err)
+	listId := ctx.Param("id")
+	err := h.Service.ReorderItems(ctx.Request.Context(), ownerId, listId, req)
+	h.writeMutationAudit(ctx, domainaudit.ActionUpdate, "gift_item", listId, "Reordered gift items", nil, req, err)
 	writeGiftResult(ctx, http.StatusOK, "Gift items reordered successfully", nil, err)
 }
 
@@ -184,7 +186,7 @@ func (h *GiftHandler) GetReservations(ctx *gin.Context) {
 		unauthorized(ctx)
 		return
 	}
-	data, err := h.Service.GetReservations(ctx.Request.Context(), ownerId, ctx.Param("list_id"))
+	data, err := h.Service.GetReservations(ctx.Request.Context(), ownerId, ctx.Param("id"))
 	writeGiftResult(ctx, http.StatusOK, "Get gift reservations successfully", data, err)
 }
 

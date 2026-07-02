@@ -218,10 +218,10 @@ The current route set includes:
 - `GET /api/gift-lists/:id`
 - `PUT /api/gift-lists/:id`
 - `DELETE /api/gift-lists/:id`
-- `GET /api/gift-lists/:list_id/items`
-- `POST /api/gift-lists/:list_id/items`
-- `POST /api/gift-lists/:list_id/items/reorder`
-- `GET /api/gift-lists/:list_id/reservations`
+- `GET /api/gift-lists/:id/items`
+- `POST /api/gift-lists/:id/items`
+- `POST /api/gift-lists/:id/items/reorder`
+- `GET /api/gift-lists/:id/reservations`
 - `PUT /api/gift-items/:id`
 - `DELETE /api/gift-items/:id`
 
@@ -246,9 +246,9 @@ Core tables:
 Owner flow:
 1. Login and use the returned `access_token`.
 2. Create a gift list with `POST /api/gift-lists`.
-3. Create items with `POST /api/gift-lists/:list_id/items`.
+3. Create items with `POST /api/gift-lists/:id/items`.
 4. Share the returned `share_code` with guests.
-5. View reservations with `GET /api/gift-lists/:list_id/reservations`.
+5. View reservations with `GET /api/gift-lists/:id/reservations`.
 
 Public guest flow:
 1. Open `GET /api/public/gift-lists/:code`.
