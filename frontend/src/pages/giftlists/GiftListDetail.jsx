@@ -1,11 +1,43 @@
-import { CheckCircle2, Copy, Edit2, Package, Plus, Tag, Trash2, Users } from 'lucide-react'
+import {
+  Archive,
+  CheckCircle2,
+  Copy,
+  ExternalLink,
+  Globe,
+  Package,
+  Search,
+  Settings,
+  Share2,
+} from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Loading from '../../components/common/Loading'
 import RetryState from '../../components/common/RetryState'
 import giftService from '../../services/giftService'
 import { getErrorMessage, getListData, getResponseData } from '../../services/api'
+import { formatOccasion } from '../../utils/giftDisplay'
+
+const publicUrl = (shareCode) => `${window.location.origin}/g/${shareCode}`
+
+const formatPrice = (item) => {
+  if (item.price === null || item.price === undefined) return ''
+  return `${item.currency || 'IDR'} ${Number(item.price).toLocaleString('id-ID')}`
+}
+
+const sourceHost = (url) => {
+  if (!url) return ''
+  try {
+    return new URL(url).host.replace(/^www\./, '')
+  } catch {
+    return ''
+  }
+}
+
+const reservationQuantity = (reservations, itemId) =>
+  reservations
+    .filter((reservation) => reservation.item_id === itemId)
+    .reduce((total, reservation) => total + Number(reservation.quantity || 0), 0)
 
 const GiftListDetail = () => {
   const { listId } = useParams()
@@ -16,6 +48,9 @@ const GiftListDetail = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [search, setSearch] = useState('')
+  const [sortBy, setSortBy] = useState('preferred')
+  const [expandedItemId, setExpandedItemId] = useState('')
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -41,14 +76,14 @@ const GiftListDetail = () => {
   }, [load])
 
   const copyLink = async () => {
-    await navigator.clipboard.writeText(`${window.location.origin}/g/${list.share_code}`)
+    await navigator.clipboard.writeText(publicUrl(list.share_code))
     setNotice('Public link copied')
     setTimeout(() => setNotice(''), 3000)
   }
 
-  const deleteItem = async (itemId) => {
-    if (!window.confirm('Delete this item?')) return
-    await giftService.deleteItem(itemId)
+  const archiveItem = async (item) => {
+    await giftService.updateItem(item.id, { is_archived: true })
+    setNotice('Item archived')
     await load()
   }
 
@@ -56,201 +91,194 @@ const GiftListDetail = () => {
     navigate(`/app/items/${item.id}/edit`, { state: { item, listId } })
   }
 
+  const visibleItems = useMemo(() => {
+    const keyword = search.trim().toLowerCase()
+    const filtered = keyword
+      ? items.filter((item) =>
+          [item.name, item.description, sourceHost(item.product_url)]
+            .filter(Boolean)
+            .some((value) => String(value).toLowerCase().includes(keyword)),
+        )
+      : items
+
+    return [...filtered].sort((a, b) => {
+      if (sortBy === 'price_asc') return Number(a.price || 0) - Number(b.price || 0)
+      if (sortBy === 'price_desc') return Number(b.price || 0) - Number(a.price || 0)
+      if (sortBy === 'name') return String(a.name).localeCompare(String(b.name))
+      if (sortBy === 'reserved') return reservationQuantity(reservations, b.id) - reservationQuantity(reservations, a.id)
+      return Number(a.priority || 0) - Number(b.priority || 0)
+    })
+  }, [items, reservations, search, sortBy])
+
   if (loading) return <Loading label="Loading gift list detail" />
   if (error) return <RetryState message={error} onRetry={load} />
   if (!list) return <RetryState message="Gift list not found" onRetry={load} />
 
+  const availableItems = items.filter((item) => item.quantity_remaining !== 0 && item.is_active !== false && item.is_archived !== true).length
+  const reservedItems = reservations.length
+
   return (
-    <section style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '80px' }}>
-      
-      {/* Immersive Header */}
-      <div style={{ 
-        position: 'relative', 
-        borderRadius: 'var(--radius-xl)', 
-        overflow: 'hidden',
-        marginBottom: '40px',
-        background: list.cover_image_url ? `url(${list.cover_image_url}) center/cover` : 'linear-gradient(135deg, #f43f5e 0%, #3b82f6 100%)',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
-      }}>
-        <div style={{ 
-          background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%)',
-          padding: '60px 40px 40px',
-          color: 'white',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '24px'
-        }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <span style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)', padding: '4px 12px', borderRadius: '99px', fontSize: '13px', fontWeight: 600, letterSpacing: '0.5px' }}>
-                {list.occasion_type?.replace('_', ' ').toUpperCase() || 'EVENT'}
-              </span>
-              {list.is_active && (
-                <span style={{ background: '#10b981', padding: '4px 12px', borderRadius: '99px', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <CheckCircle2 size={14} /> Active
-                </span>
-              )}
+    <>
+      <div className="gift-detail-hero">
+        {list.cover_image_url ? (
+          <div className="gift-detail-hero__bg" style={{ backgroundImage: `url(${list.cover_image_url})` }} />
+        ) : null}
+        <div className="gift-detail-hero__content">
+          <div className="gift-detail-hero__copy">
+            <span className="gift-detail-hero__eyebrow">{formatOccasion(list.occasion_type)}</span>
+            <h1>{list.title}</h1>
+            <p>{list.description || 'Share this list with friends and family so they can reserve the right gift.'}</p>
+            <button className="gift-detail-more" onClick={copyLink} type="button">
+              <Copy size={16} />
+              Copy public link
+            </button>
+            <div className="gift-detail-owner">
+              <span>Created by You</span>
+              <div className="gift-detail-owner__avatar">{String(list.title || 'Y').charAt(0).toUpperCase()}</div>
             </div>
-            <h1 style={{ fontSize: '42px', fontWeight: 800, margin: '0 0 12px 0', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>{list.title}</h1>
-            <p style={{ fontSize: '18px', opacity: 0.9, maxWidth: '600px', margin: 0, textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{list.description || 'No description provided'}</p>
           </div>
-          
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center', marginTop: '16px' }}>
-            <div style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)', padding: '12px 20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <span style={{ opacity: 0.7, fontSize: '14px' }}>Share Code:</span>
-              <strong style={{ fontSize: '18px', letterSpacing: '1px' }}>{list.share_code}</strong>
-              <button onClick={copyLink} style={{ background: 'white', color: 'black', border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginLeft: '8px' }} title="Copy Link">
-                <Copy size={14} />
-              </button>
-            </div>
-            
-            <Link to={`/app/lists/${listId}/edit`} className="button" style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(4px)', color: 'white', border: '1px solid rgba(255,255,255,0.3)', minHeight: '48px', borderRadius: '12px' }}>
-              <Edit2 size={16} style={{ marginRight: '6px' }} /> Edit List
-            </Link>
+          <div className="gift-detail-hero__media">
+            {list.cover_image_url ? <img alt="" src={list.cover_image_url} /> : <Package size={64} />}
           </div>
         </div>
       </div>
 
-      {notice && (
-        <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', color: '#059669', padding: '16px 24px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '32px', fontWeight: 600 }}>
-          <CheckCircle2 size={20} /> {notice}
+      <section className="gift-detail-page">
+        <div className="gift-detail-stats">
+        <div>
+          <span>AVAILABLE ITEMS</span>
+          <strong>{availableItems}</strong>
         </div>
-      )}
+        <div>
+          <span>ITEMS RESERVED</span>
+          <strong>{reservedItems}</strong>
+        </div>
+        <div>
+          <span>SHIPPING ADDRESS</span>
+          <button onClick={() => setNotice(list.shipping_note || 'No shipping note yet')} type="button">View</button>
+        </div>
+      </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '32px', alignItems: 'start' }}>
-        
-        {/* Left Column: Items */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Package size={24} color="var(--color-primary)" />
-              Gift Items <span style={{ background: 'var(--color-surface-hover)', padding: '2px 10px', borderRadius: '99px', fontSize: '14px', color: 'var(--color-shade-50)' }}>{items.length}</span>
-            </h2>
-            <Link className="button" to={`/app/lists/${listId}/items/new`} style={{ background: 'var(--color-primary)', color: 'white', borderRadius: '99px', padding: '0 20px', minHeight: '40px' }}>
-              <Plus size={18} style={{ marginRight: '4px' }} /> Add Item
-            </Link>
+      {notice ? (
+        <div className="alert alert--success gift-detail-notice">
+          <CheckCircle2 size={16} /> {notice}
+        </div>
+      ) : null}
+
+      <div className="gift-detail-controls">
+        <label>
+          <span>Search</span>
+          <div className="gift-detail-search">
+            <Search size={16} />
+            <input aria-label="Search" onChange={(event) => setSearch(event.target.value)} placeholder="E.g. bunny toy" value={search} />
           </div>
+        </label>
+        <label>
+          <span>Sort by</span>
+          <select aria-label="Sort by" className="gift-detail-sort" onChange={(event) => setSortBy(event.target.value)} value={sortBy}>
+            <option value="preferred">Preferred</option>
+            <option value="reserved">Reserved first</option>
+            <option value="price_asc">Price low to high</option>
+            <option value="price_desc">Price high to low</option>
+            <option value="name">Name</option>
+          </select>
+        </label>
+      </div>
 
-          {items.length === 0 ? (
-            <div className="surface" style={{ padding: '48px 32px', textAlign: 'center', borderRadius: 'var(--radius-xl)' }}>
-              <div style={{ width: '64px', height: '64px', background: 'var(--color-surface-hover)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-                <Package size={32} color="var(--color-shade-40)" />
-              </div>
-              <h3 style={{ fontSize: '20px', margin: '0 0 8px 0' }}>No items yet</h3>
-              <p className="muted" style={{ margin: '0 0 24px 0' }}>Guests need visible items before they can reserve.</p>
-              <Link className="button" to={`/app/lists/${listId}/items/new`} style={{ background: 'var(--color-primary)', color: 'white' }}>Add first item</Link>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {items.map((item) => (
-                <article key={item.id} style={{ 
-                  display: 'flex', 
-                  background: 'rgba(255, 255, 255, 0.6)', 
-                  backdropFilter: 'blur(16px)',
-                  border: '1px solid rgba(255,255,255,0.8)',
-                  borderRadius: '20px', 
-                  padding: '16px',
-                  gap: '20px',
-                  boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
-                  transition: 'transform 0.2s, box-shadow 0.2s'
-                }} className="item-card">
-                  
-                  <div style={{ 
-                    width: '100px', 
-                    height: '100px', 
-                    borderRadius: '12px', 
-                    background: item.image_url ? `url(${item.image_url}) center/cover` : 'var(--color-surface-hover)',
-                    flexShrink: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    {!item.image_url && <Package size={32} color="var(--color-shade-30)" />}
+      <div className="gift-detail-items">
+        {visibleItems.length === 0 ? (
+          <div className="gift-detail-empty">
+            <Package size={32} />
+            <h2>No items found</h2>
+            <p>Add gift items or change the search term.</p>
+            <Link className="button button--primary" to={`/app/lists/${listId}/items/new`}>Add item</Link>
+          </div>
+        ) : (
+          visibleItems.map((item) => {
+            const itemReservations = reservations.filter((reservation) => reservation.item_id === item.id)
+            const reservedQty = reservationQuantity(reservations, item.id)
+            const receivedInFull = Number(item.quantity_remaining) === 0 || (item.quantity && reservedQty >= item.quantity)
+            const host = sourceHost(item.product_url)
+            const expanded = expandedItemId === item.id
+
+            return (
+              <article className="gift-detail-item" key={item.id}>
+                <div className="gift-detail-item__status">
+                  <div className="gift-detail-item__status-text">
+                    <CheckCircle2 size={16} /> 
+                    <span>
+                      You have {itemReservations.length} active reservation{itemReservations.length === 1 ? '' : 's'} &bull; {receivedInFull ? 'Item received in full' : `${Math.max(Number(item.quantity_remaining ?? item.quantity ?? 0), 0)} still available`}
+                    </span>
                   </div>
-                  
-                  <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <h3 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: 600 }}>{item.name}</h3>
-                        {!item.is_active && (
-                          <span style={{ fontSize: '11px', background: 'var(--color-shade-10)', padding: '2px 8px', borderRadius: '4px', color: 'var(--color-shade-50)', fontWeight: 600 }}>INACTIVE</span>
-                        )}
+                  <button onClick={() => archiveItem(item)} type="button"><Archive size={14} /> Archive item</button>
+                </div>
+
+                <div className="gift-detail-item__body">
+                  <div className="gift-detail-item__source">{host ? <><Globe size={12} /> {host}</> : <><Package size={12} /> manual item</>}</div>
+                  <div className="gift-detail-item__main">
+                    <div className="gift-detail-item__image">
+                      {item.image_url ? <img alt="" src={item.image_url} /> : <Package size={24} />}
+                    </div>
+                    <div className="gift-detail-item__text">
+                      <h2>{item.name} {item.product_url ? <a href={item.product_url} rel="noreferrer" target="_blank" style={{ color: '#9ca3af', marginLeft: '4px' }}><ExternalLink size={16} /></a> : null}</h2>
+                      <div className="gift-detail-item__price">
+                        {formatPrice(item)}
+                        {receivedInFull ? <span>Item received in full</span> : null}
                       </div>
-                      <p style={{ margin: 0, fontSize: '14px', color: 'var(--color-shade-50)', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                        {item.description || 'No description'}
-                      </p>
+                      <p>{item.description || item.name}</p>
+                      
+                      {item.product_url ? (
+                        <a className="gift-detail-online" href={item.product_url} rel="noreferrer" target="_blank" style={{ marginTop: '8px', textDecoration: 'none' }}>
+                          View online <ExternalLink size={14} />
+                        </a>
+                      ) : null}
                     </div>
                     
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-primary)', fontWeight: 700 }}>
-                        <Tag size={16} /> {item.currency || 'IDR'} {item.price ?? '-'}
-                        <span style={{ color: 'var(--color-shade-40)', fontWeight: 500, fontSize: '13px', marginLeft: '4px' }}>&times; {item.quantity}</span>
-                      </div>
-                      
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <button onClick={() => editItem(item)} style={{ background: 'white', border: '1px solid var(--color-hairline)', borderRadius: '8px', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--color-ink)' }}>
-                          <Edit2 size={16} />
-                        </button>
-                        <button onClick={() => deleteItem(item.id)} style={{ background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: '8px', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#e11d48' }}>
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </div>
+                    <button onClick={() => setExpandedItemId(expanded ? '' : item.id)} type="button" style={{ background: 'transparent', border: '1px solid #10b981', color: '#10b981', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0 }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <polyline points="19 12 12 19 5 12"></polyline>
+                      </svg>
+                    </button>
                   </div>
-                </article>
-              ))}
-            </div>
-          )}
-        </div>
+                </div>
 
-        {/* Right Column: Reservations */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <h2 style={{ fontSize: '24px', fontWeight: 700, margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Users size={24} color="var(--color-primary)" />
-            Reservations <span style={{ background: 'var(--color-surface-hover)', padding: '2px 10px', borderRadius: '99px', fontSize: '14px', color: 'var(--color-shade-50)' }}>{reservations.length}</span>
-          </h2>
-
-          <div className="surface" style={{ padding: '24px', borderRadius: 'var(--radius-xl)' }}>
-            {reservations.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '32px 0' }}>
-                <Users size={32} color="var(--color-shade-30)" style={{ margin: '0 auto 12px' }} />
-                <p className="muted" style={{ margin: 0 }}>No guests have reserved items yet.</p>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {reservations.map((reservation) => (
-                  <div key={reservation.id} style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'space-between',
-                    padding: '16px',
-                    background: 'var(--color-surface-hover)',
-                    borderRadius: '12px'
-                  }}>
-                    <div>
-                      <strong style={{ display: 'block', fontSize: '16px', marginBottom: '2px' }}>{reservation.guest_name || reservation.guest_email}</strong>
-                      <div style={{ fontSize: '13px', color: 'var(--color-shade-50)' }}>{reservation.item_name || reservation.item_id}</div>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-primary)' }}>Qty: {reservation.quantity}</div>
-                      <div style={{ fontSize: '12px', fontWeight: 600, color: '#10b981', textTransform: 'uppercase', marginTop: '2px' }}>{reservation.status}</div>
-                    </div>
+                <div className="gift-detail-item__footer">
+                  <div>
+                    <button onClick={() => editItem(item)} type="button">Edit</button>
+                    <span style={{ color: '#9ca3af' }}>|</span>
+                    <button onClick={() => editItem(item)} type="button">Move</button>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-        
+                  <button onClick={() => setExpandedItemId(expanded ? '' : item.id)} type="button" className="text-green">View reservations</button>
+                </div>
+
+                {expanded ? (
+                  <div className="gift-detail-reservations">
+                    {itemReservations.length === 0 ? (
+                      <p>No reservation for this item yet.</p>
+                    ) : (
+                      itemReservations.map((reservation) => (
+                        <div key={reservation.id}>
+                          <strong>{reservation.guest_name || reservation.guest_email || 'Guest'}</strong>
+                          <span>Qty {reservation.quantity} - {reservation.status}</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                ) : null}
+              </article>
+            )
+          })
+        )}
       </div>
-      
-      <style dangerouslySetInnerHTML={{__html: `
-        .item-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 10px 25px rgba(0,0,0,0.06) !important;
-        }
-      `}} />
+
+      <div className="gift-detail-actionbar" aria-label="Gift list actions">
+        <Link to={`/app/lists/${listId}/edit`}><Settings size={20} /> List Settings</Link>
+        <button onClick={copyLink} type="button"><Share2 size={20} /> Share</button>
+        <Link className="gift-detail-actionbar__primary" to={`/app/lists/${listId}/items/new`}>Add Item</Link>
+      </div>
     </section>
+    </>
   )
 }
 
