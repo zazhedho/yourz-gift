@@ -1,4 +1,4 @@
-import { ExternalLink, Gift, CheckCircle2, ShoppingBag, Package, Search, X } from 'lucide-react'
+import { ExternalLink, Gift, CheckCircle2, ShoppingBag, Package, Search, X, Globe } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useParams } from 'react-router-dom'
@@ -26,6 +26,15 @@ const shouldShowReadMore = (value) => {
 const remainingQuantity = (item) => Number(item.quantity_remaining ?? item.quantity ?? 0)
 
 const isItemAvailable = (item) => item.can_reserve !== false && remainingQuantity(item) > 0
+
+const sourceHost = (url) => {
+  if (!url) return null
+  try {
+    return new URL(url).hostname.replace('www.', '')
+  } catch {
+    return null
+  }
+}
 
 const PublicGiftList = () => {
   const { code } = useParams()
@@ -180,6 +189,7 @@ const PublicGiftList = () => {
             {filteredItems.map((item) => {
               const remaining = remainingQuantity(item)
               const canReserve = isItemAvailable(item)
+              const host = sourceHost(item.product_url)
               
               return (
                 <div className="gift-detail-item" key={item.id}>
@@ -191,23 +201,28 @@ const PublicGiftList = () => {
                   </div>
 
                   <div className="gift-detail-item__body">
-                    <div className="gift-detail-item__main" style={{ gridTemplateColumns: '84px minmax(0, 1fr)' }}>
+                    <div className="gift-detail-item__source">{host ? <><Globe size={12} /> {host}</> : <><Package size={12} /> manual item</>}</div>
+                    <div className="gift-detail-item__main">
                       <div className="gift-detail-item__image">
                         {item.image_url ? (
                           <img alt={item.name} src={item.image_url} />
                         ) : (
-                          <Package size={40} color="#94a3b8" />
+                          <Package size={24} color="#94a3b8" />
                         )}
                       </div>
                       <div className="gift-detail-item__text">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
-                          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#111827' }}>{item.name}</h2>
-                          {item.price && <div className="gift-detail-item__price" style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#10b981' }}>{formatPrice(item)}</div>}
+                          <h2 style={{ margin: 0 }}>{item.name}</h2>
+                          {item.price && (
+                            <div className="gift-detail-item__price" style={{ color: '#10b981', margin: 0, whiteSpace: 'nowrap' }}>
+                              {formatPrice(item)}
+                            </div>
+                          )}
                         </div>
-                        <p style={{ margin: '8px 0 16px', fontSize: '14px', color: '#6b7280', lineHeight: 1.5 }}>{item.description || item.name}</p>
+                        <p>{item.description || item.name}</p>
                         
                         {item.product_url ? (
-                          <a className="gift-detail-online" href={item.product_url} rel="noreferrer" target="_blank" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', color: '#334155', fontSize: '13px', fontWeight: 600, textDecoration: 'none' }}>
+                          <a className="gift-detail-online" href={item.product_url} rel="noreferrer" target="_blank" style={{ marginTop: '8px', textDecoration: 'none' }}>
                             View online <ExternalLink size={14} />
                           </a>
                         ) : null}

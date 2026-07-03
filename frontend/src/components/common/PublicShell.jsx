@@ -129,13 +129,16 @@ const PublicShell = () => {
         }
 
         @media (max-width: 768px) {
-          .app-shell__header.header-capsule {
-            margin: 0 auto !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            border-radius: 0 !important;
+          .app-shell__header {
             min-height: 72px !important;
             padding: 12px 16px !important;
+          }
+
+          .app-shell__header.header-capsule {
+            margin: 12px auto !important;
+            width: calc(100% - 24px) !important;
+            padding: 12px 16px !important;
+            border-radius: 24px !important;
           }
         }
       `}} />

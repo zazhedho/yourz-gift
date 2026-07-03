@@ -2085,6 +2085,10 @@ a {
   font-weight: 600;
 }
 
+.gift-detail-item--owner .gift-detail-item__price {
+  color: #059669;
+}
+
 .gift-detail-item__text p {
   color: #6b7280;
   font-size: 13px;
@@ -3322,7 +3326,6 @@ a {
   }
 
   .gift-detail-item--owner .gift-detail-item__price {
-    color: #059669;
     font-size: 15px;
   }
 
