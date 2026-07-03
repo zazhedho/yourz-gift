@@ -1,5 +1,6 @@
-import { ExternalLink, Gift, CheckCircle2, ShoppingBag, Package, Search } from 'lucide-react'
+import { ExternalLink, Gift, CheckCircle2, ShoppingBag, Package, Search, X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useParams } from 'react-router-dom'
 
 import Button from '../../components/common/Button'
@@ -17,6 +18,11 @@ const formatPrice = (item) => {
   return `${item.currency || 'IDR'} ${Number(item.price).toLocaleString('id-ID')}`
 }
 
+const shouldShowReadMore = (value) => {
+  const text = String(value || '').trim()
+  return text.length > 180 || text.split(/\r?\n/).length > 3
+}
+
 const PublicGiftList = () => {
   const { code } = useParams()
   const [list, setList] = useState(null)
@@ -25,6 +31,7 @@ const PublicGiftList = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [showDescription, setShowDescription] = useState(false)
   const [showShipping, setShowShipping] = useState(false)
 
   const [search, setSearch] = useState('')
@@ -75,6 +82,7 @@ const PublicGiftList = () => {
     })
 
   const availableItems = items.filter(i => (i.quantity_remaining ?? i.quantity) > 0).length
+  const showReadMore = shouldShowReadMore(list.description)
 
   return (
     <>
@@ -88,7 +96,11 @@ const PublicGiftList = () => {
             <span className="gift-detail-hero__eyebrow">{formatOccasion(list.occasion_type)}</span>
             <h1>{list.title}</h1>
             <p>{list.description || 'Choose a gift and reserve it for the owner.'}</p>
-
+            {showReadMore ? (
+              <button className="gift-detail-description-button" onClick={() => setShowDescription(true)} type="button">
+                Read more
+              </button>
+            ) : null}
           </div>
           <div className="gift-detail-hero__media">
             {list.cover_image_url ? <img alt="" src={list.cover_image_url} /> : <Gift size={64} />}
@@ -96,7 +108,7 @@ const PublicGiftList = () => {
         </div>
         <div className="gift-detail-hero__wave">
           <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <path fill="currentColor" d="M0,96L60,85.3C120,75,240,53,360,48C480,43,600,53,720,69.3C840,85,960,107,1080,106.7C1200,107,1320,85,1380,74.7L1440,64L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z"></path>
+            <path fill="currentColor" d="M0,82 C220,108 420,108 650,90 C890,72 1055,68 1240,74 C1330,77 1395,82 1440,78 L1440,120 L0,120 Z"></path>
           </svg>
         </div>
       </div>
@@ -237,6 +249,29 @@ const PublicGiftList = () => {
 
       {showShipping && (
         <ShippingModal note={list.shipping_note} onClose={() => setShowShipping(false)} />
+      )}
+
+      {showDescription && createPortal(
+        <div className="dialog-backdrop" role="presentation" style={{ zIndex: 9999 }}>
+          <div className="dialog gift-description-dialog" role="dialog" aria-modal="true" aria-label="Gift list description">
+            <div className="gift-description-dialog__header">
+              <div>
+                <span>{formatOccasion(list.occasion_type)}</span>
+                <h2>{list.title}</h2>
+              </div>
+              <button aria-label="Close description" onClick={() => setShowDescription(false)} type="button">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="gift-description-dialog__body">
+              <p>{list.description}</p>
+            </div>
+            <div className="gift-description-dialog__footer">
+              <button onClick={() => setShowDescription(false)} type="button">Close</button>
+            </div>
+          </div>
+        </div>,
+        document.body,
       )}
     </>
   )

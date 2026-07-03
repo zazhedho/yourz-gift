@@ -732,10 +732,13 @@ a {
   align-items: center;
   background: rgba(0, 0, 0, 0.62);
   display: grid;
+  height: 100dvh;
   inset: 0;
   justify-items: center;
+  overflow: auto;
   padding: 20px;
   position: fixed;
+  width: 100vw;
   z-index: 50;
 }
 
@@ -746,6 +749,97 @@ a {
   max-width: 520px;
   padding: 22px;
   width: 100%;
+}
+
+.gift-description-dialog {
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 18px;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.28);
+  max-width: min(620px, calc(100vw - 32px));
+  max-height: calc(100dvh - 40px);
+  overflow: hidden;
+  padding: 0;
+}
+
+.gift-description-dialog__header {
+  align-items: flex-start;
+  background: linear-gradient(135deg, #fff7ed 0%, #fff1f2 52%, #eef2ff 100%);
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  padding: 22px 24px 18px;
+}
+
+.gift-description-dialog__header span {
+  color: #f43f5e;
+  display: block;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  margin-bottom: 7px;
+  text-transform: uppercase;
+}
+
+.gift-description-dialog__header h2 {
+  color: #111827;
+  font-size: clamp(20px, 4vw, 26px);
+  font-weight: 850;
+  letter-spacing: 0;
+  line-height: 1.12;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.gift-description-dialog__header button {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 999px;
+  color: #475569;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 38px;
+  justify-content: center;
+  width: 38px;
+}
+
+.gift-description-dialog__body {
+  background: #ffffff;
+  max-height: min(56dvh, 440px);
+  overflow: auto;
+  padding: 22px 24px;
+}
+
+.gift-description-dialog__body p {
+  color: #334155;
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.gift-description-dialog__footer {
+  background: #f8fafc;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px 18px;
+}
+
+.gift-description-dialog__footer button {
+  background: #111827;
+  border: 0;
+  border-radius: 999px;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 800;
+  min-height: 40px;
+  min-width: 104px;
+  padding: 0 18px;
 }
 
 .reservation-table {
@@ -1133,20 +1227,23 @@ a {
 .gift-detail-hero__content {
   align-items: center;
   display: grid;
-  gap: 32px;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.7fr);
+  gap: clamp(72px, 10vw, 160px);
+  grid-template-columns: minmax(0, 1.25fr) minmax(340px, 0.75fr);
   min-height: 280px;
-  padding: 32px clamp(24px, 4vw, 48px) 80px;
-  max-width: 1000px;
+  padding: 32px clamp(44px, 9vw, 140px) 80px;
+  max-width: 1360px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
 }
 
 .gift-detail-hero__copy {
+  justify-self: start;
   display: grid;
   gap: 16px;
   justify-items: start;
+  min-width: 0;
+  max-width: 680px;
 }
 
 .gift-detail-hero__eyebrow {
@@ -1167,29 +1264,35 @@ a {
   letter-spacing: -0.02em;
   line-height: 1.1;
   margin: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .gift-detail-hero p {
-  font-size: clamp(15px, 1.8vw, 18px);
+  display: -webkit-box;
+  font-size: clamp(13px, 1.45vw, 15px);
   font-weight: 500;
-  line-height: 1.5;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  line-height: 1.45;
   margin: 0;
-  max-width: 540px;
+  max-width: 620px;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
-.gift-detail-more {
-  align-items: center;
-  background: rgba(255, 255, 255, 0.13);
-  border: 1px solid rgba(255, 255, 255, 0.32);
+.gift-detail-description-button {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 999px;
   color: #ffffff;
   cursor: pointer;
-  display: inline-flex;
-  font-weight: 700;
-  font-size: 14px;
-  gap: 8px;
-  min-height: 42px;
-  padding: 0 18px;
+  font-size: 12px;
+  font-weight: 750;
+  min-height: 34px;
+  padding: 0 14px;
 }
 
 .gift-detail-owner {
@@ -1231,8 +1334,10 @@ a {
   border-radius: 40px 100px 40px 100px;
   display: flex;
   justify-content: center;
+  justify-self: end;
   min-height: 200px;
   overflow: hidden;
+  width: min(440px, 100%);
 }
 
 .gift-detail-hero__media img {
@@ -1252,9 +1357,9 @@ a {
   color: #ffffff;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  margin: -90px auto 40px;
-  max-width: 720px;
-  min-height: 84px;
+  margin: -66px auto 40px;
+  max-width: 690px;
+  min-height: 64px;
   position: relative;
   z-index: 2;
 }
@@ -1263,13 +1368,13 @@ a {
   display: grid;
   gap: 4px;
   justify-items: center;
-  padding: 12px;
+  padding: 8px 12px;
   text-align: center;
 }
 
 .gift-detail-stats span {
   color: rgba(255, 255, 255, 0.8);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
 }
@@ -1277,7 +1382,7 @@ a {
 .gift-detail-stats strong,
 .gift-detail-stats button {
   color: #ffffff;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   line-height: 1;
 }
@@ -1577,12 +1682,13 @@ a {
 
 .gift-detail-actionbar {
   align-items: center;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 999px;
   bottom: 32px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255,255,255,0.2);
   display: flex;
   gap: 16px;
   left: 50%;
@@ -1804,12 +1910,15 @@ a {
   }
 
   .gift-detail-hero__content {
+    gap: 28px;
     grid-template-columns: 1fr;
     padding: 32px 22px 88px;
   }
 
   .gift-detail-hero__media {
+    justify-self: stretch;
     min-height: 220px;
+    width: 100%;
   }
 
   .gift-detail-hero__media img {

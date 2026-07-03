@@ -3,16 +3,17 @@ import {
   ArrowDown,
   ArrowUp,
   CheckCircle2,
-  Copy,
   ExternalLink,
   Globe,
   Package,
   Search,
   Settings,
   Share2,
+  X,
 } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 import Loading from '../../components/common/Loading'
 import RetryState from '../../components/common/RetryState'
@@ -44,6 +45,11 @@ const reservationQuantity = (reservations, itemId) =>
     .filter((reservation) => reservation.item_id === itemId)
     .reduce((total, reservation) => total + Number(reservation.quantity || 0), 0)
 
+const shouldShowReadMore = (value) => {
+  const text = String(value || '').trim()
+  return text.length > 180 || text.split(/\r?\n/).length > 3
+}
+
 const GiftListDetail = () => {
   const { listId } = useParams()
   const navigate = useNavigate()
@@ -53,6 +59,7 @@ const GiftListDetail = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [showDescription, setShowDescription] = useState(false)
   const [showShipping, setShowShipping] = useState(false)
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('preferred')
@@ -143,6 +150,7 @@ const GiftListDetail = () => {
 
   const availableItems = items.filter((item) => item.quantity_remaining !== 0 && item.is_active !== false && item.is_archived !== true).length
   const reservedItems = reservations.length
+  const showReadMore = shouldShowReadMore(list.description)
 
   return (
     <>
@@ -156,10 +164,11 @@ const GiftListDetail = () => {
             <span className="gift-detail-hero__eyebrow">{formatOccasion(list.occasion_type)}</span>
             <h1>{list.title}</h1>
             <p>{list.description || 'Share this list with friends and family so they can reserve the right gift.'}</p>
-            <button className="gift-detail-more" onClick={copyLink} type="button">
-              <Copy size={16} />
-              Copy public link
-            </button>
+            {showReadMore ? (
+              <button className="gift-detail-description-button" onClick={() => setShowDescription(true)} type="button">
+                Read more
+              </button>
+            ) : null}
             <div className="gift-detail-owner">
               <div className="gift-detail-owner__avatar">{String(list.title || 'Y').charAt(0).toUpperCase()}</div>
               <span>Created by You</span>
@@ -289,11 +298,14 @@ const GiftListDetail = () => {
         )}
       </div>
 
-      <div className="gift-detail-actionbar" aria-label="Gift list actions">
-        <Link to={`/app/lists/${listId}/edit`}><Settings size={20} /> List Settings</Link>
-        <button onClick={copyLink} type="button"><Share2 size={20} /> Share</button>
-        <Link className="gift-detail-actionbar__primary" to={`/app/lists/${listId}/items/new`}>Add Item</Link>
-      </div>
+      {createPortal(
+        <div className="gift-detail-actionbar" aria-label="Gift list actions">
+          <Link to={`/app/lists/${listId}/edit`}><Settings size={20} /> List Settings</Link>
+          <button onClick={copyLink} type="button"><Share2 size={20} /> Share</button>
+          <Link className="gift-detail-actionbar__primary" to={`/app/lists/${listId}/items/new`}>Add Item</Link>
+        </div>,
+        document.body
+      )}
 
       <ReservationsModal 
         item={items.find(i => i.id === expandedItemId)}
@@ -303,6 +315,29 @@ const GiftListDetail = () => {
 
       {showShipping && (
         <ShippingModal note={list.shipping_note} onClose={() => setShowShipping(false)} />
+      )}
+
+      {showDescription && createPortal(
+        <div className="dialog-backdrop" role="presentation" style={{ zIndex: 9999 }}>
+          <div className="dialog gift-description-dialog" role="dialog" aria-modal="true" aria-label="Gift list description">
+            <div className="gift-description-dialog__header">
+              <div>
+                <span>{formatOccasion(list.occasion_type)}</span>
+                <h2>{list.title}</h2>
+              </div>
+              <button aria-label="Close description" onClick={() => setShowDescription(false)} type="button">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="gift-description-dialog__body">
+              <p>{list.description}</p>
+            </div>
+            <div className="gift-description-dialog__footer">
+              <button onClick={() => setShowDescription(false)} type="button">Close</button>
+            </div>
+          </div>
+        </div>,
+        document.body,
       )}
     </section>
     </>
