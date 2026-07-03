@@ -14,6 +14,7 @@ const giftService = {
   deleteList: (id) => api.delete(`/gift-lists/${id}`),
   listItems: (listId) => api.get(`/gift-lists/${listId}/items`),
   createItem: (listId, payload) => api.post(`/gift-lists/${listId}/items`, payload),
+  reorderItems: (listId, payload) => api.post(`/gift-lists/${listId}/items/reorder`, payload),
   updateItem: (itemId, payload) => api.put(`/gift-items/${itemId}`, payload),
   deleteItem: (itemId) => api.delete(`/gift-items/${itemId}`),
   listReservations: (listId) => api.get(`/gift-lists/${listId}/reservations`),

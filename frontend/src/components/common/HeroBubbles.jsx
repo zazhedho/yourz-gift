@@ -1,5 +1,3 @@
-import React from 'react'
-
 const HeroBubbles = () => {
   return (
     <div className="hero-bubbles">

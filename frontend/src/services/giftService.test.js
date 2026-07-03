@@ -44,12 +44,14 @@ describe('giftService', () => {
   it('uses owner gift item endpoints', () => {
     giftService.listItems('list-1')
     giftService.createItem('list-1', { name: 'Book' })
+    giftService.reorderItems('list-1', { items: [{ id: 'item-1', priority: 0 }] })
     giftService.updateItem('item-1', { name: 'Lamp' })
     giftService.deleteItem('item-1')
     giftService.listReservations('list-1')
 
     expect(api.get).toHaveBeenCalledWith('/gift-lists/list-1/items')
     expect(api.post).toHaveBeenCalledWith('/gift-lists/list-1/items', { name: 'Book' })
+    expect(api.post).toHaveBeenCalledWith('/gift-lists/list-1/items/reorder', { items: [{ id: 'item-1', priority: 0 }] })
     expect(api.put).toHaveBeenCalledWith('/gift-items/item-1', { name: 'Lamp' })
     expect(api.delete).toHaveBeenCalledWith('/gift-items/item-1')
     expect(api.get).toHaveBeenCalledWith('/gift-lists/list-1/reservations')

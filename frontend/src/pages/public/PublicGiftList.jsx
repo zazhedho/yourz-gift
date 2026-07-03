@@ -1,4 +1,4 @@
-import { ExternalLink, Gift, MapPin, CheckCircle2, ShoppingBag, Package, Search } from 'lucide-react'
+import { ExternalLink, Gift, CheckCircle2, ShoppingBag, Package, Search } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 

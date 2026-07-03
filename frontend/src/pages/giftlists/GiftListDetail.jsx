@@ -1,5 +1,7 @@
 import {
   Archive,
+  ArrowDown,
+  ArrowUp,
   CheckCircle2,
   Copy,
   ExternalLink,
@@ -89,6 +91,27 @@ const GiftListDetail = () => {
     await giftService.updateItem(item.id, { is_archived: true })
     setNotice('Item archived')
     await load()
+  }
+
+  const reorderItem = async (itemId, direction) => {
+    const currentIndex = items.findIndex((item) => item.id === itemId)
+    const nextIndex = currentIndex + direction
+    if (currentIndex < 0 || nextIndex < 0 || nextIndex >= items.length) return
+
+    const nextItems = [...items]
+    const [moved] = nextItems.splice(currentIndex, 1)
+    nextItems.splice(nextIndex, 0, moved)
+    const payload = {
+      items: nextItems.map((item, index) => ({ id: item.id, priority: index })),
+    }
+
+    setItems(nextItems.map((item, index) => ({ ...item, priority: index })))
+    try {
+      await giftService.reorderItems(listId, payload)
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to reorder item'))
+      await load()
+    }
   }
 
   const editItem = (item) => {
@@ -205,12 +228,11 @@ const GiftListDetail = () => {
           </div>
         ) : (
           visibleItems.map((item) => {
+            const itemIndex = items.findIndex((currentItem) => currentItem.id === item.id)
             const itemReservations = reservations.filter((reservation) => reservation.item_id === item.id)
             const reservedQty = reservationQuantity(reservations, item.id)
             const receivedInFull = Number(item.quantity_remaining) === 0 || (item.quantity && reservedQty >= item.quantity)
             const host = sourceHost(item.product_url)
-            const expanded = expandedItemId === item.id
-
             return (
               <article className="gift-detail-item" key={item.id}>
                 <div className="gift-detail-item__status">
@@ -244,20 +266,20 @@ const GiftListDetail = () => {
                       ) : null}
                     </div>
                     
-                    <button onClick={() => setExpandedItemId(expanded ? '' : item.id)} type="button" style={{ background: 'transparent', border: '1px solid #10b981', color: '#10b981', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0 }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <polyline points="19 12 12 19 5 12"></polyline>
-                      </svg>
-                    </button>
+                    <div className="gift-detail-item__reorder" aria-label={`Reorder ${item.name}`}>
+                      <button aria-label={`Move ${item.name} up`} disabled={itemIndex <= 0} onClick={() => reorderItem(item.id, -1)} type="button">
+                        <ArrowUp size={14} />
+                      </button>
+                      <button aria-label={`Move ${item.name} down`} disabled={itemIndex === items.length - 1} onClick={() => reorderItem(item.id, 1)} type="button">
+                        <ArrowDown size={14} />
+                      </button>
+                    </div>
                   </div>
                 </div>
 
                 <div className="gift-detail-item__footer">
                   <div>
                     <button onClick={() => editItem(item)} type="button">Edit</button>
-                    <span style={{ color: '#9ca3af' }}>|</span>
-                    <button onClick={() => editItem(item)} type="button">Move</button>
                   </div>
                   <button onClick={() => setExpandedItemId(item.id)} type="button" className="text-green">View reservations</button>
                 </div>
