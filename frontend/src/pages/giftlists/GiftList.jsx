@@ -1,6 +1,7 @@
 import { CheckCircle, ChevronRight, Copy, Edit2, Plus, Trash2 } from 'lucide-react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 import ConfirmDialog from '../../components/common/ConfirmDialog'
 import EmptyState from '../../components/common/EmptyState'
@@ -74,6 +75,7 @@ const GiftList = () => {
   const copyLink = async (shareCode) => {
     await navigator.clipboard.writeText(publicUrl(shareCode))
     setNotice('Public link copied')
+    setTimeout(() => setNotice(''), 3000)
   }
 
   if (loading) return <Loading label="Loading gift lists" />
@@ -89,7 +91,12 @@ const GiftList = () => {
         <p>Browse your lists and those shared by friends</p>
       </div>
 
-      {notice ? <div className="alert alert--success">{notice}</div> : null}
+      {notice ? createPortal(
+        <div className="gift-detail-notice" role="alert">
+          <CheckCircle size={18} /> {notice}
+        </div>,
+        document.body
+      ) : null}
 
       <div className="wish-toolbar">
         <div className="wish-toolbar__segments">

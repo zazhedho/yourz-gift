@@ -209,10 +209,11 @@ const GiftListDetail = () => {
         </div>
       </div>
 
-      {notice ? (
-        <div className="alert alert--success gift-detail-notice">
-          <CheckCircle2 size={16} /> {notice}
-        </div>
+      {notice ? createPortal(
+        <div className="gift-detail-notice" role="alert">
+          <CheckCircle2 size={18} /> {notice}
+        </div>,
+        document.body
       ) : null}
 
       <div className="gift-detail-controls">

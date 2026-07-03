@@ -1341,7 +1341,6 @@ a {
 }
 
 .gift-detail-hero__media img {
-  filter: grayscale(100%);
   height: 100%;
   min-height: 200px;
   object-fit: cover;
@@ -1397,9 +1396,26 @@ a {
 
 .gift-detail-notice {
   align-items: center;
+  background: #10b981;
+  color: white;
+  border-radius: 99px;
+  box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
   display: inline-flex;
   gap: 8px;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 12px 24px;
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  animation: toastFadeInUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes toastFadeInUp {
+  0% { opacity: 0; transform: translate(-50%, 20px) scale(0.95); }
+  100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
 }
 
 .gift-detail-controls {
