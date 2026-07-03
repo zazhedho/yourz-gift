@@ -119,7 +119,7 @@ const PublicGiftList = () => {
         </div>
       </div>
 
-      <section className="gift-detail-page">
+      <section className="gift-detail-page gift-detail-page--public">
         <div className="gift-detail-stats">
           <div>
             <span>AVAILABLE ITEMS</span>

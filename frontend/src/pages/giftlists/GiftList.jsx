@@ -147,13 +147,13 @@ const GiftList = () => {
                     </div>
                   )}
                 </div>
-                <div>
+                <div className="wish-list-card__text">
                   <h2>{list.title}</h2>
                   <p>{view === 'friends' ? 'By Friend' : 'By You'}</p>
                 </div>
               </div>
 
-              <div className="wish-list-card__actions">
+              <div aria-label={`Actions for ${list.title}`} className="wish-list-card__actions" role="group">
                 <button className="wish-icon-action" onClick={() => copyLink(list.share_code)} title="Copy Public Link" type="button">
                   <Copy size={16} />
                 </button>

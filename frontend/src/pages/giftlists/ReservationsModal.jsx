@@ -6,7 +6,7 @@ const ReservationsModal = ({ item, reservations, onClose }) => {
 
   return createPortal(
     <div className="dialog-backdrop" onClick={onClose} style={{ zIndex: 9999 }}>
-      <div className="dialog" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', width: '90%', padding: '32px', borderRadius: '24px', background: '#ffffff', position: 'relative' }}>
+      <div className="dialog dialog--reservations" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', width: '90%', padding: '32px', borderRadius: '24px', background: '#ffffff', position: 'relative' }}>
         <button 
           onClick={onClose} 
           aria-label="Close" 

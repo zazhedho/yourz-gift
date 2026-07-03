@@ -193,7 +193,7 @@ const GiftListDetail = () => {
         </div>
       </div>
 
-      <section className="gift-detail-page">
+      <section className="gift-detail-page gift-detail-page--owner">
         <div className="gift-detail-stats">
         <div>
           <span>AVAILABLE ITEMS</span>
@@ -252,7 +252,7 @@ const GiftListDetail = () => {
             const receivedInFull = Number(item.quantity_remaining) === 0 || (item.quantity && reservedQty >= item.quantity)
             const host = sourceHost(item.product_url)
             return (
-              <article className="gift-detail-item" key={item.id}>
+              <article className="gift-detail-item gift-detail-item--owner" key={item.id}>
                 <div className="gift-detail-item__status">
                   <div className="gift-detail-item__status-text">
                     <CheckCircle2 size={16} /> 

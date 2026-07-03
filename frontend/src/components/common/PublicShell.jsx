@@ -127,6 +127,17 @@ const PublicShell = () => {
           transform: translateY(1px);
           box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2);
         }
+
+        @media (max-width: 768px) {
+          .app-shell__header.header-capsule {
+            margin: 0 auto !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            border-radius: 0 !important;
+            min-height: 72px !important;
+            padding: 12px 16px !important;
+          }
+        }
       `}} />
     </div>
   )

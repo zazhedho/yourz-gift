@@ -43,7 +43,7 @@ const ReservationForm = ({ code, item, onClose, onReserved }) => {
 
   const modalContent = (
     <div className="dialog-backdrop" role="presentation">
-      <section className="dialog" role="dialog" aria-modal="true" aria-label={`Reserve ${item.name}`}>
+      <section className="dialog dialog--reservation-form" role="dialog" aria-modal="true" aria-label={`Reserve ${item.name}`}>
         <h2>Reserve {item.name}</h2>
         <p className="muted">Your reservation helps the owner avoid duplicates.</p>
         <ErrorBanner message={error} />

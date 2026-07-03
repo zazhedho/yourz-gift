@@ -7,7 +7,7 @@ const ShippingModal = ({ note, onClose }) => {
 
   const modalContent = (
     <div className="dialog-backdrop" role="presentation" style={{ zIndex: 9999 }}>
-      <div className="dialog" role="dialog" aria-modal="true" aria-label="Shipping Address" style={{ maxWidth: '420px', padding: '32px', borderRadius: '24px', textAlign: 'center' }}>
+      <div className="dialog dialog--shipping" role="dialog" aria-modal="true" aria-label="Shipping Address" style={{ maxWidth: '420px', padding: '32px', borderRadius: '24px', textAlign: 'center' }}>
         <div style={{
           width: '64px',
           height: '64px',

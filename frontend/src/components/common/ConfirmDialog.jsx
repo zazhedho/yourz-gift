@@ -6,7 +6,7 @@ const ConfirmDialog = ({ message, onCancel, onConfirm, open, title = 'Confirm ac
 
   const modalContent = (
     <div className="dialog-backdrop" role="presentation">
-      <div className="dialog" role="dialog" aria-modal="true" aria-label={title}>
+      <div className="dialog dialog--confirm" role="dialog" aria-modal="true" aria-label={title}>
         <h2>{title}</h2>
         <p>{message}</p>
         <div className="actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
