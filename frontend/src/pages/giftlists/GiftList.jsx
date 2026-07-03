@@ -2,6 +2,7 @@ import { CheckCircle, ChevronRight, Copy, Edit2, Plus, Trash2 } from 'lucide-rea
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
 
+import ConfirmDialog from '../../components/common/ConfirmDialog'
 import EmptyState from '../../components/common/EmptyState'
 import Loading from '../../components/common/Loading'
 import RetryState from '../../components/common/RetryState'
@@ -21,6 +22,7 @@ const GiftList = () => {
   const [status, setStatus] = useState('current')
   const navigate = useNavigate()
   const searchTerm = searchParams.get('search')?.trim() || ''
+  const [deleteId, setDeleteId] = useState(null)
 
   const loadLists = useCallback(async () => {
     setLoading(true)
@@ -58,9 +60,14 @@ const GiftList = () => {
     setSearchParams(next)
   }
 
-  const remove = async (id) => {
-    if (!window.confirm('Delete this gift list?')) return
-    await giftService.deleteList(id)
+  const remove = (id) => {
+    setDeleteId(id)
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteId) return
+    await giftService.deleteList(deleteId)
+    setDeleteId(null)
     await loadLists()
   }
 
@@ -161,6 +168,14 @@ const GiftList = () => {
           ))}
         </div>
       )}
+
+      <ConfirmDialog 
+        open={Boolean(deleteId)} 
+        title="Delete Gift List" 
+        message="Are you sure you want to delete this gift list? This action cannot be undone."
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteId(null)}
+      />
 
       <p className="wish-end">You've reached the end</p>
     </section>

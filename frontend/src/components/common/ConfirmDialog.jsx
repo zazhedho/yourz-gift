@@ -9,9 +9,9 @@ const ConfirmDialog = ({ message, onCancel, onConfirm, open, title = 'Confirm ac
       <div className="dialog" role="dialog" aria-modal="true" aria-label={title}>
         <h2>{title}</h2>
         <p>{message}</p>
-        <div className="actions">
-          <Button variant="danger" onClick={onConfirm}>Confirm</Button>
-          <Button variant="ghost" onClick={onCancel}>Cancel</Button>
+        <div className="actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
+          <Button variant="ghost" onClick={onCancel} style={{ borderRadius: '99px', padding: '0 24px' }}>Cancel</Button>
+          <Button variant="danger" onClick={onConfirm} style={{ borderRadius: '99px', padding: '0 24px' }}>Confirm</Button>
         </div>
       </div>
     </div>

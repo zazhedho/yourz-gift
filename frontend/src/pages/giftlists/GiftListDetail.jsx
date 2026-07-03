@@ -23,6 +23,7 @@ import { formatOccasion } from '../../utils/giftDisplay'
 import HeroBubbles from '../../components/common/HeroBubbles'
 import ShippingModal from './ShippingModal'
 import ReservationsModal from './ReservationsModal'
+import useAuth from '../../hooks/useAuth'
 
 const publicUrl = (shareCode) => `${window.location.origin}/g/${shareCode}`
 
@@ -51,6 +52,7 @@ const shouldShowReadMore = (value) => {
 }
 
 const GiftListDetail = () => {
+  const auth = useAuth()
   const { listId } = useParams()
   const navigate = useNavigate()
   const [list, setList] = useState(null)
@@ -170,7 +172,13 @@ const GiftListDetail = () => {
               </button>
             ) : null}
             <div className="gift-detail-owner">
-              <div className="gift-detail-owner__avatar">{String(list.title || 'Y').charAt(0).toUpperCase()}</div>
+              <div className="gift-detail-owner__avatar">
+                {auth.user?.avatar_url ? (
+                  <img alt="" src={auth.user.avatar_url} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                ) : (
+                  String(auth.user?.name || auth.user?.email || 'Y').charAt(0).toUpperCase()
+                )}
+              </div>
               <span>Created by You</span>
             </div>
           </div>

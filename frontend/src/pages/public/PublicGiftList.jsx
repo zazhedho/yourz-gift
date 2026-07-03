@@ -23,6 +23,10 @@ const shouldShowReadMore = (value) => {
   return text.length > 180 || text.split(/\r?\n/).length > 3
 }
 
+const remainingQuantity = (item) => Number(item.quantity_remaining ?? item.quantity ?? 0)
+
+const isItemAvailable = (item) => item.can_reserve !== false && remainingQuantity(item) > 0
+
 const PublicGiftList = () => {
   const { code } = useParams()
   const [list, setList] = useState(null)
@@ -75,13 +79,15 @@ const PublicGiftList = () => {
       return item.name?.toLowerCase().includes(s) || item.description?.toLowerCase().includes(s)
     })
     .sort((a, b) => {
+      const availabilityOrder = Number(isItemAvailable(b)) - Number(isItemAvailable(a))
+      if (availabilityOrder !== 0) return availabilityOrder
       if (sortBy === 'price-asc') return Number(a.price || 0) - Number(b.price || 0)
       if (sortBy === 'price-desc') return Number(b.price || 0) - Number(a.price || 0)
       if (sortBy === 'newest') return new Date(b.created_at || 0) - new Date(a.created_at || 0)
       return Number(a.priority || 0) - Number(b.priority || 0)
     })
 
-  const availableItems = items.filter(i => (i.quantity_remaining ?? i.quantity) > 0).length
+  const availableItems = items.filter(isItemAvailable).length
   const showReadMore = shouldShowReadMore(list.description)
 
   return (
@@ -172,8 +178,8 @@ const PublicGiftList = () => {
         ) : (
           <div className="gift-detail-items">
             {filteredItems.map((item) => {
-              const remaining = item.quantity_remaining ?? item.quantity
-              const canReserve = item.can_reserve !== false && remaining > 0
+              const remaining = remainingQuantity(item)
+              const canReserve = isItemAvailable(item)
               
               return (
                 <div className="gift-detail-item" key={item.id}>
