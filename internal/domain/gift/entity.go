@@ -34,6 +34,8 @@ type GiftList struct {
 	Visibility            string         `json:"visibility" gorm:"column:visibility"`
 	ReservationVisibility string         `json:"reservation_visibility" gorm:"column:reservation_visibility"`
 	IsActive              bool           `json:"is_active" gorm:"column:is_active"`
+	NeverExpires          bool           `json:"never_expires" gorm:"column:never_expires"`
+	ExpiresAt             *time.Time     `json:"expires_at,omitempty" gorm:"column:expires_at"`
 	CreatedAt             time.Time      `json:"created_at,omitempty" gorm:"column:created_at"`
 	UpdatedAt             *time.Time     `json:"updated_at,omitempty" gorm:"column:updated_at"`
 	DeletedAt             gorm.DeletedAt `json:"-" gorm:"index"`

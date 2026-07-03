@@ -19,7 +19,21 @@ const defaultForm = {
   visibility: 'public',
   reservation_visibility: 'immediately',
   is_active: true,
+  never_expires: true,
+  expires_at: '',
 }
+
+const toDateTimeLocalValue = (value) => {
+  if (!value) return ''
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
+}
+
+const toPayload = (form) => ({
+  ...form,
+  expires_at: form.never_expires || !form.expires_at ? null : new Date(form.expires_at).toISOString(),
+})
 
 const GiftListForm = () => {
   const { listId } = useParams()
@@ -36,7 +50,7 @@ const GiftListForm = () => {
     try {
       const response = await giftService.getList(listId)
       const data = getResponseData(response)
-      setForm({ ...defaultForm, ...data })
+      setForm({ ...defaultForm, ...data, expires_at: toDateTimeLocalValue(data?.expires_at) })
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to load gift list'))
     } finally {
@@ -50,7 +64,11 @@ const GiftListForm = () => {
 
   const update = (event) => {
     const { checked, name, type, value } = event.target
-    setForm((current) => ({ ...current, [name]: type === 'checkbox' ? checked : value }))
+    setForm((current) => ({
+      ...current,
+      [name]: type === 'checkbox' ? checked : value,
+      ...(name === 'never_expires' && checked ? { expires_at: '' } : {}),
+    }))
   }
   const updateField = (name, value) => setForm((current) => ({ ...current, [name]: value }))
 
@@ -59,7 +77,7 @@ const GiftListForm = () => {
     setSubmitting(true)
     setError('')
     try {
-      const payload = { ...form }
+      const payload = toPayload(form)
       if (editing) {
         await giftService.updateList(listId, payload)
         navigate(`/app/lists/${listId}`)
@@ -161,6 +179,19 @@ const GiftListForm = () => {
               List is Active
             </label>
           </div>
+          <div style={{ marginTop: '16px' }}>
+            <label className="checkbox-row" style={{ fontWeight: 600, cursor: 'pointer', color: '#111827' }}>
+              <input checked={form.never_expires} name="never_expires" onChange={update} type="checkbox" style={{ accentColor: '#f43f5e', width: '20px', height: '20px' }} />
+              Active forever
+            </label>
+          </div>
+          {!form.never_expires ? (
+            <div style={{ marginTop: '20px', maxWidth: '360px' }}>
+              <FormField label="Expires at">
+                <input className="input" name="expires_at" onChange={update} required type="datetime-local" value={form.expires_at} style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
+              </FormField>
+            </div>
+          ) : null}
         </div>
         
       </form>

@@ -1,24 +1,30 @@
 package dto
 
+import "time"
+
 type GiftListCreate struct {
-	Title                 string `json:"title" binding:"required,min=2,max=160"`
-	Description           string `json:"description" binding:"omitempty,max=2000"`
-	OccasionType          string `json:"occasion_type" binding:"omitempty,max=40"`
-	CoverImageUrl         string `json:"cover_image_url" binding:"omitempty,url,max=1000"`
-	ShippingNote          string `json:"shipping_note" binding:"omitempty,max=2000"`
-	Visibility            string `json:"visibility" binding:"omitempty,oneof=public private"`
-	ReservationVisibility string `json:"reservation_visibility" binding:"omitempty,max=40"`
+	Title                 string     `json:"title" binding:"required,min=2,max=160"`
+	Description           string     `json:"description" binding:"omitempty,max=2000"`
+	OccasionType          string     `json:"occasion_type" binding:"omitempty,max=40"`
+	CoverImageUrl         string     `json:"cover_image_url" binding:"omitempty,url,max=1000"`
+	ShippingNote          string     `json:"shipping_note" binding:"omitempty,max=2000"`
+	Visibility            string     `json:"visibility" binding:"omitempty,oneof=public private"`
+	ReservationVisibility string     `json:"reservation_visibility" binding:"omitempty,max=40"`
+	NeverExpires          *bool      `json:"never_expires" binding:"omitempty"`
+	ExpiresAt             *time.Time `json:"expires_at" binding:"omitempty"`
 }
 
 type GiftListUpdate struct {
-	Title                 string `json:"title" binding:"omitempty,min=2,max=160"`
-	Description           string `json:"description" binding:"omitempty,max=2000"`
-	OccasionType          string `json:"occasion_type" binding:"omitempty,max=40"`
-	CoverImageUrl         string `json:"cover_image_url" binding:"omitempty,url,max=1000"`
-	ShippingNote          string `json:"shipping_note" binding:"omitempty,max=2000"`
-	Visibility            string `json:"visibility" binding:"omitempty,oneof=public private"`
-	ReservationVisibility string `json:"reservation_visibility" binding:"omitempty,max=40"`
-	IsActive              *bool  `json:"is_active" binding:"omitempty"`
+	Title                 string     `json:"title" binding:"omitempty,min=2,max=160"`
+	Description           string     `json:"description" binding:"omitempty,max=2000"`
+	OccasionType          string     `json:"occasion_type" binding:"omitempty,max=40"`
+	CoverImageUrl         string     `json:"cover_image_url" binding:"omitempty,url,max=1000"`
+	ShippingNote          string     `json:"shipping_note" binding:"omitempty,max=2000"`
+	Visibility            string     `json:"visibility" binding:"omitempty,oneof=public private"`
+	ReservationVisibility string     `json:"reservation_visibility" binding:"omitempty,max=40"`
+	IsActive              *bool      `json:"is_active" binding:"omitempty"`
+	NeverExpires          *bool      `json:"never_expires" binding:"omitempty"`
+	ExpiresAt             *time.Time `json:"expires_at" binding:"omitempty"`
 }
 
 type GiftItemCreate struct {
@@ -75,16 +81,18 @@ type GiftFriendResponse struct {
 }
 
 type GiftListPublicResponse struct {
-	Id                    string `json:"id"`
-	Title                 string `json:"title"`
-	Description           string `json:"description"`
-	OccasionType          string `json:"occasion_type"`
-	ShareCode             string `json:"share_code"`
-	CoverImageUrl         string `json:"cover_image_url"`
-	ShippingNote          string `json:"shipping_note"`
-	ReservationVisibility string `json:"reservation_visibility"`
-	AvailableItems        int    `json:"available_items"`
-	ReservedItems         int    `json:"reserved_items"`
+	Id                    string     `json:"id"`
+	Title                 string     `json:"title"`
+	Description           string     `json:"description"`
+	OccasionType          string     `json:"occasion_type"`
+	ShareCode             string     `json:"share_code"`
+	CoverImageUrl         string     `json:"cover_image_url"`
+	ShippingNote          string     `json:"shipping_note"`
+	ReservationVisibility string     `json:"reservation_visibility"`
+	NeverExpires          bool       `json:"never_expires"`
+	ExpiresAt             *time.Time `json:"expires_at,omitempty"`
+	AvailableItems        int        `json:"available_items"`
+	ReservedItems         int        `json:"reserved_items"`
 }
 
 type GiftItemPublicResponse struct {

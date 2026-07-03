@@ -48,6 +48,14 @@ func NewGiftService(
 }
 
 func (s *GiftService) CreateList(ctx context.Context, ownerId string, req dto.GiftListCreate) (domaingift.GiftList, error) {
+	neverExpires := true
+	if req.NeverExpires != nil {
+		neverExpires = *req.NeverExpires
+	}
+	var expiresAt *time.Time
+	if !neverExpires {
+		expiresAt = req.ExpiresAt
+	}
 	list := domaingift.GiftList{
 		Id:                    utils.CreateUUID(),
 		OwnerId:               ownerId,
@@ -60,6 +68,8 @@ func (s *GiftService) CreateList(ctx context.Context, ownerId string, req dto.Gi
 		Visibility:            utils.StringOrDefault(req.Visibility, domaingift.ListVisibilityPublic),
 		ReservationVisibility: utils.StringOrDefault(req.ReservationVisibility, "immediately"),
 		IsActive:              true,
+		NeverExpires:          neverExpires,
+		ExpiresAt:             expiresAt,
 		CreatedAt:             time.Now(),
 	}
 	if err := s.ListRepo.Store(ctx, list); err != nil {
@@ -111,6 +121,16 @@ func (s *GiftService) UpdateList(ctx context.Context, ownerId, listId string, re
 	}
 	if req.IsActive != nil {
 		list.IsActive = *req.IsActive
+	}
+	if req.NeverExpires != nil {
+		list.NeverExpires = *req.NeverExpires
+		if list.NeverExpires {
+			list.ExpiresAt = nil
+		}
+	}
+	if req.ExpiresAt != nil {
+		list.ExpiresAt = req.ExpiresAt
+		list.NeverExpires = false
 	}
 	list.UpdatedAt = new(time.Now())
 	if err := s.ListRepo.Update(ctx, list); err != nil {
@@ -325,6 +345,8 @@ func (s *GiftService) GetPublicList(ctx context.Context, shareCode string) (dto.
 		CoverImageUrl:         list.CoverImageUrl,
 		ShippingNote:          list.ShippingNote,
 		ReservationVisibility: list.ReservationVisibility,
+		NeverExpires:          list.NeverExpires,
+		ExpiresAt:             list.ExpiresAt,
 		AvailableItems:        available,
 		ReservedItems:         reserved,
 	}, nil
@@ -376,10 +398,20 @@ func (s *GiftService) getPublicList(ctx context.Context, shareCode string) (doma
 	if err != nil {
 		return domaingift.GiftList{}, err
 	}
-	if !list.IsActive || list.Visibility != domaingift.ListVisibilityPublic {
+	if !isGiftListAvailable(list, time.Now()) || list.Visibility != domaingift.ListVisibilityPublic {
 		return domaingift.GiftList{}, ErrGiftListNotPublic
 	}
 	return list, nil
+}
+
+func isGiftListAvailable(list domaingift.GiftList, now time.Time) bool {
+	if !list.IsActive {
+		return false
+	}
+	if list.NeverExpires {
+		return true
+	}
+	return list.ExpiresAt != nil && list.ExpiresAt.After(now)
 }
 
 func (s *GiftService) updateFriendStatus(ctx context.Context, userId, friendId, status string) (domaingift.GiftFriend, error) {

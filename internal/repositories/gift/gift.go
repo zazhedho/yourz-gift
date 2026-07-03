@@ -81,7 +81,8 @@ func (r *GiftListRepo) GetListsByFriendOwners(ctx context.Context, ownerId strin
 				Where("(requester_id = ? OR addressee_id = ?) AND status = ?", ownerId, ownerId, domaingift.FriendStatusAccepted).
 				Where("deleted_at IS NULL")
 			return q.Where("owner_id IN (?)", friendOwnerQuery).
-				Where("is_active = ? AND visibility = ?", true, domaingift.ListVisibilityPublic)
+				Where("is_active = ? AND visibility = ?", true, domaingift.ListVisibilityPublic).
+				Where("(never_expires = ? OR (expires_at IS NOT NULL AND expires_at > NOW()))", true)
 		},
 		Search:              repositorygeneric.BuildSearchFunc("title", "description", "share_code"),
 		AllowedOrderColumns: []string{"created_at", "title"},

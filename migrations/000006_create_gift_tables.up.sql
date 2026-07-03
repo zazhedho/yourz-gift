@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS gift_lists (
     visibility VARCHAR(20) NOT NULL DEFAULT 'public',
     reservation_visibility VARCHAR(40) NOT NULL DEFAULT 'immediately',
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    never_expires BOOLEAN NOT NULL DEFAULT TRUE,
+    expires_at TIMESTAMP,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
@@ -18,6 +20,7 @@ CREATE TABLE IF NOT EXISTS gift_lists (
 CREATE INDEX IF NOT EXISTS idx_gift_lists_owner_id ON gift_lists(owner_id);
 CREATE INDEX IF NOT EXISTS idx_gift_lists_share_code ON gift_lists(share_code);
 CREATE INDEX IF NOT EXISTS idx_gift_lists_visibility_active ON gift_lists(visibility, is_active) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_gift_lists_expiration ON gift_lists(is_active, never_expires, expires_at) WHERE deleted_at IS NULL;
 
 CREATE TABLE IF NOT EXISTS gift_items (
     id UUID PRIMARY KEY,

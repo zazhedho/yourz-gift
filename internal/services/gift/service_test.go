@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 	domaingift "yourz-gift/internal/domain/gift"
 	"yourz-gift/internal/dto"
 	"yourz-gift/pkg/filter"
@@ -40,10 +41,48 @@ func TestBuildItemResponsesCalculatesRemaining(t *testing.T) {
 
 func TestGetPublicListRejectsPrivateList(t *testing.T) {
 	fake := &fakeGiftRepo{list: domaingift.GiftList{
-		Id:         "list-1",
-		ShareCode:  "ABC12345",
-		Visibility: domaingift.ListVisibilityPrivate,
-		IsActive:   true,
+		Id:           "list-1",
+		ShareCode:    "ABC12345",
+		Visibility:   domaingift.ListVisibilityPrivate,
+		IsActive:     true,
+		NeverExpires: true,
+	}}
+	svc := NewGiftService(fakeGiftListRepo{fake}, fakeGiftItemRepo{fake}, fakeGiftReservationRepo{fake}, nil, nil)
+
+	_, err := svc.GetPublicList(context.Background(), "ABC12345")
+	if !errors.Is(err, ErrGiftListNotPublic) {
+		t.Fatalf("err = %v, want ErrGiftListNotPublic", err)
+	}
+}
+
+func TestCreateListDefaultsToNeverExpires(t *testing.T) {
+	fake := &fakeGiftRepo{}
+	svc := NewGiftService(fakeGiftListRepo{fake}, fakeGiftItemRepo{fake}, fakeGiftReservationRepo{fake}, nil, nil)
+
+	got, err := svc.CreateList(context.Background(), "owner-1", dto.GiftListCreate{Title: "Birthday"})
+	if err != nil {
+		t.Fatalf("CreateList error = %v", err)
+	}
+	if !got.NeverExpires {
+		t.Fatalf("NeverExpires = false, want true")
+	}
+	if got.ExpiresAt != nil {
+		t.Fatalf("ExpiresAt = %v, want nil", got.ExpiresAt)
+	}
+	if !fake.storedList.NeverExpires {
+		t.Fatalf("stored NeverExpires = false, want true")
+	}
+}
+
+func TestGetPublicListRejectsExpiredList(t *testing.T) {
+	expiredAt := time.Now().Add(-time.Hour)
+	fake := &fakeGiftRepo{list: domaingift.GiftList{
+		Id:           "list-1",
+		ShareCode:    "ABC12345",
+		Visibility:   domaingift.ListVisibilityPublic,
+		IsActive:     true,
+		NeverExpires: false,
+		ExpiresAt:    &expiredAt,
 	}}
 	svc := NewGiftService(fakeGiftListRepo{fake}, fakeGiftItemRepo{fake}, fakeGiftReservationRepo{fake}, nil, nil)
 
@@ -56,10 +95,11 @@ func TestGetPublicListRejectsPrivateList(t *testing.T) {
 func TestCreatePublicReservationDefaultsShowName(t *testing.T) {
 	fake := &fakeGiftRepo{
 		list: domaingift.GiftList{
-			Id:         "list-1",
-			ShareCode:  "ABC12345",
-			Visibility: domaingift.ListVisibilityPublic,
-			IsActive:   true,
+			Id:           "list-1",
+			ShareCode:    "ABC12345",
+			Visibility:   domaingift.ListVisibilityPublic,
+			IsActive:     true,
+			NeverExpires: true,
 		},
 		item: domaingift.GiftItem{
 			Id:         "item-1",
@@ -111,6 +151,7 @@ func TestGetFriendListsUsesAcceptedFriends(t *testing.T) {
 
 type fakeGiftRepo struct {
 	list        domaingift.GiftList
+	storedList  domaingift.GiftList
 	item        domaingift.GiftItem
 	items       []domaingift.GiftItem
 	friendLists []domaingift.GiftList
@@ -122,7 +163,10 @@ type fakeGiftItemRepo struct{ *fakeGiftRepo }
 type fakeGiftReservationRepo struct{ *fakeGiftRepo }
 type fakeGiftFriendRepo struct{ *fakeGiftRepo }
 
-func (f fakeGiftListRepo) Store(context.Context, domaingift.GiftList) error { return nil }
+func (f fakeGiftListRepo) Store(_ context.Context, list domaingift.GiftList) error {
+	f.storedList = list
+	return nil
+}
 func (f fakeGiftListRepo) GetByID(context.Context, string) (domaingift.GiftList, error) {
 	return f.list, nil
 }

@@ -7,6 +7,7 @@ import Loading from '../../components/common/Loading'
 import RetryState from '../../components/common/RetryState'
 import giftService from '../../services/giftService'
 import { getErrorMessage, getListData } from '../../services/api'
+import { isGiftListCurrent } from '../../utils/giftDisplay'
 
 const publicUrl = (shareCode) => `${window.location.origin}/g/${shareCode}`
 
@@ -71,7 +72,7 @@ const GiftList = () => {
   if (loading) return <Loading label="Loading gift lists" />
   if (error) return <RetryState message={error} onRetry={loadLists} />
 
-  const visibleLists = lists.filter((list) => (status === 'current' ? list.is_active : !list.is_active))
+  const visibleLists = lists.filter((list) => (status === 'current' ? isGiftListCurrent(list) : !isGiftListCurrent(list)))
   const listLabel = view === 'friends' ? 'FRIENDS' : status === 'current' ? 'CURRENT & UPCOMING' : 'PREVIOUS'
 
   return (
@@ -126,7 +127,7 @@ const GiftList = () => {
               <div className="wish-list-card__identity">
                 <div className="wish-list-card__avatar">
                   <img alt="" src={list.cover_image_url || 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=180&q=80'} />
-                  {list.is_active && (
+                  {isGiftListCurrent(list) && (
                     <div className="wish-list-card__badge">
                       <CheckCircle size={14} color="#10b981" />
                     </div>
