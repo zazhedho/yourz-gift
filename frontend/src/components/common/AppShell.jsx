@@ -57,6 +57,22 @@ const AppShell = () => {
   }, [navMenu])
 
   useEffect(() => {
+    if (!mobileNavOpen) return undefined
+    const close = (event) => {
+      if (event.key === 'Escape' || (!navRef.current?.contains(event.target) && !event.target.closest('.mobile-nav-toggle'))) {
+        setMobileNavOpen(false)
+        setNavMenu('')
+      }
+    }
+    document.addEventListener('keydown', close)
+    document.addEventListener('pointerdown', close)
+    return () => {
+      document.removeEventListener('keydown', close)
+      document.removeEventListener('pointerdown', close)
+    }
+  }, [mobileNavOpen])
+
+  useEffect(() => {
     if (!quickOpen) return undefined
     const close = (event) => {
       if (event.key === 'Escape' || !quickRef.current?.contains(event.target)) setQuickOpen(false)

@@ -1281,35 +1281,39 @@ a {
 
 .segmented-control {
   display: inline-flex;
-  background: #ffffff;
-  border: 1px solid var(--color-hairline-light);
-  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 999px;
   padding: 4px;
   gap: 4px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .segmented-control button {
   border: none;
   background: transparent;
-  padding: 8px 16px;
-  border-radius: var(--radius-sm);
-  font-weight: 500;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-weight: 700;
   cursor: pointer;
   color: var(--color-shade-60);
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   font-size: 14px;
+  letter-spacing: 0.3px;
 }
 
 .segmented-control button.active-pink {
-  background: #f43f5e;
+  background: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%);
   color: white;
-  box-shadow: 0 2px 4px rgba(244, 63, 94, 0.2);
+  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.25);
 }
 
 .segmented-control button.active-dark {
-  background: var(--color-surface-dark);
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
   color: white;
+  box-shadow: 0 4px 12px rgba(31, 41, 55, 0.25);
 }
 
 .wish-page {
@@ -1355,20 +1359,26 @@ a {
 
 .wish-create-button {
   align-items: center;
-  background: #16a34a;
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
   border: 0;
-  border-radius: 8px;
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);
   color: #ffffff;
   display: inline-flex;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 800;
   gap: 10px;
   justify-content: center;
-  min-height: 46px;
+  min-height: 48px;
   padding: 0 24px;
   white-space: nowrap;
+  transition: all 0.3s ease;
 }
 
+.wish-create-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(16, 185, 129, 0.35);
+}
 .wish-section-label {
   align-items: center;
   color: #475569;
@@ -1887,7 +1897,7 @@ a {
   align-items: center;
   background: #ffffff;
   border: 1px solid #d7dce5;
-  border-radius: 8px;
+  border-radius: 999px;
   display: flex;
   gap: 8px;
   min-height: 42px;
@@ -1908,7 +1918,7 @@ a {
   appearance: auto;
   background: #ffffff;
   border: 1px solid #d7dce5;
-  border-radius: 8px;
+  border-radius: 999px;
   color: #111827;
   min-height: 42px;
   min-width: 180px;
@@ -2333,13 +2343,10 @@ a {
 }
 
 .account-panel {
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-radius: 24px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
-  padding: 32px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
 }
 
 .account-panel__bar {
@@ -2581,20 +2588,33 @@ a {
   }
 
   .app-shell__nav {
-    background: rgba(255, 255, 255, 0.94);
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(226, 232, 240, 0.9);
-    border-radius: 18px;
-    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.14);
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16), 0 4px 12px rgba(15, 23, 42, 0.08);
     display: none;
-    grid-column: 1 / -1;
-    grid-template-columns: 1fr;
-    order: 4;
-    padding: 10px;
-    width: 100%;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 16px;
+    left: auto;
+    width: 220px;
+    padding: 8px;
+    z-index: 100;
+    flex-direction: column;
+    gap: 4px;
+    transform-origin: top right;
+    animation: dropdownSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes dropdownSlide {
+    from { opacity: 0; transform: scale(0.96) translateY(-8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
   }
 
   .app-shell__nav.is-mobile-open {
-    display: grid;
+    display: flex;
   }
 
   .nav-menu {
@@ -2606,29 +2626,45 @@ a {
     min-height: 46px;
     padding: 0 14px;
     width: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .nav-trigger:focus,
+  .nav-trigger:focus-visible {
+    outline: none;
+  }
+
+  .nav-trigger.is-active {
+    background: transparent;
+    color: #f43f5e;
   }
 
   .nav-dropdown {
-    background: #ffffff;
-    border-radius: 14px;
+    background: rgba(243, 244, 246, 0.6);
+    border-radius: 12px;
     box-shadow: none;
     left: auto;
-    margin-top: 8px;
+    margin: 4px 0 8px;
     min-width: 0;
     position: static;
     top: auto;
-    width: 100%;
+    width: auto;
   }
 
   .nav-dropdown__item {
-    min-height: 60px;
-    padding: 8px 10px;
+    gap: 10px;
+    min-height: 44px;
+    padding: 6px 10px;
+  }
+
+  .nav-dropdown__item small {
+    display: none;
   }
 
   .nav-dropdown__icon {
-    border-radius: 10px;
-    height: 38px;
-    width: 38px;
+    border-radius: 8px;
+    height: 32px;
+    width: 32px;
   }
 
   .app-shell__actions {
@@ -2651,16 +2687,33 @@ a {
     position: static;
   }
 
-  .header-search__panel,
-  .profile-menu__panel,
-  .nav-dropdown--quick {
+  .header-search__panel {
     left: 16px;
     max-width: calc(100vw - 32px);
-    position: fixed;
+    position: absolute;
     right: 16px;
-    top: 78px;
+    top: calc(100% + 8px);
     width: auto;
     z-index: 120;
+  }
+
+  .profile-menu__panel,
+  .nav-dropdown--quick {
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16), 0 4px 12px rgba(15, 23, 42, 0.08);
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 16px;
+    left: auto;
+    width: 220px;
+    padding: 8px;
+    z-index: 120;
+    transform-origin: top right;
+    animation: dropdownSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   .app-shell__main,
@@ -3032,20 +3085,22 @@ a {
     margin-bottom: 22px;
   }
 
-  .wish-toolbar__segments,
-  .segmented-control {
-    width: 100%;
+  .wish-toolbar__segments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-start;
   }
 
-  .wish-toolbar__segments {
-    display: grid;
-    gap: 10px;
+  .wish-toolbar__segments,
+  .segmented-control {
+    width: auto;
   }
 
   .segmented-control button {
-    flex: 1 1 0;
+    flex: none;
     min-height: 40px;
-    padding: 8px 10px;
+    padding: 8px 14px;
   }
 
   .wish-section-label {
@@ -3155,16 +3210,22 @@ a {
   .gift-detail-controls,
   .gift-detail-item__footer {
     align-items: stretch;
+  }
+
+  .gift-detail-item__footer {
     flex-direction: column;
   }
 
   .gift-detail-controls {
-    gap: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
   }
 
   .gift-detail-search,
   .gift-detail-sort {
     width: 100%;
+    min-width: 0; /* allows grid children to shrink below content width if needed */
   }
 
   .gift-detail-item__status {
@@ -3471,8 +3532,7 @@ a {
     width: 100%;
   }
 
-  .account-panel__bar,
-  .session-item {
+  .account-panel__bar {
     grid-template-columns: 1fr;
     align-items: stretch;
   }
