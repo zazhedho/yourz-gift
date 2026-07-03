@@ -131,7 +131,7 @@ const PublicGiftList = () => {
           </div>
           <div>
             <span>SHIPPING ADDRESS</span>
-            <button onClick={() => setShowShipping(true)} type="button" style={{ background: 'transparent', border: 0, color: '#ffffff', textDecoration: 'underline', padding: 0, fontSize: '24px', fontWeight: 800, cursor: 'pointer' }}>View</button>
+            <button onClick={() => setShowShipping(true)} type="button">View</button>
           </div>
         </div>
 
