@@ -253,7 +253,7 @@ const Register = () => {
           {googleClientId ? (
             <GoogleIdentityButton
               disabled={submitting || googleSubmitting}
-              label="Sign up with Google"
+              label="Or register with email"
               onCredential={handleGoogleCredential}
               onError={setGoogleError}
               text="signup_with"

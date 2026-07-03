@@ -768,7 +768,7 @@ a {
 
 .auth-page::before {
   content: '';
-  position: absolute;
+  position: fixed;
   top: -20%;
   left: -10%;
   width: 70%;
@@ -780,7 +780,7 @@ a {
 
 .auth-page::after {
   content: '';
-  position: absolute;
+  position: fixed;
   bottom: -20%;
   right: -10%;
   width: 60%;

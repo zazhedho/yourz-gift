@@ -52,7 +52,7 @@ const Login = () => {
         {googleClientId ? (
           <GoogleIdentityButton
             disabled={submitting || googleSubmitting}
-            label="Continue with Google"
+            label="Or continue with email"
             onCredential={handleGoogleCredential}
             onError={setGoogleError}
             text="signin_with"

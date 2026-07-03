@@ -103,15 +103,16 @@ const GoogleIdentityButton = ({ disabled = false, label, onCredential, onError, 
   if (!clientId) return null
 
   return (
-    <div className="google-auth-block">
-      <div className="auth-divider">
-        <span>{label}</span>
-      </div>
+    <div className="google-auth-block" style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '8px' }}>
       <div
         ref={containerRef}
         aria-disabled={!available || disabled}
         className={`google-identity-button ${!available || disabled ? 'disabled' : ''}`}
+        style={{ display: 'flex', justifyContent: 'center' }}
       />
+      <div className="auth-divider">
+        <span style={{ color: '#64748b', fontWeight: 500 }}>{label}</span>
+      </div>
     </div>
   )
 }
