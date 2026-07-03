@@ -1,5 +1,5 @@
 import { MonitorSmartphone, Trash2 } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Button from '../../components/common/Button'
 import Loading from '../../components/common/Loading'
@@ -12,6 +12,32 @@ const formatDate = (value) => {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(new Date(value))
+}
+
+const getSessionTime = (session) => {
+  const time = new Date(session.last_activity || session.login_at || 0).getTime()
+  return Number.isNaN(time) ? 0 : time
+}
+
+const normalizeCurrentSession = (sessions) => {
+  const storedSessionId = localStorage.getItem('session_id')
+  const withStoredCurrent = sessions.map((session) => ({
+    ...session,
+    is_current_session: Boolean(session.is_current_session || (storedSessionId && session.session_id === storedSessionId)),
+  }))
+
+  if (withStoredCurrent.some((session) => session.is_current_session) || withStoredCurrent.length === 0) {
+    return withStoredCurrent
+  }
+
+  const newestSessionId = withStoredCurrent.reduce((latest, session) => (
+    getSessionTime(session) > getSessionTime(latest) ? session : latest
+  ), withStoredCurrent[0]).session_id
+
+  return withStoredCurrent.map((session) => ({
+    ...session,
+    is_current_session: session.session_id === newestSessionId,
+  }))
 }
 
 const Sessions = () => {
@@ -37,6 +63,8 @@ const Sessions = () => {
   useEffect(() => {
     load()
   }, [load])
+
+  const visibleSessions = useMemo(() => normalizeCurrentSession(sessions), [sessions])
 
   const revoke = async (sessionId) => {
     setBusy(sessionId)
@@ -78,7 +106,7 @@ const Sessions = () => {
         {error ? <div className="alert alert--error">{error}</div> : null}
 
         <div className="account-panel__bar">
-          <strong>{sessions.length} active sessions</strong>
+          <strong>{visibleSessions.length} active sessions</strong>
           <Button className="button button--ghost" disabled={busy === 'others'} onClick={revokeOthers} type="button">
             Revoke other sessions
           </Button>
@@ -86,12 +114,12 @@ const Sessions = () => {
 
         {loading ? <Loading label="Loading sessions" /> : null}
 
-        {!loading && sessions.length === 0 ? (
+        {!loading && visibleSessions.length === 0 ? (
           <p className="muted">No active sessions found. Redis session management may be disabled locally.</p>
         ) : null}
 
         <div className="session-list">
-          {sessions.map((session) => (
+          {visibleSessions.map((session) => (
             <article className={`session-item${session.is_current_session ? ' session-item--current' : ''}`} key={session.session_id}>
               <div className="session-item__main">
                 <div className="session-item__icon">

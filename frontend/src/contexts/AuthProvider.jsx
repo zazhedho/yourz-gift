@@ -27,8 +27,10 @@ export const AuthProvider = ({ children }) => {
     const data = getResponseData(response) || {}
     const token = data.access_token || data.token
     const refreshToken = data.refresh_token
+    const sessionId = data.session_id
     if (token) localStorage.setItem('token', token)
     if (refreshToken) localStorage.setItem('refresh_token', refreshToken)
+    if (sessionId) localStorage.setItem('session_id', sessionId)
     const profile = await authService.me()
     setUser(getResponseData(profile))
   }, [])
@@ -74,6 +76,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       localStorage.removeItem('token')
       localStorage.removeItem('refresh_token')
+      localStorage.removeItem('session_id')
       setUser(null)
     }
   }, [])

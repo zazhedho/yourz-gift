@@ -24,6 +24,7 @@ const refreshAccessToken = async () => {
   if (!token) throw new Error('missing access token')
   localStorage.setItem('token', token)
   if (data.refresh_token) localStorage.setItem('refresh_token', data.refresh_token)
+  if (data.session_id) localStorage.setItem('session_id', data.session_id)
   return token
 }
 
@@ -43,6 +44,7 @@ api.interceptors.response.use(
         refreshPromise = null
         localStorage.removeItem('token')
         localStorage.removeItem('refresh_token')
+        localStorage.removeItem('session_id')
         return Promise.reject(refreshError)
       }
     }

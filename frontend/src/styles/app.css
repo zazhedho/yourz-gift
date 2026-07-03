@@ -3485,7 +3485,7 @@ a {
     align-items: flex-start;
     display: grid;
     gap: 8px;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: 1fr;
   }
 
   .session-item__title-row .session-current {
