@@ -1,10 +1,7 @@
-import { Copy, Plus, Trash2, Edit2, ExternalLink, Package, Users, Tag, CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, Copy, Edit2, Package, Plus, Tag, Trash2, Users } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
 
-import Button from '../../components/common/Button'
-import EmptyState from '../../components/common/EmptyState'
-import ErrorBanner from '../../components/common/ErrorBanner'
 import Loading from '../../components/common/Loading'
 import RetryState from '../../components/common/RetryState'
 import giftService from '../../services/giftService'
@@ -86,7 +83,7 @@ const GiftListDetail = () => {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <span style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)', padding: '4px 12px', borderRadius: '99px', fontSize: '13px', fontWeight: 600, letterSpacing: '0.5px' }}>
-                {list.occasion_type?.toUpperCase() || 'EVENT'}
+                {list.occasion_type?.replace('_', ' ').toUpperCase() || 'EVENT'}
               </span>
               {list.is_active && (
                 <span style={{ background: '#10b981', padding: '4px 12px', borderRadius: '99px', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>

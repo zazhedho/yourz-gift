@@ -1,8 +1,13 @@
 import api from './api'
 
+const listParams = (params = {}) => {
+  const clean = Object.fromEntries(Object.entries(params).filter(([, value]) => value))
+  return { page: 1, limit: 50, ...clean }
+}
+
 const giftService = {
-  listLists: () => api.get('/gift-lists', { params: { page: 1, limit: 50 } }),
-  listFriendLists: () => api.get('/gift-lists/friends', { params: { page: 1, limit: 50 } }),
+  listLists: (params) => api.get('/gift-lists', { params: listParams(params) }),
+  listFriendLists: (params) => api.get('/gift-lists/friends', { params: listParams(params) }),
   createList: (payload) => api.post('/gift-lists', payload),
   getList: (id) => api.get(`/gift-lists/${id}`),
   updateList: (id, payload) => api.put(`/gift-lists/${id}`, payload),

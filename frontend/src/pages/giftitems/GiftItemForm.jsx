@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Package, AlignLeft, Link2, Image as ImageIcon, DollarSign, Layers, Settings, Save, Box } from 'lucide-react'
+import { Package } from 'lucide-react'
 
 import Button from '../../components/common/Button'
 import ErrorBanner from '../../components/common/ErrorBanner'
@@ -78,53 +78,53 @@ const GiftItemForm = () => {
   }
 
   return (
-    <section className="surface" style={{ padding: '32px' }}>
-      <div className="page-header" style={{ marginBottom: '32px', borderBottom: '1px solid var(--color-hairline-light)', paddingBottom: '24px' }}>
+    <section className="surface" style={{ padding: '40px' }}>
+      <div className="page-header" style={{ marginBottom: '40px', borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: '24px' }}>
         <div>
-          <h1 className="page-title" style={{ fontSize: '32px' }}>{editing ? 'Edit Gift Item' : 'Create New Gift Item'}</h1>
-          <p className="page-subtitle">Add practical details guests need before reserving.</p>
+          <h1 className="page-title" style={{ fontSize: '32px', letterSpacing: '-0.02em', color: '#111827' }}>{editing ? 'Edit Gift Item' : 'Create New Gift Item'}</h1>
+          <p className="page-subtitle" style={{ fontSize: '15px', color: 'var(--color-shade-50)' }}>Add practical details guests need before reserving.</p>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
-          <Link className="button button--ghost" to={`/app/lists/${listId}`}>Cancel</Link>
-          <Button isLoading={submitting} type="submit" onClick={submit} className="button button--primary">{editing ? 'Save changes' : 'Create item'}</Button>
+          <Link className="button button--ghost" to={`/app/lists/${listId}`} style={{ borderRadius: '99px', padding: '0 24px', minHeight: '40px', fontWeight: 600, color: 'var(--color-shade-60)', background: 'rgba(0,0,0,0.05)' }}>Cancel</Link>
+          <Button isLoading={submitting} type="submit" onClick={submit} className="button" style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)', color: 'white', padding: '0 24px', borderRadius: '99px', minHeight: '40px', fontWeight: 600, border: 'none', boxShadow: '0 4px 12px rgba(244,63,94,0.3)', letterSpacing: '0.5px' }}>{editing ? 'Save changes' : 'Create item'}</Button>
         </div>
       </div>
 
       <ErrorBanner message={error} />
 
-      <form className="form" onSubmit={submit} style={{ display: 'grid', gap: '32px' }}>
+      <form className="form" onSubmit={submit} style={{ display: 'grid', gap: '24px' }}>
         
         {/* Basic Info Section */}
-        <div style={{ padding: '24px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-hairline-light)' }}>
-          <h3 style={{ marginTop: 0, marginBottom: '16px', fontSize: '18px', fontWeight: 600, color: 'var(--color-ink)' }}>Basic Information</h3>
+        <div style={{ background: 'rgba(255, 255, 255, 0.5)', padding: '32px', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.8)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+          <h3 style={{ marginTop: 0, marginBottom: '24px', fontSize: '18px', fontWeight: 700, color: '#111827' }}>Basic Information</h3>
           <div className="form-grid">
             <FormField label="Item Name">
-              <input className="input" name="name" onChange={update} required value={form.name} placeholder="e.g. Espresso Machine" />
+              <input className="input" name="name" onChange={update} required value={form.name} placeholder="e.g. Espresso Machine" style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
             </FormField>
             <FormField label="Priority Level">
-              <input className="input" min="0" name="priority" onChange={update} type="number" value={form.priority} placeholder="0 = lowest priority" />
+              <input className="input" min="0" name="priority" onChange={update} type="number" value={form.priority} placeholder="0 = lowest priority" style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
             </FormField>
           </div>
-          <div style={{ marginTop: '16px' }}>
+          <div style={{ marginTop: '20px' }}>
             <FormField label="Description">
-              <textarea className="textarea" name="description" onChange={update} value={form.description} placeholder="Any specific details, colors, or sizes..." />
+              <textarea className="textarea" name="description" onChange={update} value={form.description} placeholder="Any specific details, colors, or sizes..." style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
             </FormField>
           </div>
         </div>
 
         {/* Pricing & Quantity */}
-        <div style={{ padding: '24px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-hairline-light)' }}>
-          <h3 style={{ marginTop: 0, marginBottom: '16px', fontSize: '18px', fontWeight: 600, color: 'var(--color-ink)' }}>Pricing & Quantity</h3>
+        <div style={{ background: 'rgba(255, 255, 255, 0.5)', padding: '32px', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.8)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+          <h3 style={{ marginTop: 0, marginBottom: '24px', fontSize: '18px', fontWeight: 700, color: '#111827' }}>Pricing & Quantity</h3>
           <div className="form-grid">
             <FormField label="Estimated Price">
               <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-shade-40)', fontWeight: 500 }}>{form.currency}</span>
-                <input className="input" min="0" name="price" onChange={update} step="0.01" type="number" value={form.price ?? ''} placeholder="0.00" style={{ paddingLeft: '60px' }} />
+                <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-shade-50)', fontWeight: 600 }}>{form.currency}</span>
+                <input className="input" min="0" name="price" onChange={update} step="0.01" type="number" value={form.price ?? ''} placeholder="0.00" style={{ paddingLeft: '64px', background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
               </div>
             </FormField>
             <FormField label="Currency">
               <div style={{ position: 'relative' }}>
-                <select className="select" name="currency" onChange={update} value={form.currency}>
+                <select className="select" name="currency" onChange={update} value={form.currency} style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }}>
                   <button><selectedcontent></selectedcontent></button>
                   <option value="IDR">IDR - Rupiah</option>
                   <option value="USD">USD - US Dollar</option>
@@ -136,39 +136,39 @@ const GiftItemForm = () => {
               </div>
             </FormField>
           </div>
-          <div style={{ marginTop: '16px', maxWidth: '300px' }}>
+          <div style={{ marginTop: '20px', maxWidth: '300px' }}>
             <FormField label="Desired Quantity">
-              <input className="input" min="1" name="quantity" onChange={update} required type="number" value={form.quantity} />
+              <input className="input" min="1" name="quantity" onChange={update} required type="number" value={form.quantity} style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
             </FormField>
           </div>
         </div>
 
         {/* Media & Links Section */}
-        <div style={{ padding: '24px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-hairline-light)' }}>
-          <h3 style={{ marginTop: 0, marginBottom: '16px', fontSize: '18px', fontWeight: 600, color: 'var(--color-ink)' }}>Reference & Media</h3>
+        <div style={{ background: 'rgba(255, 255, 255, 0.5)', padding: '32px', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.8)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+          <h3 style={{ marginTop: 0, marginBottom: '24px', fontSize: '18px', fontWeight: 700, color: '#111827' }}>Reference & Media</h3>
           <ImageUploadField
             folder="gift-items"
             label="Item image"
             onChange={(url) => updateField('image_url', url)}
             value={form.image_url}
           />
-          <div style={{ marginTop: '16px' }}>
+          <div style={{ marginTop: '24px' }}>
             <FormField label="Product URL">
-              <input className="input" name="product_url" onChange={update} value={form.product_url} placeholder="https://store.com/item" />
+              <input className="input" name="product_url" onChange={update} value={form.product_url} placeholder="https://store.com/item" style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
             </FormField>
           </div>
         </div>
 
         {/* Settings Section */}
-        <div style={{ padding: '24px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-hairline-light)' }}>
-          <h3 style={{ marginTop: 0, marginBottom: '16px', fontSize: '18px', fontWeight: 600, color: 'var(--color-ink)' }}>Settings</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <label className="checkbox-row" style={{ fontWeight: 500, cursor: 'pointer' }}>
-              <input checked={form.is_active} name="is_active" onChange={update} type="checkbox" style={{ accentColor: 'var(--color-primary)', width: '18px', height: '18px' }} />
+        <div style={{ background: 'rgba(255, 255, 255, 0.5)', padding: '32px', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.8)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+          <h3 style={{ marginTop: 0, marginBottom: '24px', fontSize: '18px', fontWeight: 700, color: '#111827' }}>Settings</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <label className="checkbox-row" style={{ fontWeight: 600, cursor: 'pointer', color: '#111827' }}>
+              <input checked={form.is_active} name="is_active" onChange={update} type="checkbox" style={{ accentColor: '#f43f5e', width: '20px', height: '20px' }} />
               Active Status (Visible to guests)
             </label>
-            <label className="checkbox-row" style={{ fontWeight: 500, cursor: 'pointer' }}>
-              <input checked={form.is_archived} name="is_archived" onChange={update} type="checkbox" style={{ accentColor: 'var(--color-shade-40)', width: '18px', height: '18px' }} />
+            <label className="checkbox-row" style={{ fontWeight: 600, cursor: 'pointer', color: 'var(--color-shade-50)' }}>
+              <input checked={form.is_archived} name="is_archived" onChange={update} type="checkbox" style={{ accentColor: 'var(--color-shade-40)', width: '20px', height: '20px' }} />
               Archived (Hidden from active management)
             </label>
           </div>

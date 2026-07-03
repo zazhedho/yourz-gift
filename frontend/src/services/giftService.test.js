@@ -33,6 +33,14 @@ describe('giftService', () => {
     expect(api.delete).toHaveBeenCalledWith('/gift-lists/list-1')
   })
 
+  it('passes search params to gift list endpoints', () => {
+    giftService.listLists({ search: 'birthday' })
+    giftService.listFriendLists({ search: 'wedding' })
+
+    expect(api.get).toHaveBeenCalledWith('/gift-lists', { params: { page: 1, limit: 50, search: 'birthday' } })
+    expect(api.get).toHaveBeenCalledWith('/gift-lists/friends', { params: { page: 1, limit: 50, search: 'wedding' } })
+  })
+
   it('uses owner gift item endpoints', () => {
     giftService.listItems('list-1')
     giftService.createItem('list-1', { name: 'Book' })

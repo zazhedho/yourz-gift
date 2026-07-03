@@ -5,8 +5,10 @@ import authService from './authService'
 
 vi.mock('./api', () => ({
   default: {
+    delete: vi.fn(),
     get: vi.fn(),
     post: vi.fn(),
+    put: vi.fn(),
   },
 }))
 
@@ -30,5 +32,17 @@ describe('authService', () => {
     authService.googleLogin({ id_token: 'google-token' })
 
     expect(api.post).toHaveBeenCalledWith('/user/google/login', { id_token: 'google-token' })
+  })
+
+  it('uses profile and session endpoints', () => {
+    authService.updateProfile({ name: 'Jane' })
+    authService.listSessions()
+    authService.revokeSession('session-1')
+    authService.revokeOtherSessions()
+
+    expect(api.put).toHaveBeenCalledWith('/user', { name: 'Jane' })
+    expect(api.get).toHaveBeenCalledWith('/user/sessions')
+    expect(api.delete).toHaveBeenCalledWith('/user/session/session-1')
+    expect(api.post).toHaveBeenCalledWith('/user/sessions/revoke-others')
   })
 })

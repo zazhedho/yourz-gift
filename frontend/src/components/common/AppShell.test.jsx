@@ -1,10 +1,16 @@
 import { render, screen } from '@testing-library/react'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import userEvent from '@testing-library/user-event'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
 import { AuthContext } from '../../contexts/auth-context'
 import AppShell from './AppShell'
 import RetryState from './RetryState'
+
+const LocationView = () => {
+  const location = useLocation()
+  return <div>{location.pathname + location.search}</div>
+}
 
 describe('common components', () => {
   it('renders owner shell navigation', () => {
@@ -20,9 +26,31 @@ describe('common components', () => {
       </AuthContext.Provider>,
     )
 
-    expect(screen.getByText('Yourz Gift')).toBeInTheDocument()
-    expect(screen.getByText('Gift Lists')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /yourz/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /lists/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /friends/i })).toBeInTheDocument()
+    expect(screen.queryByLabelText('Notifications')).not.toBeInTheDocument()
     expect(screen.getByText('Lists page')).toBeInTheDocument()
+  })
+
+  it('submits header search to gift list query', async () => {
+    render(
+      <AuthContext.Provider value={{ logout: vi.fn() }}>
+        <MemoryRouter initialEntries={['/app/lists']}>
+          <Routes>
+            <Route element={<AppShell />}>
+              <Route path="/app/lists" element={<LocationView />} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AuthContext.Provider>,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /search/i }))
+    await userEvent.type(screen.getByPlaceholderText('Search wish lists'), 'birthday')
+    await userEvent.keyboard('{Enter}')
+
+    expect(screen.getByText('/app/lists?search=birthday')).toBeInTheDocument()
   })
 
   it('renders retry state action', () => {

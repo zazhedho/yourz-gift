@@ -1,5 +1,5 @@
-import { Copy, Plus, Trash2, Edit2, ChevronRight, CheckCircle } from 'lucide-react'
-import { Link, useNavigate } from 'react-router-dom'
+import { CheckCircle, ChevronRight, Copy, Edit2, Plus, Trash2 } from 'lucide-react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
 
 import EmptyState from '../../components/common/EmptyState'
@@ -15,25 +15,47 @@ const GiftList = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
-  const [view, setView] = useState('mine')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [view, setView] = useState(() => (searchParams.get('friends') === '1' ? 'friends' : 'mine'))
+  const [status, setStatus] = useState('current')
   const navigate = useNavigate()
+  const searchTerm = searchParams.get('search')?.trim() || ''
 
   const loadLists = useCallback(async () => {
     setLoading(true)
     setError('')
     try {
-      const response = view === 'friends' ? await giftService.listFriendLists() : await giftService.listLists()
+      const params = searchTerm ? { search: searchTerm } : undefined
+      const response = view === 'friends' ? await giftService.listFriendLists(params) : await giftService.listLists(params)
       setLists(getListData(response))
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to load gift lists'))
     } finally {
       setLoading(false)
     }
-  }, [view])
+  }, [searchTerm, view])
 
   useEffect(() => {
     loadLists()
   }, [loadLists])
+
+  useEffect(() => {
+    setView(searchParams.get('friends') === '1' ? 'friends' : 'mine')
+  }, [searchParams])
+
+  const selectView = (nextView) => {
+    setView(nextView)
+    const next = new URLSearchParams(searchParams)
+    if (nextView === 'friends') next.set('friends', '1')
+    else next.delete('friends')
+    setSearchParams(next)
+  }
+
+  const clearSearch = () => {
+    const next = new URLSearchParams(searchParams)
+    next.delete('search')
+    setSearchParams(next)
+  }
 
   const remove = async (id) => {
     if (!window.confirm('Delete this gift list?')) return
@@ -49,112 +71,97 @@ const GiftList = () => {
   if (loading) return <Loading label="Loading gift lists" />
   if (error) return <RetryState message={error} onRetry={loadLists} />
 
+  const visibleLists = lists.filter((list) => (status === 'current' ? list.is_active : !list.is_active))
+  const listLabel = view === 'friends' ? 'FRIENDS' : status === 'current' ? 'CURRENT & UPCOMING' : 'PREVIOUS'
+
   return (
-    <section style={{ maxWidth: '960px', margin: '0 auto' }}>
-      {/* Centered Header block */}
-      <div style={{ textAlign: 'center', marginBottom: '40px', marginTop: '30px' }}>
-        <h1 style={{ fontSize: '46px', fontWeight: 800, marginBottom: '12px', letterSpacing: '-0.03em', color: '#111827' }}>Wish Lists</h1>
-        <p style={{ fontSize: '18px', color: 'var(--color-shade-60)', margin: 0 }}>Browse your lists and those shared by friends</p>
+    <section className="wish-page">
+      <div className="wish-hero">
+        <h1>Wish Lists</h1>
+        <p>Browse your lists and those shared by friends</p>
       </div>
 
       {notice ? <div className="alert alert--success">{notice}</div> : null}
 
-      {/* Toolbar: Segmented Controls & New Button */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '20px' }}>
-        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+      <div className="wish-toolbar">
+        <div className="wish-toolbar__segments">
           <div className="segmented-control">
-            <button className={view === 'mine' ? 'active-pink' : ''} onClick={() => setView('mine')} type="button">My lists</button>
-            <button className={view === 'friends' ? 'active-pink' : ''} onClick={() => setView('friends')} type="button">Friends</button>
+            <button className={view === 'mine' ? 'active-pink' : ''} onClick={() => selectView('mine')} type="button">My lists</button>
+            <button className={view === 'friends' ? 'active-pink' : ''} onClick={() => selectView('friends')} type="button">Friends</button>
           </div>
           <div className="segmented-control">
-            <button className="active-dark">Current</button>
-            <button>Previous</button>
+            <button className={status === 'current' ? 'active-dark' : ''} onClick={() => setStatus('current')} type="button">Current</button>
+            <button className={status === 'previous' ? 'active-dark' : ''} onClick={() => setStatus('previous')} type="button">Previous</button>
           </div>
         </div>
-        
-        <Link to="/app/lists/new" className="button" style={{ background: '#10b981', color: 'white', border: 'none', borderRadius: '8px', padding: '0 20px', minHeight: '40px' }}>
-          <Plus size={18} style={{ marginRight: '6px' }} /> New Wish List
+
+        <Link to="/app/lists/new" className="wish-create-button">
+          <Plus size={20} /> New Wish List
         </Link>
       </div>
-      
-      {/* List count indicator */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', fontSize: '12px', fontWeight: 700, color: 'var(--color-shade-50)', letterSpacing: '1px' }}>
-        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f43f5e' }}></span>
-        {view === 'friends' ? 'FRIENDS' : 'CURRENT & UPCOMING'} ({lists.length})
-      </div>
 
-      {lists.length === 0 ? (
+      <div className="wish-section-label">
+        <span />
+        {listLabel} ({visibleLists.length})
+      </div>
+      {searchTerm ? (
+        <div className="wish-search-chip">
+          Search: <strong>{searchTerm}</strong>
+          <button onClick={clearSearch} type="button">Clear</button>
+        </div>
+      ) : null}
+
+      {visibleLists.length === 0 ? (
         <EmptyState
-          action={view === 'friends' ? null : <Link className="button" style={{ background: '#10b981', color: 'white' }} to="/app/lists/new">Create your first list</Link>}
-          message={view === 'friends' ? 'Accepted friends with active public lists will show here.' : 'Create a list, add gift items, and share it with your guests.'}
+          action={view === 'friends' ? null : <Link className="wish-create-button" to="/app/lists/new">Create your first list</Link>}
+          message={searchTerm ? 'Try another search term.' : view === 'friends' ? 'Accepted friends with active public lists will show here.' : 'Create a list, add gift items, and share it with your guests.'}
           title={view === 'friends' ? 'No friend lists yet' : 'No gift lists yet'}
         />
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {lists.map((list) => (
-            <article key={list.id} style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'space-between',
-              padding: '24px 32px', 
-              borderRadius: '16px',
-              background: list.cover_image_url ? `url(${list.cover_image_url}) center/cover` : 'linear-gradient(90deg, #c35c87 0%, #355787 100%)',
-              color: 'white',
-              boxShadow: 'var(--shadow-md)',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
-              
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px', position: 'relative', zIndex: 2 }}>
-                {/* Circular avatar */}
-                <div style={{ width: '64px', height: '64px', borderRadius: '50%', border: '3px solid white', background: '#ccc', overflow: 'hidden', position: 'relative', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-                  <img src={list.cover_image_url || 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=150&q=80'} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div className="wish-list-stack">
+          {visibleLists.map((list) => (
+            <article className="wish-list-card" key={list.id}>
+              {list.cover_image_url ? <img alt="" className="wish-list-card__cover" src={list.cover_image_url} /> : null}
+              <div className="wish-list-card__overlay" />
+              <div className="wish-list-card__identity">
+                <div className="wish-list-card__avatar">
+                  <img alt="" src={list.cover_image_url || 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=180&q=80'} />
                   {list.is_active && (
-                    <div style={{ position: 'absolute', bottom: 2, right: 2, background: 'white', borderRadius: '50%' }}>
+                    <div className="wish-list-card__badge">
                       <CheckCircle size={14} color="#10b981" />
                     </div>
                   )}
                 </div>
                 <div>
-                  <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 700, textShadow: '0 1px 3px rgba(0,0,0,0.3)', letterSpacing: '-0.02em' }}>{list.title}</h2>
-                  <p style={{ margin: '4px 0 0 0', fontSize: '15px', opacity: 0.9, textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{view === 'friends' ? 'By Friend' : 'By You'}</p>
+                  <h2>{list.title}</h2>
+                  <p>{view === 'friends' ? 'By Friend' : 'By You'}</p>
                 </div>
               </div>
-              
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', position: 'relative', zIndex: 2 }}>
-                  <button onClick={() => copyLink(list.share_code)} title="Copy Public Link" style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background 0.2s' }}>
-                    <Copy size={16} />
-                  </button>
-                  {view === 'mine' ? (
-                    <>
-                      <button onClick={() => navigate(`/app/lists/${list.id}/edit`)} title="Edit List" style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background 0.2s' }}>
-                        <Edit2 size={16} />
-                      </button>
-                      <button onClick={() => remove(list.id)} title="Delete List" style={{ background: 'rgba(244,63,94,0.15)', backdropFilter: 'blur(4px)', border: '1px solid rgba(244,63,94,0.3)', color: 'white', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background 0.2s' }}>
-                        <Trash2 size={16} />
-                      </button>
-                    </>
-                  ) : null}
-                  <Link to={view === 'friends' ? `/g/${list.share_code}` : `/app/lists/${list.id}`} className="button" style={{ 
-                    background: 'rgba(255,255,255,0.2)', 
-                    backdropFilter: 'blur(8px)', 
-                    border: '1px solid rgba(255,255,255,0.4)', 
-                    color: 'white',
-                    borderRadius: '99px',
-                    marginLeft: '8px',
-                    padding: '0 20px',
-                    minHeight: '40px',
-                    fontWeight: 500
-                  }}>
-                    {view === 'friends' ? 'Open Public List' : 'View Wish List'} <ChevronRight size={18} style={{ marginLeft: '4px' }} />
-                  </Link>
+
+              <div className="wish-list-card__actions">
+                <button className="wish-icon-action" onClick={() => copyLink(list.share_code)} title="Copy Public Link" type="button">
+                  <Copy size={16} />
+                </button>
+                {view === 'mine' ? (
+                  <>
+                    <button className="wish-icon-action" onClick={() => navigate(`/app/lists/${list.id}/edit`)} title="Edit List" type="button">
+                      <Edit2 size={16} />
+                    </button>
+                    <button className="wish-icon-action wish-icon-action--danger" onClick={() => remove(list.id)} title="Delete List" type="button">
+                      <Trash2 size={16} />
+                    </button>
+                  </>
+                ) : null}
+                <Link className="wish-card-button" to={view === 'friends' ? `/g/${list.share_code}` : `/app/lists/${list.id}`}>
+                  {view === 'friends' ? 'Open Public List' : 'View Wish List'} <ChevronRight size={18} />
+                </Link>
               </div>
             </article>
           ))}
         </div>
       )}
 
-      <p style={{ textAlign: 'center', color: 'var(--color-shade-40)', marginTop: '48px', fontSize: '15px' }}>You've reached the end</p>
+      <p className="wish-end">You've reached the end</p>
     </section>
   )
 }
