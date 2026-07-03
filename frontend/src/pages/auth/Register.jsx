@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
+import { Eye, EyeOff, Gift } from 'lucide-react'
 
 import Button from '../../components/common/Button'
 import ErrorBanner from '../../components/common/ErrorBanner'
@@ -10,6 +11,7 @@ import useAuth from '../../hooks/useAuth'
 import useRegisterStatus from '../../hooks/useRegisterStatus'
 import authService from '../../services/authService'
 import { getErrorMessage } from '../../services/api'
+import { isPasswordValid, passwordRequirements, passwordStrength, passwordStrengthLabel, validatePassword } from '../../utils/passwordValidation'
 import { getGoogleClientId } from '../../utils/runtimeConfig'
 
 const isOTPRequiredError = (err) => getErrorMessage(err, '').toLowerCase().includes('otp_code is required')
@@ -33,7 +35,7 @@ const Register = () => {
   const navigate = useNavigate()
   const [form, setForm] = useState(() => {
     const saved = sessionStorage.getItem('register_form')
-    return saved ? JSON.parse(saved) : { email: '', name: '', password: '', phone: '', otp_code: '' }
+    return saved ? { confirm_password: '', ...JSON.parse(saved) } : { email: '', name: '', password: '', confirm_password: '', phone: '', otp_code: '' }
   })
   const [error, setError] = useState('')
   const [googleError, setGoogleError] = useState('')
@@ -41,7 +43,14 @@ const Register = () => {
   const [otpStep, setOtpStep] = useState(() => sessionStorage.getItem('register_otp_step') === 'true')
   const [cooldown, setCooldown] = useState(getStoredOTPCooldown)
   const [submitting, setSubmitting] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const passwordId = useId()
+  const confirmPasswordId = useId()
   const googleClientId = getGoogleClientId()
+  const passwordValidation = validatePassword(form.password)
+  const strength = passwordStrength(passwordValidation)
+  const passwordsMatch = form.confirm_password && form.password === form.confirm_password
 
   useEffect(() => {
     sessionStorage.setItem('register_form', JSON.stringify(form))
@@ -96,6 +105,14 @@ const Register = () => {
     setSubmitting(true)
     try {
       if (otpEnabled && !otpStep) {
+        if (!isPasswordValid(passwordValidation)) {
+          setError('Password does not meet all requirements')
+          return
+        }
+        if (form.password !== form.confirm_password) {
+          setError('Passwords do not match')
+          return
+        }
         await requestRegisterOTP()
         return
       }
@@ -105,7 +122,17 @@ const Register = () => {
         return
       }
 
+      if (!isPasswordValid(passwordValidation)) {
+        setError('Password does not meet all requirements')
+        return
+      }
+      if (form.password !== form.confirm_password) {
+        setError('Passwords do not match')
+        return
+      }
+
       const payload = { ...form }
+      delete payload.confirm_password
       if (!otpEnabled || !payload.otp_code.trim()) delete payload.otp_code
       const ok = await auth.register(payload)
       if (ok) {
@@ -142,7 +169,7 @@ const Register = () => {
   if (loading) {
     return (
       <main className="auth-page">
-        <section className="surface auth-card">
+        <section className="auth-card">
           <Loading label="Checking registration status" />
         </section>
       </main>
@@ -152,11 +179,16 @@ const Register = () => {
   if (!enabled) {
     return (
       <main className="auth-page">
-        <section className="surface auth-card">
+        <section className="auth-card">
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+            <div style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)', borderRadius: '16px', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)' }}>
+              <Gift size={32} strokeWidth={2.5} />
+            </div>
+          </div>
           <h1 className="page-title">Registration closed</h1>
           <p className="page-subtitle">New accounts cannot be created right now.</p>
           <ErrorBanner message={statusError || 'Public registration is currently disabled.'} />
-          <Link className="button button--primary" to="/login">Back to login</Link>
+          <Link className="button button--primary" to="/login" style={{ width: '100%' }}>Back to login</Link>
         </section>
       </main>
     )
@@ -165,8 +197,13 @@ const Register = () => {
   if (otpStep) {
     return (
       <main className="auth-page auth-page-otp">
-        <section className="surface auth-card otp-card">
-          <p className="meta">Email verification</p>
+        <section className="auth-card otp-card">
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+            <div style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)', borderRadius: '16px', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)' }}>
+              <Gift size={32} strokeWidth={2.5} />
+            </div>
+          </div>
+          <p className="meta" style={{ marginTop: 0, marginBottom: '8px' }}>Email verification</p>
           <h1 className="page-title">Check your email</h1>
           <p className="page-subtitle">Enter the 6 digit OTP code sent to {form.email}.</p>
           <ErrorBanner message={error || auth.error} />
@@ -203,7 +240,12 @@ const Register = () => {
 
   return (
     <main className="auth-page">
-      <section className="surface auth-card">
+      <section className="auth-card">
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+          <div style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)', borderRadius: '16px', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)' }}>
+            <Gift size={32} strokeWidth={2.5} />
+          </div>
+        </div>
         <h1 className="page-title">Create account</h1>
         <p className="page-subtitle">Start a reusable gift list for any occasion.</p>
         <ErrorBanner message={error || auth.error || googleError} />
@@ -218,17 +260,56 @@ const Register = () => {
             />
           ) : null}
           <FormField label="Name">
-            <input className="input" name="name" onChange={update} required value={form.name} />
+            <input className="input" name="name" onChange={update} placeholder="Edho" required value={form.name} />
           </FormField>
           <FormField label="Email">
-            <input className="input" name="email" onChange={update} required type="email" value={form.email} />
+            <input className="input" name="email" onChange={update} placeholder="wew@example.com" required type="email" value={form.email} />
           </FormField>
           <FormField label="Phone">
-            <input className="input" name="phone" onChange={update} required value={form.phone} />
+            <input className="input" name="phone" onChange={update} placeholder="628123456789" required value={form.phone} />
           </FormField>
-          <FormField label="Password">
-            <input className="input" minLength={8} name="password" onChange={update} required type="password" value={form.password} />
-          </FormField>
+          <div className="field">
+            <label htmlFor={passwordId}>Password</label>
+            <div className="input-with-action">
+              <input autoComplete="new-password" className="input" id={passwordId} name="password" onChange={update} placeholder="Create password" required type={showPassword ? 'text' : 'password'} value={form.password} />
+              <button aria-label={showPassword ? 'Hide password' : 'Show password'} className="input-action-button" onClick={() => setShowPassword((value) => !value)} type="button">
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+          {form.password ? (
+            <div className="password-validation-card">
+              <div className="password-meter-row">
+                <div aria-hidden="true" className="password-meter">
+                  <span style={{ width: `${(strength / 5) * 100}%` }} />
+                </div>
+                <strong>{passwordStrengthLabel(strength)}</strong>
+              </div>
+              <div className="password-requirements">
+                {passwordRequirements.map(([key, label]) => (
+                  <span className={passwordValidation[key] ? 'valid' : ''} key={key}>
+                    <span aria-hidden="true">{passwordValidation[key] ? '✓' : '○'}</span>
+                    {label}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          <div className="field">
+            <label htmlFor={confirmPasswordId}>Confirm password</label>
+            <div className="input-with-action">
+              <input autoComplete="new-password" className="input" id={confirmPasswordId} name="confirm_password" onChange={update} placeholder="Repeat password" required type={showConfirmPassword ? 'text' : 'password'} value={form.confirm_password} />
+              <button aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'} className="input-action-button" onClick={() => setShowConfirmPassword((value) => !value)} type="button">
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+          {form.confirm_password ? (
+            <div className={`password-match-note ${passwordsMatch ? 'valid' : ''}`}>
+              <span aria-hidden="true">{passwordsMatch ? '✓' : '!'}</span>
+              {passwordsMatch ? 'Passwords match' : 'Passwords do not match'}
+            </div>
+          ) : null}
           <Button isLoading={submitting} type="submit">{otpEnabled ? 'Send OTP' : 'Register'}</Button>
         </form>
         <p className="meta">Already registered? <Link to="/login">Sign in</Link>.</p>

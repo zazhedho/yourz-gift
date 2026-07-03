@@ -13,14 +13,13 @@ import {
   UserRound,
   UsersRound,
 } from 'lucide-react'
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Outlet, useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 
 import useAuth from '../../hooks/useAuth'
 
 const AppShell = () => {
   const auth = useAuth()
-  const location = useLocation()
   const navigate = useNavigate()
   const menuRef = useRef(null)
   const navRef = useRef(null)

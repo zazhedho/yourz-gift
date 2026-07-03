@@ -50,7 +50,8 @@ describe('Register', () => {
     await userEvent.type(screen.getByLabelText('Name'), 'Jane Doe')
     await userEvent.type(screen.getByLabelText('Email'), 'jane@example.com')
     await userEvent.type(screen.getByLabelText('Phone'), '628123456789')
-    await userEvent.type(screen.getByLabelText('Password'), 'password123')
+    await userEvent.type(screen.getByLabelText('Password'), 'Password123!')
+    await userEvent.type(screen.getByLabelText('Confirm password'), 'Password123!')
     await userEvent.click(screen.getByRole('button', { name: 'Send OTP' }))
 
     await waitFor(() => expect(authService.sendRegisterOTP).toHaveBeenCalledWith({
@@ -60,5 +61,31 @@ describe('Register', () => {
     expect(screen.getByRole('heading', { name: 'Check your email' })).toBeInTheDocument()
     expect(screen.getByLabelText('OTP code')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Resend 45s' })).toBeDisabled()
+  })
+
+  it('requires a strong matching password before requesting OTP', async () => {
+    render(<Register />, { wrapper: MemoryRouter })
+
+    await userEvent.type(screen.getByLabelText('Name'), 'Jane Doe')
+    await userEvent.type(screen.getByLabelText('Email'), 'jane@example.com')
+    await userEvent.type(screen.getByLabelText('Phone'), '628123456789')
+    await userEvent.type(screen.getByLabelText('Password'), 'password123')
+    await userEvent.type(screen.getByLabelText('Confirm password'), 'password123')
+    await userEvent.click(screen.getByRole('button', { name: 'Send OTP' }))
+
+    expect(await screen.findByText('Password does not meet all requirements')).toBeInTheDocument()
+    expect(authService.sendRegisterOTP).not.toHaveBeenCalled()
+  })
+
+  it('can reveal password fields', async () => {
+    render(<Register />, { wrapper: MemoryRouter })
+
+    expect(screen.getByLabelText('Password')).toHaveAttribute('type', 'password')
+    await userEvent.click(screen.getByRole('button', { name: 'Show password' }))
+    expect(screen.getByLabelText('Password')).toHaveAttribute('type', 'text')
+
+    expect(screen.getByLabelText('Confirm password')).toHaveAttribute('type', 'password')
+    await userEvent.click(screen.getByRole('button', { name: 'Show confirm password' }))
+    expect(screen.getByLabelText('Confirm password')).toHaveAttribute('type', 'text')
   })
 })

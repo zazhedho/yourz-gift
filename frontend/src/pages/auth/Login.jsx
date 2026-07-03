@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import { Gift } from 'lucide-react'
 
 import Button from '../../components/common/Button'
 import ErrorBanner from '../../components/common/ErrorBanner'
@@ -39,9 +40,14 @@ const Login = () => {
 
   return (
     <main className="auth-page">
-      <section className="surface auth-card">
-        <h1 className="page-title">Sign in</h1>
-        <p className="page-subtitle">Manage gift lists and reservations.</p>
+      <section className="auth-card">
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+          <div style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)', borderRadius: '16px', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)' }}>
+            <Gift size={32} strokeWidth={2.5} />
+          </div>
+        </div>
+        <h1 className="page-title">Welcome back</h1>
+        <p className="page-subtitle">Sign in to manage your gift lists.</p>
         <ErrorBanner message={auth.error || googleError} />
         {googleClientId ? (
           <GoogleIdentityButton
@@ -54,10 +60,10 @@ const Login = () => {
         ) : null}
         <form className="form" onSubmit={submit}>
           <FormField label="Email or phone">
-            <input className="input" name="identifier" onChange={update} required value={form.identifier} />
+            <input className="input" name="identifier" onChange={update} placeholder="wew@example.com" required value={form.identifier} />
           </FormField>
           <FormField label="Password">
-            <input className="input" name="password" onChange={update} required type="password" value={form.password} />
+            <input className="input" name="password" onChange={update} placeholder="Enter your password" required type="password" value={form.password} />
           </FormField>
           <Button isLoading={submitting} type="submit">Login</Button>
         </form>
