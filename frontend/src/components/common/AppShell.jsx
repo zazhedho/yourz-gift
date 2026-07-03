@@ -6,6 +6,7 @@ import {
   Gift,
   Lightbulb,
   LogOut,
+  Menu,
   MonitorSmartphone,
   Plus,
   Search,
@@ -26,6 +27,7 @@ const AppShell = () => {
   const quickRef = useRef(null)
   const searchRef = useRef(null)
   const [navMenu, setNavMenu] = useState('')
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [quickOpen, setQuickOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -109,10 +111,14 @@ const AppShell = () => {
     setSearchOpen(false)
     setProfileOpen(false)
     setQuickOpen(false)
+    setMobileNavOpen(true)
     setNavMenu((current) => (current === menu ? '' : menu))
   }
 
-  const closeNav = () => setNavMenu('')
+  const closeNav = () => {
+    setNavMenu('')
+    setMobileNavOpen(false)
+  }
 
   const navSections = {
     lists: [
@@ -187,7 +193,22 @@ const AppShell = () => {
           </div>
           Yourz<span style={{ fontWeight: 300, color: '#6b7280' }}>Gift</span>
         </Link>
-        <nav className="app-shell__nav" ref={navRef}>
+        <button
+          aria-expanded={mobileNavOpen}
+          aria-label="Open navigation"
+          className="mobile-nav-toggle"
+          onClick={() => {
+            setSearchOpen(false)
+            setProfileOpen(false)
+            setQuickOpen(false)
+            setMobileNavOpen((open) => !open)
+            setNavMenu('')
+          }}
+          type="button"
+        >
+          <Menu size={22} />
+        </button>
+        <nav className={`app-shell__nav ${mobileNavOpen ? 'is-mobile-open' : ''}`} ref={navRef}>
           <div className="nav-menu">
             <button aria-expanded={navMenu === 'lists'} className={`nav-trigger ${navMenu === 'lists' ? 'is-active' : ''}`} onClick={() => openNav('lists')} type="button">
               Lists {navMenu === 'lists' ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
@@ -318,11 +339,16 @@ const AppShell = () => {
         }
 
         @media (max-width: 768px) {
+          .app-shell__header {
+            min-height: 72px !important;
+            padding: 12px 16px !important;
+          }
+
           .app-shell__header.header-capsule {
             margin: 12px auto !important;
             width: calc(100% - 24px) !important;
-            padding: 0 24px !important;
-            border-radius: 28px !important;
+            padding: 12px 16px !important;
+            border-radius: 24px !important;
           }
         }
       `}} />
