@@ -1,15 +1,34 @@
-import { Gift, LogOut, MonitorSmartphone, Plus, Search, UserRound } from 'lucide-react'
-import { Link, Outlet, useNavigate } from 'react-router-dom'
+import {
+  Check,
+  ChevronDown,
+  ChevronUp,
+  ClipboardList,
+  Gift,
+  Lightbulb,
+  LogOut,
+  MonitorSmartphone,
+  Plus,
+  Search,
+  ShoppingBag,
+  UserRound,
+  UsersRound,
+} from 'lucide-react'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 
 import useAuth from '../../hooks/useAuth'
 
 const AppShell = () => {
   const auth = useAuth()
+  const location = useLocation()
   const navigate = useNavigate()
   const menuRef = useRef(null)
+  const navRef = useRef(null)
+  const quickRef = useRef(null)
   const searchRef = useRef(null)
+  const [navMenu, setNavMenu] = useState('')
   const [profileOpen, setProfileOpen] = useState(false)
+  const [quickOpen, setQuickOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [scrolled, setScrolled] = useState(false)
@@ -22,6 +41,32 @@ const AppShell = () => {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useEffect(() => {
+    if (!navMenu) return undefined
+    const close = (event) => {
+      if (event.key === 'Escape' || !navRef.current?.contains(event.target)) setNavMenu('')
+    }
+    document.addEventListener('keydown', close)
+    document.addEventListener('pointerdown', close)
+    return () => {
+      document.removeEventListener('keydown', close)
+      document.removeEventListener('pointerdown', close)
+    }
+  }, [navMenu])
+
+  useEffect(() => {
+    if (!quickOpen) return undefined
+    const close = (event) => {
+      if (event.key === 'Escape' || !quickRef.current?.contains(event.target)) setQuickOpen(false)
+    }
+    document.addEventListener('keydown', close)
+    document.addEventListener('pointerdown', close)
+    return () => {
+      document.removeEventListener('keydown', close)
+      document.removeEventListener('pointerdown', close)
+    }
+  }, [quickOpen])
 
   useEffect(() => {
     if (!profileOpen) return undefined
@@ -61,6 +106,59 @@ const AppShell = () => {
     navigate(query ? `/app/lists?search=${encodeURIComponent(query)}` : '/app/lists')
   }
 
+  const openNav = (menu) => {
+    setSearchOpen(false)
+    setProfileOpen(false)
+    setQuickOpen(false)
+    setNavMenu((current) => (current === menu ? '' : menu))
+  }
+
+  const closeNav = () => setNavMenu('')
+
+  const navSections = {
+    lists: [
+      { icon: ClipboardList, title: 'My Lists', description: 'View and manage your wish lists', to: '/app/lists', tone: 'green' },
+      { icon: UsersRound, title: "Friends' Lists", description: 'Browse lists from your friends', to: '/app/lists?friends=1', tone: 'blue' },
+      { icon: Lightbulb, title: 'Gift Ideas', description: 'Ideas saved for later', disabled: true, tone: 'amber' },
+      { divider: true },
+      { icon: Plus, title: 'Create List', description: 'Start a new wish list', to: '/app/lists/new', tone: 'solid-green' },
+    ],
+    gifts: [
+      { icon: ShoppingBag, title: 'Shopping list', description: "Gifts you've reserved to buy", disabled: true, tone: 'green' },
+      { icon: Check, title: 'Received', description: 'Gifts marked as received', to: '/app/gifts/received', tone: 'blue' },
+    ],
+  }
+
+  const renderDropdown = (items) => (
+    <div className="nav-dropdown" role="menu">
+      {items.map((item, index) => {
+        if (item.divider) return <div className="nav-dropdown__divider" key={`divider-${index}`} />
+        const Icon = item.icon
+        const content = (
+          <>
+            <span className={`nav-dropdown__icon nav-dropdown__icon--${item.tone}`}><Icon size={20} /></span>
+            <span>
+              <strong>{item.title}</strong>
+              <small>{item.description}</small>
+            </span>
+          </>
+        )
+        if (item.disabled) {
+          return (
+            <button className="nav-dropdown__item is-disabled" disabled key={item.title} role="menuitem" type="button">
+              {content}
+            </button>
+          )
+        }
+        return (
+          <Link className="nav-dropdown__item" key={item.title} onClick={closeNav} role="menuitem" to={item.to}>
+            {content}
+          </Link>
+        )
+      })}
+    </div>
+  )
+
   return (
     <div className="app-shell">
       <header className={`app-shell__header ${scrolled ? 'header-capsule' : ''}`}>
@@ -90,10 +188,19 @@ const AppShell = () => {
           </div>
           Yourz<span style={{ fontWeight: 300, color: '#6b7280' }}>Gift</span>
         </Link>
-        <nav className="app-shell__nav">
-          <Link to="/app/lists">Lists</Link>
-          <Link to="/app/lists?friends=1">Friends</Link>
-          <Link to="/app/lists/new">Gifts</Link>
+        <nav className="app-shell__nav" ref={navRef}>
+          <div className="nav-menu">
+            <button aria-expanded={navMenu === 'lists'} className={`nav-trigger ${navMenu === 'lists' ? 'is-active' : ''}`} onClick={() => openNav('lists')} type="button">
+              Lists {navMenu === 'lists' ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
+            </button>
+            {navMenu === 'lists' ? renderDropdown(navSections.lists) : null}
+          </div>
+          <div className="nav-menu">
+            <button aria-expanded={navMenu === 'gifts'} className={`nav-trigger ${navMenu === 'gifts' ? 'is-active' : ''}`} onClick={() => openNav('gifts')} type="button">
+              Gifts {navMenu === 'gifts' ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
+            </button>
+            {navMenu === 'gifts' ? renderDropdown(navSections.gifts) : null}
+          </div>
         </nav>
         <div className="app-shell__actions">
           <div className="header-search" ref={searchRef}>
@@ -119,9 +226,34 @@ const AppShell = () => {
               </form>
             ) : null}
           </div>
-          <Link aria-label="Create list" className="icon-button" to="/app/lists/new">
-            <Plus size={23} />
-          </Link>
+          <div className="quick-create" ref={quickRef}>
+            <button
+              aria-expanded={quickOpen}
+              aria-haspopup="menu"
+              aria-label="Create"
+              className="icon-button"
+              onClick={() => {
+                setNavMenu('')
+                setProfileOpen(false)
+                setQuickOpen((open) => !open)
+              }}
+              type="button"
+            >
+              <Plus size={23} />
+            </button>
+            {quickOpen ? (
+              <div className="nav-dropdown nav-dropdown--quick" role="menu">
+                <Link className="nav-dropdown__item" onClick={() => setQuickOpen(false)} role="menuitem" to="/app/lists/new">
+                  <span className="nav-dropdown__icon nav-dropdown__icon--solid-green"><Plus size={20} /></span>
+                  <span><strong>Create List</strong><small>Start a new wish list</small></span>
+                </Link>
+                <Link className="nav-dropdown__item" onClick={() => setQuickOpen(false)} role="menuitem" to="/app/lists">
+                  <span className="nav-dropdown__icon nav-dropdown__icon--green"><Gift size={20} /></span>
+                  <span><strong>Add Gift Item</strong><small>Choose a list first</small></span>
+                </Link>
+              </div>
+            ) : null}
+          </div>
           <div className="profile-menu" ref={menuRef}>
             <button
               aria-expanded={profileOpen}
@@ -132,6 +264,7 @@ const AppShell = () => {
               type="button"
             >
               {auth.user?.avatar_url ? <img alt="" src={auth.user.avatar_url} /> : <span>{userInitial}</span>}
+              {profileOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
             {profileOpen ? (
               <div className="profile-menu__panel" role="menu">

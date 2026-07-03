@@ -48,6 +48,7 @@ describe('giftService', () => {
     giftService.updateItem('item-1', { name: 'Lamp' })
     giftService.deleteItem('item-1')
     giftService.listReservations('list-1')
+    giftService.markReservationThanked('reservation-1')
 
     expect(api.get).toHaveBeenCalledWith('/gift-lists/list-1/items')
     expect(api.post).toHaveBeenCalledWith('/gift-lists/list-1/items', { name: 'Book' })
@@ -55,6 +56,7 @@ describe('giftService', () => {
     expect(api.put).toHaveBeenCalledWith('/gift-items/item-1', { name: 'Lamp' })
     expect(api.delete).toHaveBeenCalledWith('/gift-items/item-1')
     expect(api.get).toHaveBeenCalledWith('/gift-lists/list-1/reservations')
+    expect(api.post).toHaveBeenCalledWith('/gift-reservations/reservation-1/thank')
   })
 
   it('uses public gift endpoints', () => {

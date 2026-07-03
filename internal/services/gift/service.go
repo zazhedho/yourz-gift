@@ -241,6 +241,26 @@ func (s *GiftService) GetReservations(ctx context.Context, ownerId, listId strin
 	return s.ReservationRepo.GetReservationsByList(ctx, listId)
 }
 
+func (s *GiftService) MarkReservationThanked(ctx context.Context, ownerId, reservationId string) (domaingift.GiftReservation, error) {
+	reservation, err := s.ReservationRepo.GetByID(ctx, reservationId)
+	if err != nil {
+		return domaingift.GiftReservation{}, err
+	}
+	item, err := s.ItemRepo.GetByID(ctx, reservation.ItemId)
+	if err != nil {
+		return domaingift.GiftReservation{}, err
+	}
+	if _, err := s.GetOwnerList(ctx, ownerId, item.ListId); err != nil {
+		return domaingift.GiftReservation{}, err
+	}
+	reservation.ThankedAt = new(time.Now())
+	reservation.UpdatedAt = new(time.Now())
+	if err := s.ReservationRepo.Update(ctx, reservation); err != nil {
+		return domaingift.GiftReservation{}, err
+	}
+	return reservation, nil
+}
+
 func (s *GiftService) GetFriendLists(ctx context.Context, ownerId string, params filter.BaseParams) ([]domaingift.GiftList, int64, error) {
 	return s.ListRepo.GetListsByFriendOwners(ctx, ownerId, params)
 }

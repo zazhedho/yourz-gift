@@ -214,6 +214,17 @@ func (h *GiftHandler) GetReservations(ctx *gin.Context) {
 	writeGiftResult(ctx, http.StatusOK, "Get gift reservations successfully", data, err)
 }
 
+func (h *GiftHandler) MarkReservationThanked(ctx *gin.Context) {
+	ownerId, ok := ownerID(ctx)
+	if !ok {
+		unauthorized(ctx)
+		return
+	}
+	data, err := h.Service.MarkReservationThanked(ctx.Request.Context(), ownerId, ctx.Param("id"))
+	h.writeMutationAudit(ctx, domainaudit.ActionUpdate, "gift_reservation", ctx.Param("id"), "Marked gift reservation thanked", nil, data, err)
+	writeGiftResult(ctx, http.StatusOK, "Gift reservation marked thanked successfully", data, err)
+}
+
 func (h *GiftHandler) GetPublicList(ctx *gin.Context) {
 	data, err := h.Service.GetPublicList(ctx.Request.Context(), ctx.Param("code"))
 	writeGiftResult(ctx, http.StatusOK, "Get public gift list successfully", data, err)

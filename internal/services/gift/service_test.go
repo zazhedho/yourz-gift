@@ -149,13 +149,44 @@ func TestGetFriendListsUsesAcceptedFriends(t *testing.T) {
 	}
 }
 
+func TestMarkReservationThankedSetsTimestamp(t *testing.T) {
+	fake := &fakeGiftRepo{
+		list: domaingift.GiftList{
+			Id:      "list-1",
+			OwnerId: "owner-1",
+		},
+		item: domaingift.GiftItem{
+			Id:     "item-1",
+			ListId: "list-1",
+		},
+		reservation: domaingift.GiftReservation{
+			Id:     "reservation-1",
+			ItemId: "item-1",
+		},
+	}
+	svc := NewGiftService(fakeGiftListRepo{fake}, fakeGiftItemRepo{fake}, fakeGiftReservationRepo{fake}, nil, nil)
+
+	got, err := svc.MarkReservationThanked(context.Background(), "owner-1", "reservation-1")
+	if err != nil {
+		t.Fatalf("MarkReservationThanked error = %v", err)
+	}
+	if got.ThankedAt == nil {
+		t.Fatalf("ThankedAt = nil, want timestamp")
+	}
+	if fake.updatedReservation.ThankedAt == nil {
+		t.Fatalf("updated ThankedAt = nil, want timestamp")
+	}
+}
+
 type fakeGiftRepo struct {
-	list        domaingift.GiftList
-	storedList  domaingift.GiftList
-	item        domaingift.GiftItem
-	items       []domaingift.GiftItem
-	friendLists []domaingift.GiftList
-	reserved    map[string]int
+	list               domaingift.GiftList
+	storedList         domaingift.GiftList
+	item               domaingift.GiftItem
+	items              []domaingift.GiftItem
+	reservation        domaingift.GiftReservation
+	updatedReservation domaingift.GiftReservation
+	friendLists        []domaingift.GiftList
+	reserved           map[string]int
 }
 
 type fakeGiftListRepo struct{ *fakeGiftRepo }
@@ -207,12 +238,13 @@ func (f fakeGiftReservationRepo) Store(context.Context, domaingift.GiftReservati
 	return nil
 }
 func (f fakeGiftReservationRepo) GetByID(context.Context, string) (domaingift.GiftReservation, error) {
-	return domaingift.GiftReservation{}, nil
+	return f.reservation, nil
 }
 func (f fakeGiftReservationRepo) GetAll(context.Context, filter.BaseParams) ([]domaingift.GiftReservation, int64, error) {
 	return nil, 0, nil
 }
-func (f fakeGiftReservationRepo) Update(context.Context, domaingift.GiftReservation) error {
+func (f fakeGiftReservationRepo) Update(_ context.Context, reservation domaingift.GiftReservation) error {
+	f.updatedReservation = reservation
 	return nil
 }
 func (f fakeGiftReservationRepo) Delete(context.Context, string) error             { return nil }

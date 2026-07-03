@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { AuthContext } from '../../contexts/auth-context'
 import giftService from '../../services/giftService'
 import GiftListDetail from './GiftListDetail'
 
@@ -16,11 +17,13 @@ vi.mock('../../services/giftService', () => ({
 
 const renderDetail = () =>
   render(
-    <MemoryRouter initialEntries={['/app/lists/list-1']}>
-      <Routes>
-        <Route path="/app/lists/:listId" element={<GiftListDetail />} />
-      </Routes>
-    </MemoryRouter>,
+    <AuthContext.Provider value={{ user: { name: 'Owner' } }}>
+      <MemoryRouter initialEntries={['/app/lists/list-1']}>
+        <Routes>
+          <Route path="/app/lists/:listId" element={<GiftListDetail />} />
+        </Routes>
+      </MemoryRouter>
+    </AuthContext.Provider>,
   )
 
 describe('GiftListDetail', () => {

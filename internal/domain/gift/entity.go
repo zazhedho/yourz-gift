@@ -76,6 +76,7 @@ type GiftReservation struct {
 	Note       string         `json:"note" gorm:"column:note"`
 	ShowName   bool           `json:"show_name" gorm:"column:show_name"`
 	Status     string         `json:"status" gorm:"column:status"`
+	ThankedAt  *time.Time     `json:"thanked_at,omitempty" gorm:"column:thanked_at"`
 	CreatedAt  time.Time      `json:"created_at,omitempty" gorm:"column:created_at"`
 	UpdatedAt  *time.Time     `json:"updated_at,omitempty" gorm:"column:updated_at"`
 	DeletedAt  gorm.DeletedAt `json:"-" gorm:"index"`

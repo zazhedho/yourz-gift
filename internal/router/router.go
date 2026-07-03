@@ -360,6 +360,11 @@ func (r *Routes) GiftRoutes() {
 		items.DELETE("/:id", mdw.PermissionMiddleware("gift_items", "delete"), h.DeleteItem)
 	}
 
+	reservations := r.App.Group("/api/gift-reservations").Use(mdw.AuthMiddleware())
+	{
+		reservations.POST("/:id/thank", mdw.PermissionMiddleware("gift_reservations", "update"), h.MarkReservationThanked)
+	}
+
 	friends := r.App.Group("/api/friends").Use(mdw.AuthMiddleware())
 	{
 		friends.GET("", mdw.PermissionMiddleware("friends", "list"), h.GetFriends)

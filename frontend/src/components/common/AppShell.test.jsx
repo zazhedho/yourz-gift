@@ -27,10 +27,30 @@ describe('common components', () => {
     )
 
     expect(screen.getByRole('link', { name: /yourz/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /lists/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /friends/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /lists/i })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /^friends$/i })).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Notifications')).not.toBeInTheDocument()
     expect(screen.getByText('Lists page')).toBeInTheDocument()
+  })
+
+  it('opens list navigation dropdown', async () => {
+    render(
+      <AuthContext.Provider value={{ logout: vi.fn() }}>
+        <MemoryRouter initialEntries={['/app/lists']}>
+          <Routes>
+            <Route element={<AppShell />}>
+              <Route path="/app/lists" element={<div>Lists page</div>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AuthContext.Provider>,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /lists/i }))
+
+    expect(screen.getByRole('menuitem', { name: /my lists/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /friends' lists/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /create list/i })).toBeInTheDocument()
   })
 
   it('submits header search to gift list query', async () => {

@@ -83,6 +83,9 @@ func (f *fakeGiftService) ReorderItems(context.Context, string, string, dto.Gift
 func (f *fakeGiftService) GetReservations(context.Context, string, string) ([]domaingift.GiftReservation, error) {
 	return nil, nil
 }
+func (f *fakeGiftService) MarkReservationThanked(context.Context, string, string) (domaingift.GiftReservation, error) {
+	return domaingift.GiftReservation{}, nil
+}
 func (f *fakeGiftService) GetFriendLists(context.Context, string, filter.BaseParams) ([]domaingift.GiftList, int64, error) {
 	return nil, 0, nil
 }

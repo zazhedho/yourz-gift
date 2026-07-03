@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS gift_reservations (
     note TEXT NOT NULL DEFAULT '',
     show_name BOOLEAN NOT NULL DEFAULT TRUE,
     status VARCHAR(24) NOT NULL DEFAULT 'confirmed',
+    thanked_at TIMESTAMP,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP,
