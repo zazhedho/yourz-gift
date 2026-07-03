@@ -102,7 +102,37 @@ const GiftItemForm = () => {
               <input className="input" name="name" onChange={update} required value={form.name} placeholder="e.g. Espresso Machine" style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
             </FormField>
             <FormField label="Priority Level">
-              <input className="input" min="0" name="priority" onChange={update} type="number" value={form.priority} placeholder="0 = lowest priority" style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
+              <div style={{ display: 'flex', width: '100%', borderRadius: '12px', background: 'rgba(255,255,255,0.7)', border: '1px solid rgba(226, 232, 240, 0.8)', padding: '4px' }}>
+                {[
+                  { value: 0, label: 'Low' },
+                  { value: 1, label: 'Medium' },
+                  { value: 2, label: 'High' }
+                ].map(option => {
+                  const isSelected = Number(form.priority) === option.value
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => updateField('priority', option.value)}
+                      style={{
+                        flex: 1,
+                        padding: '8px 0',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontWeight: 600,
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        background: isSelected ? '#ffffff' : 'transparent',
+                        color: isSelected ? '#111827' : '#64748b',
+                        boxShadow: isSelected ? '0 2px 4px rgba(0,0,0,0.05)' : 'none',
+                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                      }}
+                    >
+                      {option.label}
+                    </button>
+                  )
+                })}
+              </div>
             </FormField>
           </div>
           <div style={{ marginTop: '20px' }}>

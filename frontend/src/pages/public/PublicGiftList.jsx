@@ -1,15 +1,16 @@
-import { ExternalLink, Gift, MapPin, Calendar, CheckCircle2, ShoppingBag } from 'lucide-react'
+import { ExternalLink, Gift, MapPin, CheckCircle2, ShoppingBag, Package, Search } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import Button from '../../components/common/Button'
-import EmptyState from '../../components/common/EmptyState'
 import Loading from '../../components/common/Loading'
 import RetryState from '../../components/common/RetryState'
 import giftService from '../../services/giftService'
 import { getErrorMessage, getListData, getResponseData } from '../../services/api'
 import { formatOccasion } from '../../utils/giftDisplay'
+import HeroBubbles from '../../components/common/HeroBubbles'
 import ReservationForm from './ReservationForm'
+import ShippingModal from '../giftlists/ShippingModal'
 
 const formatPrice = (item) => {
   if (item.price === null || item.price === undefined) return ''
@@ -24,6 +25,10 @@ const PublicGiftList = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [showShipping, setShowShipping] = useState(false)
+
+  const [search, setSearch] = useState('')
+  const [sortBy, setSortBy] = useState('preferred')
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -56,152 +61,170 @@ const PublicGiftList = () => {
   if (error) return <RetryState message={error} onRetry={load} />
   if (!list) return <RetryState message="Gift list not found" onRetry={load} />
 
+  const filteredItems = items
+    .filter((item) => {
+      if (!search) return true
+      const s = search.toLowerCase()
+      return item.name?.toLowerCase().includes(s) || item.description?.toLowerCase().includes(s)
+    })
+    .sort((a, b) => {
+      if (sortBy === 'price-asc') return Number(a.price || 0) - Number(b.price || 0)
+      if (sortBy === 'price-desc') return Number(b.price || 0) - Number(a.price || 0)
+      if (sortBy === 'newest') return new Date(b.created_at || 0) - new Date(a.created_at || 0)
+      return Number(a.priority || 0) - Number(b.priority || 0)
+    })
+
+  const availableItems = items.filter(i => (i.quantity_remaining ?? i.quantity) > 0).length
+
   return (
-    <main className="public-page" style={{ position: 'relative', zIndex: 1, padding: 0, maxWidth: '100%' }}>
-      {/* Immersive Hero Section */}
-      <section style={{ 
-        position: 'relative', 
-        minHeight: '60vh', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        padding: '60px 24px',
-        overflow: 'hidden'
-      }}>
-        {/* Background Blur Image */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          background: list.cover_image_url ? `url(${list.cover_image_url}) center/cover` : 'var(--gradient-main)',
-          filter: 'blur(30px)',
-          transform: 'scale(1.1)',
-          opacity: 0.4,
-          zIndex: -1
-        }} />
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'linear-gradient(to bottom, transparent, var(--color-canvas-night))',
-          zIndex: -1
-        }} />
+    <>
+      <div className="gift-detail-hero">
+        {list.cover_image_url ? (
+          <div className="gift-detail-hero__bg" style={{ backgroundImage: `url(${list.cover_image_url})` }} />
+        ) : null}
+        <HeroBubbles />
+        <div className="gift-detail-hero__content">
+          <div className="gift-detail-hero__copy">
+            <span className="gift-detail-hero__eyebrow">{formatOccasion(list.occasion_type)}</span>
+            <h1>{list.title}</h1>
+            <p>{list.description || 'Choose a gift and reserve it for the owner.'}</p>
 
-        <div style={{ 
-          maxWidth: '800px', 
-          width: '100%', 
-          textAlign: 'center',
-          animation: 'fadeIn 0.8s ease-out'
-        }}>
-          {list.cover_image_url && (
-            <div style={{ 
-              width: '120px', height: '120px', margin: '0 auto 24px', 
-              borderRadius: '50%', border: '4px solid rgba(255,255,255,0.2)', 
-              overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
-            }}>
-              <img src={list.cover_image_url} alt="Cover" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            </div>
-          )}
-          
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.1)', padding: '6px 16px', borderRadius: '99px', marginBottom: '16px', border: '1px solid rgba(255,255,255,0.1)' }}>
-            <Calendar size={16} color="var(--color-primary)" />
-            <span style={{ fontSize: '14px', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>{formatOccasion(list.occasion_type)}</span>
           </div>
-          
-          <h1 className="public-title" style={{ fontSize: 'clamp(48px, 8vw, 80px)', textShadow: '0 4px 12px rgba(0,0,0,0.3)', marginBottom: '24px' }}>{list.title}</h1>
-          
-          <p style={{ fontSize: '20px', lineHeight: 1.6, color: 'rgba(255,255,255,0.8)', maxWidth: '600px', margin: '0 auto 24px' }}>
-            {list.description || 'Choose a gift and reserve it for the owner.'}
-          </p>
-          
-          {list.shipping_note && (
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(0,0,0,0.4)', padding: '12px 20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <MapPin size={20} color="var(--color-primary)" />
-              <span style={{ fontSize: '15px', color: 'rgba(255,255,255,0.9)' }}>{list.shipping_note}</span>
-            </div>
-          )}
+          <div className="gift-detail-hero__media">
+            {list.cover_image_url ? <img alt="" src={list.cover_image_url} /> : <Gift size={64} />}
+          </div>
         </div>
-      </section>
+        <div className="gift-detail-hero__wave">
+          <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill="currentColor" d="M0,96L60,85.3C120,75,240,53,360,48C480,43,600,53,720,69.3C840,85,960,107,1080,106.7C1200,107,1320,85,1380,74.7L1440,64L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z"></path>
+          </svg>
+        </div>
+      </div>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px 80px' }}>
+      <section className="gift-detail-page">
+        <div className="gift-detail-stats">
+          <div>
+            <span>AVAILABLE ITEMS</span>
+            <strong>{availableItems}</strong>
+          </div>
+          <div>
+            <span>TOTAL ITEMS</span>
+            <strong>{items.length}</strong>
+          </div>
+          <div>
+            <span>SHIPPING ADDRESS</span>
+            <button onClick={() => setShowShipping(true)} type="button" style={{ background: 'transparent', border: 0, color: '#ffffff', textDecoration: 'underline', padding: 0, fontSize: '24px', fontWeight: 800, cursor: 'pointer' }}>View</button>
+          </div>
+        </div>
+
+        <div className="gift-detail-controls">
+          <label>
+            Search
+            <div className="gift-detail-search">
+              <Search size={18} color="#9ca3af" />
+              <input 
+                placeholder="E.g. bunny toy" 
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+          </label>
+
+          <label>
+            Sort by
+            <select 
+              className="gift-detail-sort"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="preferred">Preferred</option>
+              <option value="price-asc">Price (Low to High)</option>
+              <option value="price-desc">Price (High to Low)</option>
+              <option value="newest">Newest</option>
+            </select>
+          </label>
+        </div>
+
         {notice ? (
-          <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#10b981', padding: '16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px' }}>
-            <CheckCircle2 size={24} /> <span style={{ fontWeight: 600 }}>{notice}</span>
+          <div className="gift-detail-notice">
+            <CheckCircle2 size={18} color="#10b981" /> <strong>{notice}</strong>
           </div>
         ) : null}
 
-        {items.length === 0 ? (
-          <EmptyState message="The owner has not added public gift items yet." title="No gifts yet" />
+        {filteredItems.length === 0 ? (
+          <div className="gift-detail-empty">
+            <Package size={48} color="#94a3b8" />
+            <h2>No items found</h2>
+            <p>{search ? 'Change the search term.' : 'The owner has not added public gift items yet.'}</p>
+          </div>
         ) : (
-          <section className="public-items" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
-            {items.map((item) => {
+          <div className="gift-detail-items">
+            {filteredItems.map((item) => {
               const remaining = item.quantity_remaining ?? item.quantity
               const canReserve = item.can_reserve !== false && remaining > 0
+              
               return (
-                <article key={item.id} style={{ 
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '20px',
-                  overflow: 'hidden',
-                  transition: 'transform 0.3s, box-shadow 0.3s',
-                  display: 'flex',
-                  flexDirection: 'column'
-                }} className="gift-card-hover">
-                  
-                  <div style={{ 
-                    height: '220px', 
-                    background: item.image_url ? `url(${item.image_url}) center/cover` : 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01))',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative'
-                  }}>
-                    {!item.image_url && <Gift size={48} color="rgba(255,255,255,0.2)" />}
-                    <div style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', padding: '6px 12px', borderRadius: '99px', fontSize: '12px', fontWeight: 700, color: canReserve ? 'white' : '#94a3b8' }}>
-                      {remaining} remaining
+                <div className="gift-detail-item" key={item.id}>
+                  <div className="gift-detail-item__status" style={{ background: canReserve ? '#10b981' : '#64748b' }}>
+                    <div className="gift-detail-item__status-text">
+                      <Gift size={16} /> 
+                      {canReserve ? `${remaining} remaining` : 'Fully reserved'}
                     </div>
                   </div>
 
-                  <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                    <h2 style={{ fontSize: '20px', margin: '0 0 8px 0', fontWeight: 600 }}>{item.name}</h2>
-                    <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: '0 0 16px 0' }}>
-                      {item.description || 'No description'}
-                    </p>
-                    
-                    <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <p style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--color-primary)' }}>{formatPrice(item)}</p>
-                      
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        {item.product_url && (
-                          <a href={item.product_url} target="_blank" rel="noreferrer" style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: 'none', width: '44px', height: '44px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}>
-                            <ExternalLink size={18} />
-                          </a>
+                  <div className="gift-detail-item__body">
+                    <div className="gift-detail-item__main" style={{ gridTemplateColumns: '84px minmax(0, 1fr)' }}>
+                      <div className="gift-detail-item__image">
+                        {item.image_url ? (
+                          <img alt={item.name} src={item.image_url} />
+                        ) : (
+                          <Package size={40} color="#94a3b8" />
                         )}
-                        <Button 
-                          disabled={!canReserve} 
-                          onClick={() => setSelectedItem(item)}
-                          style={{ 
-                            background: canReserve ? 'var(--color-primary)' : 'rgba(255,255,255,0.1)', 
-                            color: canReserve ? 'white' : 'rgba(255,255,255,0.4)',
-                            border: 'none',
-                            minHeight: '44px',
-                            padding: '0 20px',
-                            borderRadius: '99px',
-                            fontWeight: 600,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px'
-                          }}
-                        >
-                          <ShoppingBag size={18} /> {canReserve ? 'Reserve' : 'Reserved'}
-                        </Button>
+                      </div>
+                      <div className="gift-detail-item__text">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+                          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#111827' }}>{item.name}</h2>
+                          {item.price && <div className="gift-detail-item__price" style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#10b981' }}>{formatPrice(item)}</div>}
+                        </div>
+                        <p style={{ margin: '8px 0 16px', fontSize: '14px', color: '#6b7280', lineHeight: 1.5 }}>{item.description || item.name}</p>
+                        
+                        {item.product_url ? (
+                          <a className="gift-detail-online" href={item.product_url} rel="noreferrer" target="_blank" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', color: '#334155', fontSize: '13px', fontWeight: 600, textDecoration: 'none' }}>
+                            View online <ExternalLink size={14} />
+                          </a>
+                        ) : null}
                       </div>
                     </div>
                   </div>
-                </article>
+                  
+                  <div className="gift-detail-item__footer">
+                    <div></div>
+                    <Button 
+                      disabled={!canReserve} 
+                      onClick={() => setSelectedItem(item)}
+                      style={{ 
+                        background: canReserve ? '#10b981' : '#e2e8f0', 
+                        color: canReserve ? 'white' : '#64748b',
+                        border: 'none',
+                        minHeight: '44px',
+                        padding: '0 24px',
+                        borderRadius: '99px',
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        cursor: canReserve ? 'pointer' : 'not-allowed'
+                      }}
+                    >
+                      <ShoppingBag size={18} /> {canReserve ? 'Reserve' : 'Reserved'}
+                    </Button>
+                  </div>
+                </div>
               )
             })}
-          </section>
+          </div>
         )}
-      </div>
+      </section>
 
       {selectedItem ? (
         <ReservationForm
@@ -212,14 +235,10 @@ const PublicGiftList = () => {
         />
       ) : null}
 
-      <style dangerouslySetInnerHTML={{__html: `
-        .gift-card-hover:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-          border-color: rgba(255,255,255,0.2) !important;
-        }
-      `}} />
-    </main>
+      {showShipping && (
+        <ShippingModal note={list.shipping_note} onClose={() => setShowShipping(false)} />
+      )}
+    </>
   )
 }
 

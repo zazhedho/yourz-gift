@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 
 import Button from '../../components/common/Button'
 import ErrorBanner from '../../components/common/ErrorBanner'
@@ -40,7 +41,7 @@ const ReservationForm = ({ code, item, onClose, onReserved }) => {
     }
   }
 
-  return (
+  const modalContent = (
     <div className="dialog-backdrop" role="presentation">
       <section className="dialog" role="dialog" aria-modal="true" aria-label={`Reserve ${item.name}`}>
         <h2>Reserve {item.name}</h2>
@@ -71,6 +72,8 @@ const ReservationForm = ({ code, item, onClose, onReserved }) => {
       </section>
     </div>
   )
+
+  return createPortal(modalContent, document.body)
 }
 
 export default ReservationForm

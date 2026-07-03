@@ -17,6 +17,9 @@ import RetryState from '../../components/common/RetryState'
 import giftService from '../../services/giftService'
 import { getErrorMessage, getListData, getResponseData } from '../../services/api'
 import { formatOccasion } from '../../utils/giftDisplay'
+import HeroBubbles from '../../components/common/HeroBubbles'
+import ShippingModal from './ShippingModal'
+import ReservationsModal from './ReservationsModal'
 
 const publicUrl = (shareCode) => `${window.location.origin}/g/${shareCode}`
 
@@ -48,6 +51,7 @@ const GiftListDetail = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [showShipping, setShowShipping] = useState(false)
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('preferred')
   const [expandedItemId, setExpandedItemId] = useState('')
@@ -123,6 +127,7 @@ const GiftListDetail = () => {
         {list.cover_image_url ? (
           <div className="gift-detail-hero__bg" style={{ backgroundImage: `url(${list.cover_image_url})` }} />
         ) : null}
+        <HeroBubbles />
         <div className="gift-detail-hero__content">
           <div className="gift-detail-hero__copy">
             <span className="gift-detail-hero__eyebrow">{formatOccasion(list.occasion_type)}</span>
@@ -133,13 +138,18 @@ const GiftListDetail = () => {
               Copy public link
             </button>
             <div className="gift-detail-owner">
-              <span>Created by You</span>
               <div className="gift-detail-owner__avatar">{String(list.title || 'Y').charAt(0).toUpperCase()}</div>
+              <span>Created by You</span>
             </div>
           </div>
           <div className="gift-detail-hero__media">
             {list.cover_image_url ? <img alt="" src={list.cover_image_url} /> : <Package size={64} />}
           </div>
+        </div>
+        <div className="gift-detail-hero__wave">
+          <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill="currentColor" d="M0,82 C220,108 420,108 650,90 C890,72 1055,68 1240,74 C1330,77 1395,82 1440,78 L1440,120 L0,120 Z"></path>
+          </svg>
         </div>
       </div>
 
@@ -155,7 +165,7 @@ const GiftListDetail = () => {
         </div>
         <div>
           <span>SHIPPING ADDRESS</span>
-          <button onClick={() => setNotice(list.shipping_note || 'No shipping note yet')} type="button">View</button>
+          <button onClick={() => setShowShipping(true)} type="button">View</button>
         </div>
       </div>
 
@@ -249,23 +259,8 @@ const GiftListDetail = () => {
                     <span style={{ color: '#9ca3af' }}>|</span>
                     <button onClick={() => editItem(item)} type="button">Move</button>
                   </div>
-                  <button onClick={() => setExpandedItemId(expanded ? '' : item.id)} type="button" className="text-green">View reservations</button>
+                  <button onClick={() => setExpandedItemId(item.id)} type="button" className="text-green">View reservations</button>
                 </div>
-
-                {expanded ? (
-                  <div className="gift-detail-reservations">
-                    {itemReservations.length === 0 ? (
-                      <p>No reservation for this item yet.</p>
-                    ) : (
-                      itemReservations.map((reservation) => (
-                        <div key={reservation.id}>
-                          <strong>{reservation.guest_name || reservation.guest_email || 'Guest'}</strong>
-                          <span>Qty {reservation.quantity} - {reservation.status}</span>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                ) : null}
               </article>
             )
           })
@@ -277,6 +272,16 @@ const GiftListDetail = () => {
         <button onClick={copyLink} type="button"><Share2 size={20} /> Share</button>
         <Link className="gift-detail-actionbar__primary" to={`/app/lists/${listId}/items/new`}>Add Item</Link>
       </div>
+
+      <ReservationsModal 
+        item={items.find(i => i.id === expandedItemId)}
+        reservations={reservations.filter(r => r.item_id === expandedItemId)}
+        onClose={() => setExpandedItemId('')} 
+      />
+
+      {showShipping && (
+        <ShippingModal note={list.shipping_note} onClose={() => setShowShipping(false)} />
+      )}
     </section>
     </>
   )

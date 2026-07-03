@@ -1,9 +1,10 @@
+import { createPortal } from 'react-dom'
 import Button from './Button'
 
 const ConfirmDialog = ({ message, onCancel, onConfirm, open, title = 'Confirm action' }) => {
   if (!open) return null
 
-  return (
+  const modalContent = (
     <div className="dialog-backdrop" role="presentation">
       <div className="dialog" role="dialog" aria-modal="true" aria-label={title}>
         <h2>{title}</h2>
@@ -15,6 +16,8 @@ const ConfirmDialog = ({ message, onCancel, onConfirm, open, title = 'Confirm ac
       </div>
     </div>
   )
+
+  return createPortal(modalContent, document.body)
 }
 
 export default ConfirmDialog

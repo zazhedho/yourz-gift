@@ -1044,13 +1044,35 @@ a {
 .gift-detail-hero {
   background: linear-gradient(135deg, #a73b7f 0%, #68487b 50%, #295574 100%);
   color: #ffffff;
-  min-height: 420px;
+  min-height: 320px;
   position: relative;
   overflow: hidden;
   width: 100vw;
   margin-left: calc(-50vw + 50%);
-  margin-top: -92px; /* Negate the .app-shell__main top padding */
-  padding-top: 52px;
+  margin-top: -92px;
+  padding: 92px 0 20px;
+}
+
+.gift-detail-hero__wave {
+  bottom: -1px;
+  color: var(--color-canvas-light);
+  height: 76px;
+  left: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 2;
+}
+
+.gift-detail-hero__wave svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (min-width: 768px) {
+  .gift-detail-hero__wave {
+    height: 104px;
+  }
 }
 
 .gift-detail-hero__bg {
@@ -1064,16 +1086,48 @@ a {
   z-index: 0;
 }
 
-.gift-detail-hero::after {
-  background: #f8fafc; /* match app background if needed, wait, original was rgba(255,255,255,0.96) or just white */
-  background: #ffffff;
-  border-radius: 50% 50% 0 0;
-  bottom: -108px;
-  content: "";
-  height: 158px;
-  left: -5%;
+.hero-bubbles {
   position: absolute;
-  width: 110%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-bubbles .bubble {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  animation: bounceGently infinite ease-in-out;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 0 10px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.05);
+}
+
+@keyframes bounceGently {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-25px) scale(1.02); }
+}
+
+.hero-bubbles .bubble:nth-child(1) { width: 20px; height: 20px; left: 10%; top: 20%; animation-duration: 6s; animation-delay: 0s; }
+.hero-bubbles .bubble:nth-child(2) { width: 12px; height: 12px; left: 22%; top: 60%; animation-duration: 5s; animation-delay: 1s; }
+.hero-bubbles .bubble:nth-child(3) { width: 25px; height: 25px; left: 35%; top: 30%; animation-duration: 7s; animation-delay: 2s; }
+.hero-bubbles .bubble:nth-child(4) { width: 15px; height: 15px; left: 48%; top: 75%; animation-duration: 8s; animation-delay: 0.5s; }
+.hero-bubbles .bubble:nth-child(5) { width: 32px; height: 32px; left: 65%; top: 15%; animation-duration: 9s; animation-delay: 3s; }
+.hero-bubbles .bubble:nth-child(6) { width: 10px; height: 10px; left: 80%; top: 50%; animation-duration: 4.5s; animation-delay: 1.5s; }
+.hero-bubbles .bubble:nth-child(7) { width: 22px; height: 22px; left: 90%; top: 25%; animation-duration: 10s; animation-delay: 4s; }
+.hero-bubbles .bubble:nth-child(8) { width: 8px; height: 8px; left: 5%; top: 80%; animation-duration: 5.5s; animation-delay: 2.5s; }
+.hero-bubbles .bubble:nth-child(9) { width: 18px; height: 18px; left: 55%; top: 40%; animation-duration: 7s; animation-delay: 1s; }
+.hero-bubbles .bubble:nth-child(10) { width: 28px; height: 28px; left: 28%; top: 85%; animation-duration: 8.5s; animation-delay: 0.5s; }
+.hero-bubbles .bubble:nth-child(11) { width: 14px; height: 14px; left: 75%; top: 70%; animation-duration: 6s; animation-delay: 3.5s; }
+.hero-bubbles .bubble:nth-child(12) { width: 19px; height: 19px; left: 85%; top: 85%; animation-duration: 7.5s; animation-delay: 2s; }
+
+.gift-detail-hero::after {
+  content: none;
 }
 
 .gift-detail-hero__content {
@@ -1081,8 +1135,8 @@ a {
   display: grid;
   gap: 32px;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 0.7fr);
-  min-height: 420px;
-  padding: 40px clamp(24px, 4vw, 48px) 72px;
+  min-height: 280px;
+  padding: 32px clamp(24px, 4vw, 48px) 80px;
   max-width: 1000px;
   margin: 0 auto;
   position: relative;
@@ -1139,26 +1193,36 @@ a {
 }
 
 .gift-detail-owner {
-  display: grid;
-  gap: 12px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  display: inline-flex;
+  gap: 10px;
+  padding: 6px 16px 6px 6px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  margin-top: 8px;
 }
 
 .gift-detail-owner span {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
 }
 
 .gift-detail-owner__avatar {
   align-items: center;
   background: linear-gradient(135deg, #f43f5e, #fb923c);
-  border: 2px solid #ffffff;
   border-radius: 999px;
   display: flex;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 800;
-  height: 44px;
+  height: 28px;
   justify-content: center;
-  width: 44px;
+  width: 28px;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
 .gift-detail-hero__media {
@@ -1167,14 +1231,14 @@ a {
   border-radius: 40px 100px 40px 100px;
   display: flex;
   justify-content: center;
-  min-height: 280px;
+  min-height: 200px;
   overflow: hidden;
 }
 
 .gift-detail-hero__media img {
   filter: grayscale(100%);
   height: 100%;
-  min-height: 280px;
+  min-height: 200px;
   object-fit: cover;
   width: 100%;
 }
@@ -1188,7 +1252,7 @@ a {
   color: #ffffff;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  margin: -42px auto 40px;
+  margin: -90px auto 40px;
   max-width: 720px;
   min-height: 84px;
   position: relative;
@@ -1290,15 +1354,11 @@ a {
   max-width: 800px;
 }
 
-.gift-detail-empty,
-.gift-detail-item {
+.gift-detail-empty {
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: 16px;
   box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
-}
-
-.gift-detail-empty {
   display: grid;
   gap: 10px;
   justify-items: center;
@@ -1306,13 +1366,18 @@ a {
   text-align: center;
 }
 
-.gift-detail-empty h2,
-.gift-detail-empty p {
-  margin: 0;
+.gift-detail-item {
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.03), 0 10px 15px -3px rgba(15, 23, 42, 0.02);
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.gift-detail-item {
-  overflow: hidden;
+.gift-detail-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 8px 12px -6px rgba(15, 23, 42, 0.04);
 }
 
 .gift-detail-item__status {
@@ -1325,7 +1390,6 @@ a {
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 600;
-  border-radius: 8px 8px 0 0;
 }
 
 .gift-detail-item__status-text {
@@ -1377,7 +1441,7 @@ a {
   align-items: center;
   background: #f8fafc;
   border: 1px solid #eef2f7;
-  border-radius: 8px;
+  border-radius: 12px;
   display: flex;
   height: 84px;
   justify-content: center;
