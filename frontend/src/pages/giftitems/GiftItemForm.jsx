@@ -78,13 +78,13 @@ const GiftItemForm = () => {
   }
 
   return (
-    <section className="surface" style={{ padding: '40px' }}>
-      <div className="page-header" style={{ marginBottom: '40px', borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: '24px' }}>
+    <section className="surface gift-item-form-page" style={{ padding: '40px' }}>
+      <div className="page-header gift-item-form-header" style={{ marginBottom: '40px', borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: '24px' }}>
         <div>
           <h1 className="page-title" style={{ fontSize: '32px', letterSpacing: '-0.02em', color: '#111827' }}>{editing ? 'Edit Gift Item' : 'Create New Gift Item'}</h1>
           <p className="page-subtitle" style={{ fontSize: '15px', color: 'var(--color-shade-50)' }}>Add practical details guests need before reserving.</p>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div className="gift-item-form-actions" style={{ display: 'flex', gap: '12px' }}>
           <Link className="button button--ghost" to={`/app/lists/${listId}`} style={{ borderRadius: '99px', padding: '0 24px', minHeight: '40px', fontWeight: 600, color: 'var(--color-shade-60)', background: 'rgba(0,0,0,0.05)' }}>Cancel</Link>
           <Button isLoading={submitting} type="submit" onClick={submit} className="button" style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)', color: 'white', padding: '0 24px', borderRadius: '99px', minHeight: '40px', fontWeight: 600, border: 'none', boxShadow: '0 4px 12px rgba(244,63,94,0.3)', letterSpacing: '0.5px' }}>{editing ? 'Save changes' : 'Create item'}</Button>
         </div>
@@ -92,7 +92,7 @@ const GiftItemForm = () => {
 
       <ErrorBanner message={error} />
 
-      <form className="form" onSubmit={submit} style={{ display: 'grid', gap: '24px' }}>
+      <form className="form gift-item-form" onSubmit={submit} style={{ display: 'grid', gap: '24px' }}>
         
         {/* Basic Info Section */}
         <div style={{ background: 'rgba(255, 255, 255, 0.5)', padding: '32px', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.8)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
@@ -112,13 +112,7 @@ const GiftItemForm = () => {
         {/* Pricing & Quantity */}
         <div style={{ background: 'rgba(255, 255, 255, 0.5)', padding: '32px', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.8)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
           <h3 style={{ marginTop: 0, marginBottom: '24px', fontSize: '18px', fontWeight: 700, color: '#111827' }}>Pricing & Quantity</h3>
-          <div className="form-grid">
-            <FormField label="Estimated Price">
-              <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-shade-50)', fontWeight: 600 }}>{form.currency}</span>
-                <input className="input" min="0" name="price" onChange={update} step="0.01" type="number" value={form.price ?? ''} placeholder="0.00" style={{ paddingLeft: '64px', background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
-              </div>
-            </FormField>
+          <div className="form-grid pricing-quantity-grid">
             <FormField label="Currency">
               <div style={{ position: 'relative' }}>
                 <select className="select" name="currency" onChange={update} value={form.currency} style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }}>
@@ -132,8 +126,12 @@ const GiftItemForm = () => {
                 </select>
               </div>
             </FormField>
-          </div>
-          <div style={{ marginTop: '20px', maxWidth: '300px' }}>
+            <FormField label="Estimated Price">
+              <div className="price-input">
+                <span className="price-input__currency">{form.currency}</span>
+                <input className="input price-input__control" min="0" name="price" onChange={update} step="0.01" type="number" value={form.price ?? ''} placeholder="0.00" style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
+              </div>
+            </FormField>
             <FormField label="Desired Quantity">
               <input className="input" min="1" name="quantity" onChange={update} required type="number" value={form.quantity} style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
             </FormField>

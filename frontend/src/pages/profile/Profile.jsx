@@ -41,8 +41,8 @@ const Profile = () => {
   }
 
   return (
-    <section style={{ maxWidth: '640px', margin: '40px auto', padding: '0 20px' }}>
-      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+    <section className="profile-form-page" style={{ maxWidth: '640px', margin: '40px auto', padding: '0 20px' }}>
+      <div className="profile-form-hero" style={{ textAlign: 'center', marginBottom: '40px' }}>
         <div style={{ 
           width: '100px', height: '100px', borderRadius: '50%', background: 'linear-gradient(135deg, #f43f5e, #fb923c)',
           margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -55,7 +55,7 @@ const Profile = () => {
         <p style={{ fontSize: '16px', color: 'var(--color-shade-50)', margin: 0 }}>Manage your personal details and account settings</p>
       </div>
 
-      <div className="surface" style={{ padding: '32px 40px' }}>
+      <div className="surface profile-form-panel" style={{ padding: '32px 40px' }}>
         <ErrorBanner message={error} />
         {notice ? <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', color: '#059669', padding: '12px 16px', borderRadius: '8px', marginBottom: '24px', fontWeight: 500 }}>{notice}</div> : null}
 
@@ -78,7 +78,7 @@ const Profile = () => {
             </FormField>
           </div>
           
-          <div style={{ marginTop: '36px', paddingTop: '28px', borderTop: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'flex-end' }}>
+          <div className="profile-form-actions" style={{ marginTop: '36px', paddingTop: '28px', borderTop: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'flex-end' }}>
             <Button isLoading={saving} type="submit" className="button" style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)', color: 'white', padding: '0 32px', borderRadius: '99px', minHeight: '44px', fontWeight: 600, border: 'none', boxShadow: '0 6px 16px rgba(244,63,94,0.3)', letterSpacing: '0.5px' }}>
               Save Changes
             </Button>

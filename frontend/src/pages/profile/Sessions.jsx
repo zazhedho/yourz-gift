@@ -92,17 +92,21 @@ const Sessions = () => {
 
         <div className="session-list">
           {sessions.map((session) => (
-            <article className="session-item" key={session.session_id}>
-              <div className="session-item__icon">
-                <MonitorSmartphone size={20} />
-              </div>
-              <div>
-                <h2>{session.device_info || 'Unknown device'}</h2>
-                <p>{session.ip || 'Unknown IP'}</p>
-                <p>Last active {formatDate(session.last_activity)}</p>
+            <article className={`session-item${session.is_current_session ? ' session-item--current' : ''}`} key={session.session_id}>
+              <div className="session-item__main">
+                <div className="session-item__icon">
+                  <MonitorSmartphone size={20} />
+                </div>
+                <div>
+                  <div className="session-item__title-row">
+                    <h2>{session.device_info || 'Unknown device'}</h2>
+                    {session.is_current_session ? <span className="session-current">Current</span> : null}
+                  </div>
+                  <p>{session.ip || 'Unknown IP'}</p>
+                  <p>Last active {formatDate(session.last_activity)}</p>
+                </div>
               </div>
               <div className="session-item__actions">
-                {session.is_current_session ? <span className="session-current">Current</span> : null}
                 {!session.is_current_session ? (
                   <button
                     aria-label="Revoke session"

@@ -96,25 +96,25 @@ const GiftListForm = () => {
   if (loading) return <Loading label="Loading gift list" />
 
   return (
-    <section className="surface" style={{ padding: '40px' }}>
-      <div className="page-header" style={{ marginBottom: '40px', borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: '24px' }}>
+    <section className="surface form-surface">
+      <div className="page-header form-page-header">
         <div>
-          <h1 className="page-title" style={{ fontSize: '32px', letterSpacing: '-0.02em', color: '#111827' }}>{editing ? 'Edit Gift List' : 'Create New Gift List'}</h1>
-          <p className="page-subtitle" style={{ fontSize: '15px', color: 'var(--color-shade-50)' }}>Personalize your list for birthdays, weddings, or any custom occasion.</p>
+          <h1 className="page-title form-page-title">{editing ? 'Edit Gift List' : 'Create New Gift List'}</h1>
+          <p className="page-subtitle form-page-subtitle">Personalize your list for birthdays, weddings, or any custom occasion.</p>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <Link className="button button--ghost" to={editing ? `/app/lists/${listId}` : '/app/lists'} style={{ borderRadius: '99px', padding: '0 24px', minHeight: '40px', fontWeight: 600, color: 'var(--color-shade-60)', background: 'rgba(0,0,0,0.05)' }}>Cancel</Link>
-          <Button isLoading={submitting} type="submit" onClick={submit} className="button" style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)', color: 'white', padding: '0 24px', borderRadius: '99px', minHeight: '40px', fontWeight: 600, border: 'none', boxShadow: '0 4px 12px rgba(244,63,94,0.3)', letterSpacing: '0.5px' }}>{editing ? 'Save changes' : 'Create list'}</Button>
+        <div className="form-page-actions">
+          <Link className="button button--ghost form-btn-cancel" to={editing ? `/app/lists/${listId}` : '/app/lists'}>Cancel</Link>
+          <Button isLoading={submitting} type="submit" onClick={submit} className="button form-btn-submit">{editing ? 'Save changes' : 'Create list'}</Button>
         </div>
       </div>
       
       <ErrorBanner message={error} />
       
-      <form className="form" onSubmit={submit} style={{ display: 'grid', gap: '24px' }}>
+      <form className="form form-container" onSubmit={submit}>
         
         {/* Basic Info Section */}
-        <div style={{ background: 'rgba(255, 255, 255, 0.5)', padding: '32px', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.8)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-          <h3 style={{ marginTop: 0, marginBottom: '24px', fontSize: '18px', fontWeight: 700, color: '#111827' }}>Basic Information</h3>
+        <div className="form-section">
+          <h3 className="form-section-title">Basic Information</h3>
           <div className="form-grid">
             <FormField label="Title">
               <input className="input" name="title" onChange={update} required value={form.title} placeholder="e.g. My 25th Birthday" style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
@@ -139,8 +139,8 @@ const GiftListForm = () => {
         </div>
 
         {/* Media & Shipping Section */}
-        <div style={{ background: 'rgba(255, 255, 255, 0.5)', padding: '32px', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.8)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-          <h3 style={{ marginTop: 0, marginBottom: '24px', fontSize: '18px', fontWeight: 700, color: '#111827' }}>Media & Shipping</h3>
+        <div className="form-section">
+          <h3 className="form-section-title">Media & Shipping</h3>
         <ImageUploadField
           folder="gift-lists"
           label="Cover image"
@@ -155,8 +155,8 @@ const GiftListForm = () => {
         </div>
 
         {/* Settings Section */}
-        <div style={{ background: 'rgba(255, 255, 255, 0.5)', padding: '32px', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.8)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-          <h3 style={{ marginTop: 0, marginBottom: '24px', fontSize: '18px', fontWeight: 700, color: '#111827' }}>Settings</h3>
+        <div className="form-section">
+          <h3 className="form-section-title">Settings</h3>
           <div className="form-grid">
             <FormField label="Visibility">
               <select className="select" name="visibility" onChange={update} value={form.visibility} style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }}>
