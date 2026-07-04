@@ -39,6 +39,32 @@ func TestBuildItemResponsesCalculatesRemaining(t *testing.T) {
 	}
 }
 
+func TestBuildItemResponsesIncludesArchiveState(t *testing.T) {
+	fake := &fakeGiftRepo{
+		items: []domaingift.GiftItem{{
+			Id:         "item-1",
+			ListId:     "list-1",
+			Name:       "Archived item",
+			Quantity:   1,
+			Currency:   "IDR",
+			IsActive:   true,
+			IsArchived: true,
+		}},
+	}
+	svc := NewGiftService(fakeGiftListRepo{fake}, fakeGiftItemRepo{fake}, fakeGiftReservationRepo{fake}, nil, nil)
+
+	got, err := svc.buildItemResponses(context.Background(), "list-1", true)
+	if err != nil {
+		t.Fatalf("buildItemResponses error = %v", err)
+	}
+	if !got[0].IsArchived {
+		t.Fatalf("IsArchived = false, want true")
+	}
+	if got[0].CanReserve {
+		t.Fatalf("CanReserve = true, want false")
+	}
+}
+
 func TestGetPublicListRejectsPrivateList(t *testing.T) {
 	fake := &fakeGiftRepo{list: domaingift.GiftList{
 		Id:           "list-1",

@@ -12,7 +12,7 @@ import {
   X,
 } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import Loading from '../../components/common/Loading'
@@ -55,6 +55,7 @@ const GiftListDetail = () => {
   const auth = useAuth()
   const { listId } = useParams()
   const navigate = useNavigate()
+  const hasLoadedRef = useRef(false)
   const [list, setList] = useState(null)
   const [items, setItems] = useState([])
   const [reservations, setReservations] = useState([])
@@ -65,17 +66,18 @@ const GiftListDetail = () => {
   const [showShipping, setShowShipping] = useState(false)
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('preferred')
+  const [itemView, setItemView] = useState('active')
   const [expandedItemId, setExpandedItemId] = useState('')
   const [cancelingReservationId, setCancelingReservationId] = useState('')
   const [releaseTarget, setReleaseTarget] = useState(null)
 
   const load = useCallback(async () => {
-    setLoading(true)
+    if (!hasLoadedRef.current) setLoading(true)
     setError('')
     try {
       const [listResponse, itemResponse, reservationResponse] = await Promise.all([
         giftService.getList(listId),
-        giftService.listItems(listId),
+        giftService.listItems(listId, itemView === 'archived' ? { archived: true } : undefined),
         giftService.listReservations(listId),
       ])
       setList(getResponseData(listResponse))
@@ -84,9 +86,10 @@ const GiftListDetail = () => {
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to load gift list detail'))
     } finally {
+      hasLoadedRef.current = true
       setLoading(false)
     }
-  }, [listId])
+  }, [itemView, listId])
 
   useEffect(() => {
     load()
@@ -101,6 +104,13 @@ const GiftListDetail = () => {
   const archiveItem = async (item) => {
     await giftService.updateItem(item.id, { is_archived: true })
     setNotice('Item archived')
+    setTimeout(() => setNotice(''), 3000)
+    await load()
+  }
+
+  const restoreItem = async (item) => {
+    await giftService.updateItem(item.id, { is_archived: false })
+    setNotice('Item restored')
     setTimeout(() => setNotice(''), 3000)
     await load()
   }
@@ -153,13 +163,16 @@ const GiftListDetail = () => {
 
   const visibleItems = useMemo(() => {
     const keyword = search.trim().toLowerCase()
+    const viewItems = itemView === 'archived'
+      ? items.filter((item) => item.is_archived === true)
+      : items.filter((item) => item.is_archived !== true)
     const filtered = keyword
-      ? items.filter((item) =>
+      ? viewItems.filter((item) =>
           [item.name, item.description, sourceHost(item.product_url)]
             .filter(Boolean)
             .some((value) => String(value).toLowerCase().includes(keyword)),
         )
-      : items
+      : viewItems
 
     return [...filtered].sort((a, b) => {
       if (sortBy === 'price_asc') return Number(a.price || 0) - Number(b.price || 0)
@@ -168,7 +181,7 @@ const GiftListDetail = () => {
       if (sortBy === 'reserved') return reservationQuantity(reservations, b.id) - reservationQuantity(reservations, a.id)
       return Number(a.priority || 0) - Number(b.priority || 0)
     })
-  }, [items, reservations, search, sortBy])
+  }, [itemView, items, reservations, search, sortBy])
 
   if (loading) return <Loading label="Loading gift list detail" />
   if (error) return <RetryState message={error} onRetry={load} />
@@ -241,6 +254,10 @@ const GiftListDetail = () => {
       ) : null}
 
       <div className="gift-detail-controls">
+        <div className="gift-detail-view-toggle" role="tablist" aria-label="Item view">
+          <button className={itemView === 'active' ? 'is-active' : ''} onClick={() => setItemView('active')} type="button">Active</button>
+          <button className={itemView === 'archived' ? 'is-active' : ''} onClick={() => setItemView('archived')} type="button">Archived</button>
+        </div>
         <label>
           <span>Search</span>
           <div className="gift-detail-search">
@@ -265,8 +282,8 @@ const GiftListDetail = () => {
           <div className="gift-detail-empty">
             <Package size={32} />
             <h2>No items found</h2>
-            <p>Add gift items or change the search term.</p>
-            <Link className="button button--primary" to={`/lists/${listId}/items/new`}>Add item</Link>
+            <p>{itemView === 'archived' ? 'No archived items yet.' : 'Add gift items or change the search term.'}</p>
+            {itemView === 'active' ? <Link className="button button--primary" to={`/lists/${listId}/items/new`}>Add item</Link> : null}
           </div>
         ) : (
           visibleItems.map((item) => {
@@ -284,7 +301,11 @@ const GiftListDetail = () => {
                       You have {itemReservations.length} active reservation{itemReservations.length === 1 ? '' : 's'} &bull; {receivedInFull ? 'Item received in full' : `${Math.max(Number(item.quantity_remaining ?? item.quantity ?? 0), 0)} still available`}
                     </span>
                   </div>
-                  <button onClick={() => archiveItem(item)} type="button"><Archive size={14} /> Archive item</button>
+                  {item.is_archived ? (
+                    <button onClick={() => restoreItem(item)} type="button"><CheckCircle2 size={14} /> Restore item</button>
+                  ) : (
+                    <button onClick={() => archiveItem(item)} type="button"><Archive size={14} /> Archive item</button>
+                  )}
                 </div>
 
                 <div className="gift-detail-item__body">
@@ -308,14 +329,14 @@ const GiftListDetail = () => {
                       ) : null}
                     </div>
                     
-                    <div className="gift-detail-item__reorder" aria-label={`Reorder ${item.name}`}>
+                    {!item.is_archived ? <div className="gift-detail-item__reorder" aria-label={`Reorder ${item.name}`}>
                       <button aria-label={`Move ${item.name} up`} disabled={itemIndex <= 0} onClick={() => reorderItem(item.id, -1)} type="button">
                         <ArrowUp size={14} />
                       </button>
                       <button aria-label={`Move ${item.name} down`} disabled={itemIndex === items.length - 1} onClick={() => reorderItem(item.id, 1)} type="button">
                         <ArrowDown size={14} />
                       </button>
-                    </div>
+                    </div> : null}
                   </div>
                 </div>
 

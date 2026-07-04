@@ -1892,6 +1892,32 @@ a {
   gap: 8px;
 }
 
+.gift-detail-view-toggle {
+  align-self: end;
+  background: #ffffff;
+  border: 1px solid #d7dce5;
+  border-radius: 999px;
+  display: flex;
+  min-height: 42px;
+  padding: 4px;
+}
+
+.gift-detail-view-toggle button {
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 0 16px;
+}
+
+.gift-detail-view-toggle button.is-active {
+  background: #111827;
+  color: #ffffff;
+}
+
 .gift-detail-search {
   align-items: center;
   background: #ffffff;
@@ -1926,10 +1952,12 @@ a {
 }
 
 .gift-detail-items {
+  align-content: start;
   display: grid;
   gap: 14px;
   margin: 0 auto;
   max-width: 800px;
+  overflow-anchor: none;
 }
 
 .gift-detail-empty {
@@ -3229,6 +3257,21 @@ a {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
+  }
+
+  .gift-detail-controls label {
+    order: 1;
+  }
+
+  .gift-detail-view-toggle {
+    grid-column: 1 / -1;
+    order: 2;
+    width: 100%;
+  }
+
+  .gift-detail-view-toggle button {
+    flex: 1;
+    text-align: center;
   }
 
   .gift-detail-search,

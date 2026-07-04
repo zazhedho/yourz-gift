@@ -114,4 +114,5 @@ type GiftItemPublicResponse struct {
 	Priority          int      `json:"priority"`
 	CanReserve        bool     `json:"can_reserve"`
 	IsReserved        bool     `json:"is_reserved"`
+	IsArchived        bool     `json:"is_archived"`
 }

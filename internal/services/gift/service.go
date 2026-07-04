@@ -522,6 +522,7 @@ func (s *GiftService) buildItemResponses(ctx context.Context, listId string, inc
 			Priority:          item.Priority,
 			CanReserve:        remaining > 0 && item.IsActive && !item.IsArchived,
 			IsReserved:        remaining == 0,
+			IsArchived:        item.IsArchived,
 		})
 	}
 	return out, nil

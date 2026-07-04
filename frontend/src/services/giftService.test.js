@@ -43,6 +43,7 @@ describe('giftService', () => {
 
   it('uses owner gift item endpoints', () => {
     giftService.listItems('list-1')
+    giftService.listItems('list-1', { archived: true })
     giftService.createItem('list-1', { name: 'Book' })
     giftService.reorderItems('list-1', { items: [{ id: 'item-1', priority: 0 }] })
     giftService.updateItem('item-1', { name: 'Lamp' })
@@ -51,7 +52,8 @@ describe('giftService', () => {
     giftService.markReservationThanked('reservation-1')
     giftService.cancelReservation('reservation-1', { cancel_reason: 'Guest changed plan' })
 
-    expect(api.get).toHaveBeenCalledWith('/gift-lists/list-1/items')
+    expect(api.get).toHaveBeenCalledWith('/gift-lists/list-1/items', undefined)
+    expect(api.get).toHaveBeenCalledWith('/gift-lists/list-1/items', { params: { archived: true } })
     expect(api.post).toHaveBeenCalledWith('/gift-lists/list-1/items', { name: 'Book' })
     expect(api.post).toHaveBeenCalledWith('/gift-lists/list-1/items/reorder', { items: [{ id: 'item-1', priority: 0 }] })
     expect(api.put).toHaveBeenCalledWith('/gift-items/item-1', { name: 'Lamp' })
