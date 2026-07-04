@@ -178,6 +178,45 @@ func TestMarkReservationThankedSetsTimestamp(t *testing.T) {
 	}
 }
 
+func TestCancelReservationSetsCanceledStatusAndOwner(t *testing.T) {
+	fake := &fakeGiftRepo{
+		list: domaingift.GiftList{
+			Id:      "list-1",
+			OwnerId: "owner-1",
+		},
+		item: domaingift.GiftItem{
+			Id:     "item-1",
+			ListId: "list-1",
+		},
+		reservation: domaingift.GiftReservation{
+			Id:     "reservation-1",
+			ItemId: "item-1",
+			Status: domaingift.ReservationStatusConfirmed,
+		},
+	}
+	svc := NewGiftService(fakeGiftListRepo{fake}, fakeGiftItemRepo{fake}, fakeGiftReservationRepo{fake}, nil, nil)
+
+	got, err := svc.CancelReservation(context.Background(), "owner-1", "reservation-1", dto.GiftReservationCancel{CancelReason: "Guest changed plan"})
+	if err != nil {
+		t.Fatalf("CancelReservation error = %v", err)
+	}
+	if got.Status != domaingift.ReservationStatusCanceled {
+		t.Fatalf("Status = %q, want %q", got.Status, domaingift.ReservationStatusCanceled)
+	}
+	if got.CanceledAt == nil {
+		t.Fatalf("CanceledAt = nil, want timestamp")
+	}
+	if got.CanceledBy == nil || *got.CanceledBy != "owner-1" {
+		t.Fatalf("CanceledBy = %v, want owner-1", got.CanceledBy)
+	}
+	if got.CancelReason != "Guest changed plan" {
+		t.Fatalf("CancelReason = %q, want reason", got.CancelReason)
+	}
+	if fake.updatedReservation.Status != domaingift.ReservationStatusCanceled {
+		t.Fatalf("updated Status = %q, want %q", fake.updatedReservation.Status, domaingift.ReservationStatusCanceled)
+	}
+}
+
 type fakeGiftRepo struct {
 	list               domaingift.GiftList
 	storedList         domaingift.GiftList

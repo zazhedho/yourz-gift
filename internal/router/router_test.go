@@ -106,6 +106,7 @@ func TestGiftRoutesRegisterNestedListRoutes(t *testing.T) {
 		"POST /api/gift-lists/:id/items/reorder",
 		"GET /api/gift-lists/:id/reservations",
 		"POST /api/gift-reservations/:id/thank",
+		"POST /api/gift-reservations/:id/cancel",
 		"GET /api/friends",
 		"GET /api/friends/requests",
 		"POST /api/friends/request",

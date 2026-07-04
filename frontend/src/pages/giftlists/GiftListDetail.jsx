@@ -43,7 +43,7 @@ const sourceHost = (url) => {
 
 const reservationQuantity = (reservations, itemId) =>
   reservations
-    .filter((reservation) => reservation.item_id === itemId)
+    .filter((reservation) => reservation.item_id === itemId && reservation.status !== 'canceled')
     .reduce((total, reservation) => total + Number(reservation.quantity || 0), 0)
 
 const shouldShowReadMore = (value) => {
@@ -66,6 +66,8 @@ const GiftListDetail = () => {
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('preferred')
   const [expandedItemId, setExpandedItemId] = useState('')
+  const [cancelingReservationId, setCancelingReservationId] = useState('')
+  const [releaseTarget, setReleaseTarget] = useState(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -100,6 +102,25 @@ const GiftListDetail = () => {
     await giftService.updateItem(item.id, { is_archived: true })
     setNotice('Item archived')
     await load()
+  }
+
+  const requestCancelReservation = (reservation) => {
+    setReleaseTarget(reservation)
+  }
+
+  const cancelReservation = async (reservation, reason) => {
+    setError('')
+    setCancelingReservationId(reservation.id)
+    try {
+      await giftService.cancelReservation(reservation.id, { cancel_reason: reason })
+      setNotice('Reservation released')
+      setReleaseTarget(null)
+      await load()
+    } catch (err) {
+      setNotice(getErrorMessage(err, 'Failed to release reservation'))
+    } finally {
+      setCancelingReservationId('')
+    }
   }
 
   const reorderItem = async (itemId, direction) => {
@@ -151,7 +172,7 @@ const GiftListDetail = () => {
   if (!list) return <RetryState message="Gift list not found" onRetry={load} />
 
   const availableItems = items.filter((item) => item.quantity_remaining !== 0 && item.is_active !== false && item.is_archived !== true).length
-  const reservedItems = reservations.length
+  const reservedItems = reservations.filter((reservation) => reservation.status !== 'canceled').length
   const showReadMore = shouldShowReadMore(list.description)
 
   return (
@@ -247,7 +268,7 @@ const GiftListDetail = () => {
         ) : (
           visibleItems.map((item) => {
             const itemIndex = items.findIndex((currentItem) => currentItem.id === item.id)
-            const itemReservations = reservations.filter((reservation) => reservation.item_id === item.id)
+            const itemReservations = reservations.filter((reservation) => reservation.item_id === item.id && reservation.status !== 'canceled')
             const reservedQty = reservationQuantity(reservations, item.id)
             const receivedInFull = Number(item.quantity_remaining) === 0 || (item.quantity && reservedQty >= item.quantity)
             const host = sourceHost(item.product_url)
@@ -319,6 +340,11 @@ const GiftListDetail = () => {
       <ReservationsModal 
         item={items.find(i => i.id === expandedItemId)}
         reservations={reservations.filter(r => r.item_id === expandedItemId)}
+        cancelingReservationId={cancelingReservationId}
+        releaseTarget={releaseTarget}
+        onCancelReservation={requestCancelReservation}
+        onCloseRelease={() => setReleaseTarget(null)}
+        onConfirmRelease={cancelReservation}
         onClose={() => setExpandedItemId('')} 
       />
 

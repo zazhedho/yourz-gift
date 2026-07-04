@@ -47,7 +47,7 @@ const GiftReceived = () => {
       }))
       const nextRows = listDetails.flatMap(({ list, items, reservations }) => (
         items.map((item) => {
-          const itemReservations = reservations.filter((reservation) => reservation.item_id === item.id)
+          const itemReservations = reservations.filter((reservation) => reservation.item_id === item.id && reservation.status !== 'canceled')
           const reservedQty = itemReservations.reduce((total, reservation) => total + Number(reservation.quantity || 0), 0)
           const remaining = Number(item.quantity_remaining ?? Math.max(Number(item.quantity || 0) - reservedQty, 0))
           return {

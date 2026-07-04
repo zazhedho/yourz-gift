@@ -21,6 +21,7 @@ type ServiceGiftInterface interface {
 	ReorderItems(ctx context.Context, ownerId, listId string, req dto.GiftItemReorder) error
 	GetReservations(ctx context.Context, ownerId, listId string) ([]domaingift.GiftReservation, error)
 	MarkReservationThanked(ctx context.Context, ownerId, reservationId string) (domaingift.GiftReservation, error)
+	CancelReservation(ctx context.Context, ownerId, reservationId string, req dto.GiftReservationCancel) (domaingift.GiftReservation, error)
 	GetFriendLists(ctx context.Context, ownerId string, params filter.BaseParams) ([]domaingift.GiftList, int64, error)
 
 	RequestFriend(ctx context.Context, userId string, req dto.GiftFriendRequest) (domaingift.GiftFriend, error)

@@ -68,6 +68,10 @@ type GiftReservationCreate struct {
 	ShowName   *bool  `json:"show_name" binding:"omitempty"`
 }
 
+type GiftReservationCancel struct {
+	CancelReason string `json:"cancel_reason" binding:"omitempty,max=500"`
+}
+
 type GiftFriendRequest struct {
 	Email string `json:"email" binding:"required,email,max=255"`
 }

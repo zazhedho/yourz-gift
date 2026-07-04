@@ -49,6 +49,7 @@ describe('giftService', () => {
     giftService.deleteItem('item-1')
     giftService.listReservations('list-1')
     giftService.markReservationThanked('reservation-1')
+    giftService.cancelReservation('reservation-1', { cancel_reason: 'Guest changed plan' })
 
     expect(api.get).toHaveBeenCalledWith('/gift-lists/list-1/items')
     expect(api.post).toHaveBeenCalledWith('/gift-lists/list-1/items', { name: 'Book' })
@@ -57,6 +58,7 @@ describe('giftService', () => {
     expect(api.delete).toHaveBeenCalledWith('/gift-items/item-1')
     expect(api.get).toHaveBeenCalledWith('/gift-lists/list-1/reservations')
     expect(api.post).toHaveBeenCalledWith('/gift-reservations/reservation-1/thank')
+    expect(api.post).toHaveBeenCalledWith('/gift-reservations/reservation-1/cancel', { cancel_reason: 'Guest changed plan' })
   })
 
   it('uses public gift endpoints', () => {

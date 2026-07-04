@@ -19,6 +19,7 @@ const giftService = {
   deleteItem: (itemId) => api.delete(`/gift-items/${itemId}`),
   listReservations: (listId) => api.get(`/gift-lists/${listId}/reservations`),
   markReservationThanked: (reservationId) => api.post(`/gift-reservations/${reservationId}/thank`),
+  cancelReservation: (reservationId, payload = {}) => api.post(`/gift-reservations/${reservationId}/cancel`, payload),
   getPublicList: (code) => api.get(`/public/gift-lists/${code}`),
   listPublicItems: (code) => api.get(`/public/gift-lists/${code}/items`),
   reservePublicItem: (code, itemId, payload) => (

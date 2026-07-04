@@ -68,18 +68,21 @@ func (GiftReservation) TableName() string {
 }
 
 type GiftReservation struct {
-	Id         string         `json:"id" gorm:"column:id;primaryKey"`
-	ItemId     string         `json:"item_id" gorm:"column:item_id"`
-	GuestEmail string         `json:"guest_email" gorm:"column:guest_email"`
-	GuestName  string         `json:"guest_name" gorm:"column:guest_name"`
-	Quantity   int            `json:"quantity" gorm:"column:quantity"`
-	Note       string         `json:"note" gorm:"column:note"`
-	ShowName   bool           `json:"show_name" gorm:"column:show_name"`
-	Status     string         `json:"status" gorm:"column:status"`
-	ThankedAt  *time.Time     `json:"thanked_at,omitempty" gorm:"column:thanked_at"`
-	CreatedAt  time.Time      `json:"created_at,omitempty" gorm:"column:created_at"`
-	UpdatedAt  *time.Time     `json:"updated_at,omitempty" gorm:"column:updated_at"`
-	DeletedAt  gorm.DeletedAt `json:"-" gorm:"index"`
+	Id           string         `json:"id" gorm:"column:id;primaryKey"`
+	ItemId       string         `json:"item_id" gorm:"column:item_id"`
+	GuestEmail   string         `json:"guest_email" gorm:"column:guest_email"`
+	GuestName    string         `json:"guest_name" gorm:"column:guest_name"`
+	Quantity     int            `json:"quantity" gorm:"column:quantity"`
+	Note         string         `json:"note" gorm:"column:note"`
+	ShowName     bool           `json:"show_name" gorm:"column:show_name"`
+	Status       string         `json:"status" gorm:"column:status"`
+	ThankedAt    *time.Time     `json:"thanked_at,omitempty" gorm:"column:thanked_at"`
+	CanceledAt   *time.Time     `json:"canceled_at,omitempty" gorm:"column:canceled_at"`
+	CanceledBy   *string        `json:"canceled_by,omitempty" gorm:"column:canceled_by"`
+	CancelReason string         `json:"cancel_reason,omitempty" gorm:"column:cancel_reason"`
+	CreatedAt    time.Time      `json:"created_at,omitempty" gorm:"column:created_at"`
+	UpdatedAt    *time.Time     `json:"updated_at,omitempty" gorm:"column:updated_at"`
+	DeletedAt    gorm.DeletedAt `json:"-" gorm:"index"`
 }
 
 func (GiftFriend) TableName() string {
