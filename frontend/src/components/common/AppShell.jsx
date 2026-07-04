@@ -24,12 +24,10 @@ const AppShell = () => {
   const navigate = useNavigate()
   const menuRef = useRef(null)
   const navRef = useRef(null)
-  const quickRef = useRef(null)
   const searchRef = useRef(null)
   const [navMenu, setNavMenu] = useState('')
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
-  const [quickOpen, setQuickOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [scrolled, setScrolled] = useState(false)
@@ -73,19 +71,6 @@ const AppShell = () => {
   }, [mobileNavOpen])
 
   useEffect(() => {
-    if (!quickOpen) return undefined
-    const close = (event) => {
-      if (event.key === 'Escape' || !quickRef.current?.contains(event.target)) setQuickOpen(false)
-    }
-    document.addEventListener('keydown', close)
-    document.addEventListener('pointerdown', close)
-    return () => {
-      document.removeEventListener('keydown', close)
-      document.removeEventListener('pointerdown', close)
-    }
-  }, [quickOpen])
-
-  useEffect(() => {
     if (!profileOpen) return undefined
     const close = (event) => {
       if (event.key === 'Escape' || !menuRef.current?.contains(event.target)) setProfileOpen(false)
@@ -126,7 +111,6 @@ const AppShell = () => {
   const openNav = (menu) => {
     setSearchOpen(false)
     setProfileOpen(false)
-    setQuickOpen(false)
     setMobileNavOpen(true)
     setNavMenu((current) => (current === menu ? '' : menu))
   }
@@ -216,7 +200,6 @@ const AppShell = () => {
           onClick={() => {
             setSearchOpen(false)
             setProfileOpen(false)
-            setQuickOpen(false)
             setMobileNavOpen((open) => !open)
             setNavMenu('')
           }}
@@ -262,33 +245,18 @@ const AppShell = () => {
               </form>
             ) : null}
           </div>
-          <div className="quick-create" ref={quickRef}>
-            <button
-              aria-expanded={quickOpen}
-              aria-haspopup="menu"
+          <div className="quick-create">
+            <Link
               aria-label="Create"
               className="icon-button"
               onClick={() => {
                 setNavMenu('')
                 setProfileOpen(false)
-                setQuickOpen((open) => !open)
               }}
-              type="button"
+              to="/lists/new"
             >
               <Plus size={23} />
-            </button>
-            {quickOpen ? (
-              <div className="nav-dropdown nav-dropdown--quick" role="menu">
-                <Link className="nav-dropdown__item" onClick={() => setQuickOpen(false)} role="menuitem" to="/lists/new">
-                  <span className="nav-dropdown__icon nav-dropdown__icon--solid-green"><Plus size={20} /></span>
-                  <span><strong>Create List</strong><small>Start a new wish list</small></span>
-                </Link>
-                <Link className="nav-dropdown__item" onClick={() => setQuickOpen(false)} role="menuitem" to="/lists">
-                  <span className="nav-dropdown__icon nav-dropdown__icon--green"><Gift size={20} /></span>
-                  <span><strong>Add Gift Item</strong><small>Choose a list first</small></span>
-                </Link>
-              </div>
-            ) : null}
+            </Link>
           </div>
           <div className="profile-menu" ref={menuRef}>
             <button

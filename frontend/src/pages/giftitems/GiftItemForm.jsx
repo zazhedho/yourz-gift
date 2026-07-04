@@ -84,10 +84,6 @@ const GiftItemForm = () => {
           <h1 className="page-title" style={{ fontSize: '32px', letterSpacing: '-0.02em', color: '#111827' }}>{editing ? 'Edit Gift Item' : 'Create New Gift Item'}</h1>
           <p className="page-subtitle" style={{ fontSize: '15px', color: 'var(--color-shade-50)' }}>Add practical details guests need before reserving.</p>
         </div>
-        <div className="gift-item-form-actions" style={{ display: 'flex', gap: '12px' }}>
-          <Link className="button button--ghost" to={`/lists/${listId}`} style={{ borderRadius: '99px', padding: '0 24px', minHeight: '40px', fontWeight: 600, color: 'var(--color-shade-60)', background: 'rgba(0,0,0,0.05)' }}>Cancel</Link>
-          <Button isLoading={submitting} type="submit" onClick={submit} className="button" style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)', color: 'white', padding: '0 24px', borderRadius: '99px', minHeight: '40px', fontWeight: 600, border: 'none', boxShadow: '0 4px 12px rgba(244,63,94,0.3)', letterSpacing: '0.5px' }}>{editing ? 'Save changes' : 'Create item'}</Button>
-        </div>
       </div>
 
       <ErrorBanner message={error} />
@@ -129,11 +125,11 @@ const GiftItemForm = () => {
             <FormField label="Estimated Price">
               <div className="price-input">
                 <span className="price-input__currency">{form.currency}</span>
-                <input className="input price-input__control" min="0" name="price" onChange={update} step="0.01" type="number" value={form.price ?? ''} placeholder="0.00" style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
+                <input className="input price-input__control" min="0" max="999999999999" name="price" onChange={update} onBlur={(e) => { if (Number(e.target.value) > 999999999999) updateField('price', 999999999999) }} onKeyDown={(e) => ['e', 'E', '+', '-', '.', ','].includes(e.key) && e.preventDefault()} type="number" value={form.price ?? ''} placeholder="0" style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
               </div>
             </FormField>
             <FormField label="Desired Quantity">
-              <input className="input" min="1" name="quantity" onChange={update} required type="number" value={form.quantity} style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
+              <input className="input" min="1" max="999" name="quantity" onChange={update} onBlur={(e) => { const val = Number(e.target.value); if (!e.target.value || val < 1) updateField('quantity', 1); else if (val > 999) updateField('quantity', 999); }} onKeyDown={(e) => { if (['e', 'E', '+', '-', '.', ','].includes(e.key)) e.preventDefault(); if (e.key === '0' && (e.target.value === '' || e.target.value === '0')) e.preventDefault(); }} required type="number" value={form.quantity} style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
             </FormField>
           </div>
         </div>
@@ -169,6 +165,12 @@ const GiftItemForm = () => {
           </div>
         </div>
 
+        <div style={{ marginTop: '36px', paddingTop: '28px', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+          <div className="gift-item-form-actions">
+            <Link className="button button--ghost form-btn-cancel" to={`/lists/${listId}`}>Cancel</Link>
+            <Button isLoading={submitting} type="submit" onClick={submit} className="button form-btn-submit">{editing ? 'Save changes' : 'Create item'}</Button>
+          </div>
+        </div>
       </form>
     </section>
   )

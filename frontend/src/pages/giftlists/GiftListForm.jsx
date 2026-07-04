@@ -102,10 +102,6 @@ const GiftListForm = () => {
           <h1 className="page-title form-page-title">{editing ? 'Edit Gift List' : 'Create New Gift List'}</h1>
           <p className="page-subtitle form-page-subtitle">Personalize your list for birthdays, weddings, or any custom occasion.</p>
         </div>
-        <div className="form-page-actions">
-          <Link className="button button--ghost form-btn-cancel" to={editing ? `/lists/${listId}` : '/lists'}>Cancel</Link>
-          <Button isLoading={submitting} type="submit" onClick={submit} className="button form-btn-submit">{editing ? 'Save changes' : 'Create list'}</Button>
-        </div>
       </div>
       
       <ErrorBanner message={error} />
@@ -193,7 +189,12 @@ const GiftListForm = () => {
             </div>
           ) : null}
         </div>
-        
+        <div style={{ marginTop: '36px', paddingTop: '28px', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+          <div className="form-page-actions">
+            <Link className="button button--ghost form-btn-cancel" to={editing ? `/lists/${listId}` : '/lists'}>Cancel</Link>
+            <Button isLoading={submitting} type="submit" onClick={submit} className="button form-btn-submit">{editing ? 'Save changes' : 'Create list'}</Button>
+          </div>
+        </div>
       </form>
     </section>
   )

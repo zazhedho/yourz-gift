@@ -387,5 +387,6 @@ func (r *Routes) MediaRoutes() {
 	media := r.App.Group("/api/media").Use(mdw.AuthMiddleware())
 	{
 		media.POST("/upload", h.UploadImage)
+		media.DELETE("", h.DeleteImage)
 	}
 }

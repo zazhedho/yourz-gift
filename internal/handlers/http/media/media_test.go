@@ -15,20 +15,25 @@ import (
 )
 
 type mediaStorageStub struct {
-	url string
+	url        string
+	deletedURL string
 }
 
-func (s mediaStorageStub) UploadFile(ctx context.Context, file multipart.File, fileHeader *multipart.FileHeader, folder string) (string, error) {
+func (s *mediaStorageStub) UploadFile(ctx context.Context, file multipart.File, fileHeader *multipart.FileHeader, folder string) (string, error) {
 	return s.url, nil
 }
 
-func (s mediaStorageStub) UploadFileFromBytes(ctx context.Context, data []byte, filename string, folder string, contentType string) (string, error) {
+func (s *mediaStorageStub) UploadFileFromBytes(ctx context.Context, data []byte, filename string, folder string, contentType string) (string, error) {
 	return s.url, nil
 }
 
-func (s mediaStorageStub) DeleteFile(ctx context.Context, fileURL string) error { return nil }
-func (s mediaStorageStub) GetFileURL(objectName string) string                  { return s.url }
-func (s mediaStorageStub) DownloadFile(ctx context.Context, objectName string) (io.ReadCloser, error) {
+func (s *mediaStorageStub) DeleteFile(ctx context.Context, fileURL string) error {
+	s.deletedURL = fileURL
+	return nil
+}
+
+func (s *mediaStorageStub) GetFileURL(objectName string) string { return s.url }
+func (s *mediaStorageStub) DownloadFile(ctx context.Context, objectName string) (io.ReadCloser, error) {
 	return io.NopCloser(bytes.NewReader(nil)), nil
 }
 
@@ -56,7 +61,7 @@ func TestUploadImageReturnsUploadedURL(t *testing.T) {
 	}
 
 	router := gin.New()
-	handler := NewMediaHandler(mediaStorageStub{url: "https://cdn.example.com/gift.png"})
+	handler := NewMediaHandler(&mediaStorageStub{url: "https://cdn.example.com/gift.png"})
 	router.POST("/api/media/upload", handler.UploadImage)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/media/upload", &body)
@@ -70,5 +75,44 @@ func TestUploadImageReturnsUploadedURL(t *testing.T) {
 	}
 	if !bytes.Contains(rec.Body.Bytes(), []byte("https://cdn.example.com/gift.png")) {
 		t.Fatalf("expected uploaded URL in response, got %s", rec.Body.String())
+	}
+}
+
+func TestDeleteImageCallsStorage(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	storage := &mediaStorageStub{}
+	handler := NewMediaHandler(storage)
+	router := gin.New()
+	router.DELETE("/api/media", handler.DeleteImage)
+
+	body := bytes.NewBufferString(`{"url":"https://cdn.example.com/gift-lists/gift.png"}`)
+	req := httptest.NewRequest(http.MethodDelete, "/api/media", body)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", rec.Code, rec.Body.String())
+	}
+	if storage.deletedURL != "https://cdn.example.com/gift-lists/gift.png" {
+		t.Fatalf("expected deleted URL to be forwarded, got %q", storage.deletedURL)
+	}
+}
+
+func TestDeleteImageRequiresURL(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	handler := NewMediaHandler(&mediaStorageStub{})
+	router := gin.New()
+	router.DELETE("/api/media", handler.DeleteImage)
+
+	req := httptest.NewRequest(http.MethodDelete, "/api/media", bytes.NewBufferString(`{}`))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400, got %d: %s", rec.Code, rec.Body.String())
 	}
 }

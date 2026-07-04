@@ -17,6 +17,10 @@ type MediaHandler struct {
 	Storage storage.StorageProvider
 }
 
+type deleteImageRequest struct {
+	URL string `json:"url"`
+}
+
 func NewMediaHandler(storageProvider storage.StorageProvider) *MediaHandler {
 	return &MediaHandler{Storage: storageProvider}
 }
@@ -60,4 +64,27 @@ func (h *MediaHandler) UploadImage(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, response.Response(http.StatusOK, "Image uploaded successfully", logId, gin.H{"url": url}))
+}
+
+func (h *MediaHandler) DeleteImage(ctx *gin.Context) {
+	logId := utils.GenerateLogId(ctx)
+	if h.Storage == nil {
+		res := response.ErrorResponse(http.StatusServiceUnavailable, messages.MsgSomethingWrong, logId, "media storage is not configured")
+		ctx.JSON(http.StatusServiceUnavailable, res)
+		return
+	}
+
+	var req deleteImageRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil || strings.TrimSpace(req.URL) == "" {
+		res := response.ErrorResponse(http.StatusBadRequest, messages.InvalidRequest, logId, "url is required")
+		ctx.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	if err := h.Storage.DeleteFile(ctx.Request.Context(), strings.TrimSpace(req.URL)); err != nil {
+		ctx.JSON(http.StatusInternalServerError, response.InternalServerError(logId))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, response.Response(http.StatusOK, "Image deleted successfully", logId, nil))
 }

@@ -6,6 +6,7 @@ import GuestRoute from './components/common/GuestRoute'
 import Loading from './components/common/Loading'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import PublicShell from './components/common/PublicShell'
+import ScrollToTop from './components/common/ScrollToTop'
 
 const Login = lazy(() => import('./pages/auth/Login'))
 const Register = lazy(() => import('./pages/auth/Register'))
@@ -20,6 +21,7 @@ const PublicGiftList = lazy(() => import('./pages/public/PublicGiftList'))
 
 const App = () => (
   <Suspense fallback={<Loading />}>
+    <ScrollToTop />
     <Routes>
       <Route element={<GuestRoute />}>
         <Route path="/login" element={<Login />} />

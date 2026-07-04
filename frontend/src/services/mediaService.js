@@ -9,6 +9,7 @@ const mediaService = {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
   },
+  deleteImage: (url) => api.delete('/media', { data: { url } }),
 }
 
 export default mediaService

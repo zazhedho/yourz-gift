@@ -8,6 +8,7 @@ import FormField from './FormField'
 const ImageUploadField = ({ folder, label, onChange, value }) => {
   const [error, setError] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [dragActive, setDragActive] = useState(false)
   const inputRef = useRef(null)
 
@@ -28,6 +29,21 @@ const ImageUploadField = ({ folder, label, onChange, value }) => {
   }
 
   const upload = (event) => handleFile(event.target.files?.[0])
+
+  const removeImage = async (event) => {
+    event.stopPropagation()
+    if (!value || deleting) return
+    setError('')
+    setDeleting(true)
+    try {
+      await mediaService.deleteImage(value)
+      onChange('')
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to delete image'))
+    } finally {
+      setDeleting(false)
+    }
+  }
 
   const handleDrag = (e) => {
     e.preventDefault()
@@ -90,10 +106,8 @@ const ImageUploadField = ({ folder, label, onChange, value }) => {
             <div style={{ position: 'absolute', top: '12px', right: '12px', display: 'flex', gap: '8px' }}>
               <button 
                 type="button" 
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onChange('')
-                }}
+                disabled={deleting}
+                onClick={removeImage}
                 style={{
                   background: 'rgba(255,255,255,0.9)',
                   backdropFilter: 'blur(8px)',
@@ -105,16 +119,17 @@ const ImageUploadField = ({ folder, label, onChange, value }) => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  cursor: 'pointer',
+                  cursor: deleting ? 'not-allowed' : 'pointer',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                   color: '#ef4444',
+                  opacity: deleting ? 0.7 : 1,
                   transition: 'all 0.2s'
                 }}
                 title="Remove image"
                 onMouseEnter={(e) => e.currentTarget.style.background = '#ffffff'}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.9)'}
               >
-                <X size={18} />
+                {deleting ? <Loader2 size={18} className="spinner" /> : <X size={18} />}
               </button>
             </div>
           </div>

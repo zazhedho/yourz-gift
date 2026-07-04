@@ -146,12 +146,6 @@ a {
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.nav-dropdown--quick {
-  left: auto;
-  min-width: 280px;
-  right: 0;
-}
-
 .nav-dropdown__item {
   align-items: center;
   background: transparent;
@@ -557,6 +551,7 @@ a {
 .field {
   display: grid;
   gap: 7px;
+  min-width: 0;
 }
 
 .field label {
@@ -581,6 +576,8 @@ a {
   min-height: 46px;
   padding: 12px 16px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   transition: all 0.2s ease;
 }
 
@@ -2485,9 +2482,11 @@ a {
   color: var(--color-shade-50);
 }
 
-.form-page-actions {
+.form-page-actions,
+.gift-item-form-actions {
   display: flex;
   gap: 12px;
+  justify-content: flex-end;
 }
 
 .form-btn-cancel {
@@ -2701,8 +2700,7 @@ a {
     z-index: 120;
   }
 
-  .profile-menu__panel,
-  .nav-dropdown--quick {
+  .profile-menu__panel {
     background: rgba(255, 255, 255, 0.96);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
@@ -3091,20 +3089,25 @@ a {
 
   .wish-toolbar__segments {
     display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 8px;
+    width: 100%;
   }
 
-  .wish-toolbar__segments,
   .segmented-control {
-    width: auto;
+    flex: 1;
+    min-width: 0; /* allows flex children to shrink below their content size if needed */
   }
 
   .segmented-control button {
-    flex: none;
-    min-height: 40px;
-    padding: 8px 14px;
+    flex: 1;
+    min-height: 36px;
+    padding: 6px 2px;
+    text-align: center;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .wish-section-label {

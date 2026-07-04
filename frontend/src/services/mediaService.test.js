@@ -5,6 +5,7 @@ import mediaService from './mediaService'
 
 vi.mock('./api', () => ({
   default: {
+    delete: vi.fn(),
     post: vi.fn(),
   },
 }))
@@ -24,5 +25,13 @@ describe('mediaService', () => {
       expect.any(FormData),
       { headers: { 'Content-Type': 'multipart/form-data' } },
     )
+  })
+
+  it('deletes image by url', () => {
+    mediaService.deleteImage('https://cdn.example.com/gift.png')
+
+    expect(api.delete).toHaveBeenCalledWith('/media', {
+      data: { url: 'https://cdn.example.com/gift.png' },
+    })
   })
 })
