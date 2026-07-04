@@ -1,11 +1,10 @@
-import { ExternalLink, Gift, CheckCircle2, ShoppingBag, Package, Search, X, Globe } from 'lucide-react'
+import { ExternalLink, Gift, CheckCircle2, ShoppingBag, Package, PackageX, Search, X, Globe } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useParams } from 'react-router-dom'
 
 import Button from '../../components/common/Button'
 import Loading from '../../components/common/Loading'
-import RetryState from '../../components/common/RetryState'
 import giftService from '../../services/giftService'
 import { getErrorMessage, getListData, getResponseData } from '../../services/api'
 import { formatOccasion } from '../../utils/giftDisplay'
@@ -79,8 +78,37 @@ const PublicGiftList = () => {
   }
 
   if (loading) return <Loading label="Loading gift list" />
-  if (error) return <RetryState message={error} onRetry={load} />
-  if (!list) return <RetryState message="Gift list not found" onRetry={load} />
+  if (error || !list) return (
+    <div style={{ minHeight: 'calc(100dvh - 92px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <div style={{ 
+        background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+        borderRadius: '32px', padding: '60px 40px', textAlign: 'center',
+        boxShadow: '0 24px 48px rgba(15, 23, 42, 0.05), 0 0 0 1px rgba(255, 255, 255, 0.8) inset',
+        maxWidth: '400px', width: '100%'
+      }}>
+        <div style={{ 
+          background: 'linear-gradient(135deg, #fecdd3, #fda4af)', color: '#be123c',
+          width: '80px', height: '80px', borderRadius: '50%', margin: '0 auto 24px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 12px 24px rgba(253, 164, 175, 0.3)'
+        }}>
+          <PackageX size={40} />
+        </div>
+        <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', marginBottom: '12px', letterSpacing: '-0.5px' }}>List Not Found</h2>
+        <p style={{ color: '#64748b', fontSize: '15px', lineHeight: 1.6, marginBottom: '32px' }}>
+          We couldn't find the gift list you're looking for. The owner might have deleted it, or the link may be incorrect.
+        </p>
+        <button onClick={load} style={{
+          background: '#0f172a', color: '#ffffff', border: 'none', borderRadius: '999px',
+          padding: '12px 32px', fontSize: '15px', fontWeight: 700, cursor: 'pointer',
+          boxShadow: '0 8px 16px rgba(15, 23, 42, 0.15)', transition: 'transform 0.2s',
+          display: 'inline-flex', alignItems: 'center', gap: '8px'
+        }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+          <Search size={16} /> Try Again
+        </button>
+      </div>
+    </div>
+  )
 
   const filteredItems = items
     .filter((item) => {

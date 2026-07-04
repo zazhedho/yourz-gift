@@ -19,7 +19,12 @@ const ImageUploadField = ({ folder, label, onChange, value }) => {
     try {
       const response = await mediaService.uploadImage(file, folder)
       const data = getResponseData(response) || {}
-      onChange(data.url || '')
+      const nextUrl = data.url || ''
+      const previousUrl = value
+      onChange(nextUrl)
+      if (previousUrl && nextUrl && previousUrl !== nextUrl) {
+        mediaService.deleteImage(previousUrl).catch(() => {})
+      }
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to upload image'))
     } finally {
@@ -101,12 +106,50 @@ const ImageUploadField = ({ folder, label, onChange, value }) => {
             )}
           </div>
         ) : (
-          <div style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.1)', background: '#f8fafc' }}>
+          <div
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+            style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', border: `1px solid ${dragActive ? '#f43f5e' : 'rgba(0,0,0,0.1)'}`, background: '#f8fafc' }}
+          >
             <img alt="Uploaded preview" src={value} style={{ width: '100%', maxHeight: '300px', objectFit: 'contain', display: 'block' }} />
+            {uploading ? (
+              <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', background: 'rgba(255,255,255,0.72)' }}>
+                <Loader2 size={28} className="spinner" color="#f43f5e" />
+              </div>
+            ) : null}
+            <input ref={inputRef} accept="image/*" disabled={uploading || deleting} onChange={upload} type="file" style={{ display: 'none' }} />
             <div style={{ position: 'absolute', top: '12px', right: '12px', display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                aria-label="Replace image"
+                disabled={uploading || deleting}
+                onClick={() => inputRef.current?.click()}
+                style={{
+                  background: 'rgba(255,255,255,0.9)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: uploading || deleting ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  color: '#111827',
+                  opacity: uploading || deleting ? 0.7 : 1,
+                  transition: 'all 0.2s'
+                }}
+                title="Replace image"
+              >
+                <ImagePlus size={18} />
+              </button>
               <button 
                 type="button" 
-                disabled={deleting}
+                disabled={uploading || deleting}
                 onClick={removeImage}
                 style={{
                   background: 'rgba(255,255,255,0.9)',
@@ -119,10 +162,10 @@ const ImageUploadField = ({ folder, label, onChange, value }) => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  cursor: deleting ? 'not-allowed' : 'pointer',
+                  cursor: uploading || deleting ? 'not-allowed' : 'pointer',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                   color: '#ef4444',
-                  opacity: deleting ? 0.7 : 1,
+                  opacity: uploading || deleting ? 0.7 : 1,
                   transition: 'all 0.2s'
                 }}
                 title="Remove image"
