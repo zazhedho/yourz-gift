@@ -212,9 +212,9 @@ const PublicGiftList = () => {
                       </div>
                       <div className="gift-detail-item__text">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
-                          <h2 style={{ margin: 0 }}>{item.name}</h2>
+                          <h2 style={{ margin: 0, flex: 1, minWidth: 0, overflowWrap: 'anywhere' }}>{item.name}</h2>
                           {item.price && (
-                            <div className="gift-detail-item__price" style={{ color: '#10b981', margin: 0, whiteSpace: 'nowrap' }}>
+                            <div className="gift-detail-item__price" style={{ color: '#10b981', margin: 0, whiteSpace: 'nowrap', flexShrink: 0 }}>
                               {formatPrice(item)}
                             </div>
                           )}

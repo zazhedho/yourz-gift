@@ -95,12 +95,12 @@ const GiftItemForm = () => {
           <h3 style={{ marginTop: 0, marginBottom: '24px', fontSize: '18px', fontWeight: 700, color: '#111827' }}>Basic Information</h3>
           <div>
             <FormField label="Item Name">
-              <input className="input" name="name" onChange={update} required value={form.name} placeholder="e.g. Espresso Machine" style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
+              <input className="input" maxLength="100" name="name" onChange={update} required value={form.name} placeholder="e.g. Espresso Machine" style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
             </FormField>
           </div>
           <div style={{ marginTop: '20px' }}>
             <FormField label="Description">
-              <textarea className="textarea" name="description" onChange={update} value={form.description} placeholder="Any specific details, colors, or sizes..." style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
+              <textarea className="textarea" maxLength="1000" name="description" onChange={update} value={form.description} placeholder="Any specific details, colors, or sizes..." style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
             </FormField>
           </div>
         </div>

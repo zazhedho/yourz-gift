@@ -113,7 +113,7 @@ const GiftListForm = () => {
           <h3 className="form-section-title">Basic Information</h3>
           <div className="form-grid">
             <FormField label="Title">
-              <input className="input" name="title" onChange={update} required value={form.title} placeholder="e.g. My 25th Birthday" style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
+              <input className="input" maxLength="100" name="title" onChange={update} required value={form.title} placeholder="e.g. My 25th Birthday" style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
             </FormField>
             <FormField label="Occasion">
               <select className="select" name="occasion_type" onChange={update} value={form.occasion_type} style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }}>
@@ -129,7 +129,7 @@ const GiftListForm = () => {
           </div>
           <div style={{ marginTop: '20px' }}>
             <FormField label="Description">
-              <textarea className="textarea" name="description" onChange={update} value={form.description} placeholder="Tell your friends what this list is for..." style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
+              <textarea className="textarea" maxLength="1000" name="description" onChange={update} value={form.description} placeholder="Tell your friends what this list is for..." style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '12px' }} />
             </FormField>
           </div>
         </div>
