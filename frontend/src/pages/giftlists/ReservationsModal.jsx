@@ -26,7 +26,7 @@ const ReservationsModal = ({
   }
 
   return createPortal(
-    <div className="dialog-backdrop" onClick={onClose} style={{ zIndex: 9999, backdropFilter: 'blur(8px)', background: 'rgba(15, 23, 42, 0.4)' }}>
+    <div className="dialog-backdrop" onClick={onClose} style={{ zIndex: 9999 }}>
       <div className="dialog dialog--reservations" onClick={(e) => e.stopPropagation()} style={{ 
         maxWidth: '540px', padding: '40px',
         background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(20px)',

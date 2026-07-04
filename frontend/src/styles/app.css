@@ -1152,7 +1152,9 @@ a {
 
 .dialog-backdrop {
   align-items: center;
-  background: rgba(0, 0, 0, 0.62);
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: grid;
   height: 100dvh;
   inset: 0;
@@ -3236,8 +3238,7 @@ a {
   }
 
   .gift-detail-item__status {
-    align-items: stretch;
-    grid-template-columns: 1fr;
+    align-items: center;
   }
 
   .gift-detail-item--owner {
@@ -3259,7 +3260,7 @@ a {
   }
 
   .gift-detail-item__status-text {
-    align-items: flex-start;
+    align-items: center;
     line-height: 1.35;
   }
 

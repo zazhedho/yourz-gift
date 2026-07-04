@@ -101,6 +101,7 @@ const GiftListDetail = () => {
   const archiveItem = async (item) => {
     await giftService.updateItem(item.id, { is_archived: true })
     setNotice('Item archived')
+    setTimeout(() => setNotice(''), 3000)
     await load()
   }
 
@@ -114,10 +115,12 @@ const GiftListDetail = () => {
     try {
       await giftService.cancelReservation(reservation.id, { cancel_reason: reason })
       setNotice('Reservation released')
+      setTimeout(() => setNotice(''), 3000)
       setReleaseTarget(null)
       await load()
     } catch (err) {
       setNotice(getErrorMessage(err, 'Failed to release reservation'))
+      setTimeout(() => setNotice(''), 3000)
     } finally {
       setCancelingReservationId('')
     }

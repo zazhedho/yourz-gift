@@ -74,6 +74,7 @@ const PublicGiftList = () => {
   const reserved = async () => {
     setSelectedItem(null)
     setNotice('Gift reserved. Thank you.')
+    setTimeout(() => setNotice(''), 3000)
     await load()
   }
 
