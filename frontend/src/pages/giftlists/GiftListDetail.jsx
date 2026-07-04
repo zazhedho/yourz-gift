@@ -124,7 +124,7 @@ const GiftListDetail = () => {
   }
 
   const editItem = (item) => {
-    navigate(`/app/items/${item.id}/edit`, { state: { item, listId } })
+    navigate(`/items/${item.id}/edit`, { state: { item, listId } })
   }
 
   const visibleItems = useMemo(() => {
@@ -242,7 +242,7 @@ const GiftListDetail = () => {
             <Package size={32} />
             <h2>No items found</h2>
             <p>Add gift items or change the search term.</p>
-            <Link className="button button--primary" to={`/app/lists/${listId}/items/new`}>Add item</Link>
+            <Link className="button button--primary" to={`/lists/${listId}/items/new`}>Add item</Link>
           </div>
         ) : (
           visibleItems.map((item) => {
@@ -309,9 +309,9 @@ const GiftListDetail = () => {
 
       {createPortal(
         <div className="gift-detail-actionbar" aria-label="Gift list actions">
-          <Link to={`/app/lists/${listId}/edit`}><Settings size={20} /> List Settings</Link>
+          <Link to={`/lists/${listId}/edit`}><Settings size={20} /> List Settings</Link>
           <button onClick={copyLink} type="button"><Share2 size={20} /> Share</button>
-          <Link className="gift-detail-actionbar__primary" to={`/app/lists/${listId}/items/new`}>Add Item</Link>
+          <Link className="gift-detail-actionbar__primary" to={`/lists/${listId}/items/new`}>Add Item</Link>
         </div>,
         document.body
       )}

@@ -18,9 +18,9 @@ vi.mock('../../services/giftService', () => ({
 const renderDetail = () =>
   render(
     <AuthContext.Provider value={{ user: { name: 'Owner' } }}>
-      <MemoryRouter initialEntries={['/app/lists/list-1']}>
+      <MemoryRouter initialEntries={['/lists/list-1']}>
         <Routes>
-          <Route path="/app/lists/:listId" element={<GiftListDetail />} />
+          <Route path="/lists/:listId" element={<GiftListDetail />} />
         </Routes>
       </MemoryRouter>
     </AuthContext.Provider>,

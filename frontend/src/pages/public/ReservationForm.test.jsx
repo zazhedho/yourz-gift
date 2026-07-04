@@ -41,7 +41,7 @@ describe('ReservationForm', () => {
     await userEvent.type(screen.getByLabelText('Email'), 'guest@example.com')
     await userEvent.clear(screen.getByLabelText('Quantity'))
     await userEvent.type(screen.getByLabelText('Quantity'), '0')
-    await userEvent.click(screen.getByRole('button', { name: /reserve gift/i }))
+    await userEvent.click(screen.getByRole('button', { name: /confirm/i }))
 
     expect(giftService.reservePublicItem).toHaveBeenCalledWith('ABC123', 'item-1', expect.objectContaining({ quantity: 1 }))
   })

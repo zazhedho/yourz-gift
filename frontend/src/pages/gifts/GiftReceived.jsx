@@ -133,7 +133,7 @@ const GiftReceived = () => {
                 </div>
                 <div className="gift-detail-item__body">
                   <div className="gift-detail-item__source">{host || 'manual item'}</div>
-                  <p className="received-page__from">From <Link to={`/app/lists/${row.list.id}`}>{row.list.title}</Link></p>
+                  <p className="received-page__from">From <Link to={`/lists/${row.list.id}`}>{row.list.title}</Link></p>
                   <div className="gift-detail-item__main gift-detail-item__main--received">
                     <div className="gift-detail-item__image">
                       {row.item.image_url ? <img alt="" src={row.item.image_url} /> : <Package size={24} />}

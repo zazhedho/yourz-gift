@@ -163,7 +163,7 @@ const Register = () => {
     setGoogleSubmitting(true)
     const ok = await auth.googleLogin(idToken)
     setGoogleSubmitting(false)
-    if (ok) navigate('/app/lists', { replace: true })
+    if (ok) navigate('/lists', { replace: true })
   }
 
   if (loading) {

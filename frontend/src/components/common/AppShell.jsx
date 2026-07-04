@@ -120,7 +120,7 @@ const AppShell = () => {
     event.preventDefault()
     const query = searchQuery.trim()
     setSearchOpen(false)
-    navigate(query ? `/app/lists?search=${encodeURIComponent(query)}` : '/app/lists')
+    navigate(query ? `/lists?search=${encodeURIComponent(query)}` : '/lists')
   }
 
   const openNav = (menu) => {
@@ -138,15 +138,15 @@ const AppShell = () => {
 
   const navSections = {
     lists: [
-      { icon: ClipboardList, title: 'My Lists', description: 'View and manage your wish lists', to: '/app/lists', tone: 'green' },
-      { icon: UsersRound, title: "Friends' Lists", description: 'Browse lists from your friends', to: '/app/lists?friends=1', tone: 'blue' },
+      { icon: ClipboardList, title: 'My Lists', description: 'View and manage your wish lists', to: '/lists', tone: 'green' },
+      { icon: UsersRound, title: "Friends' Lists", description: 'Browse lists from your friends', to: '/lists?friends=1', tone: 'blue' },
       { icon: Lightbulb, title: 'Gift Ideas', description: 'Ideas saved for later', disabled: true, tone: 'amber' },
       { divider: true },
-      { icon: Plus, title: 'Create List', description: 'Start a new wish list', to: '/app/lists/new', tone: 'solid-green' },
+      { icon: Plus, title: 'Create List', description: 'Start a new wish list', to: '/lists/new', tone: 'solid-green' },
     ],
     gifts: [
       { icon: ShoppingBag, title: 'Shopping list', description: "Gifts you've reserved to buy", disabled: true, tone: 'green' },
-      { icon: Check, title: 'Received', description: 'Gifts marked as received', to: '/app/gifts/received', tone: 'blue' },
+      { icon: Check, title: 'Received', description: 'Gifts marked as received', to: '/gifts/received', tone: 'blue' },
     ],
   }
 
@@ -183,7 +183,7 @@ const AppShell = () => {
   return (
     <div className="app-shell">
       <header className={`app-shell__header ${scrolled ? 'header-capsule' : ''}`}>
-        <Link className="brand-logo" to="/app/lists" style={{
+        <Link className="brand-logo" to="/lists" style={{
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
@@ -279,11 +279,11 @@ const AppShell = () => {
             </button>
             {quickOpen ? (
               <div className="nav-dropdown nav-dropdown--quick" role="menu">
-                <Link className="nav-dropdown__item" onClick={() => setQuickOpen(false)} role="menuitem" to="/app/lists/new">
+                <Link className="nav-dropdown__item" onClick={() => setQuickOpen(false)} role="menuitem" to="/lists/new">
                   <span className="nav-dropdown__icon nav-dropdown__icon--solid-green"><Plus size={20} /></span>
                   <span><strong>Create List</strong><small>Start a new wish list</small></span>
                 </Link>
-                <Link className="nav-dropdown__item" onClick={() => setQuickOpen(false)} role="menuitem" to="/app/lists">
+                <Link className="nav-dropdown__item" onClick={() => setQuickOpen(false)} role="menuitem" to="/lists">
                   <span className="nav-dropdown__icon nav-dropdown__icon--green"><Gift size={20} /></span>
                   <span><strong>Add Gift Item</strong><small>Choose a list first</small></span>
                 </Link>
@@ -304,10 +304,10 @@ const AppShell = () => {
             </button>
             {profileOpen ? (
               <div className="profile-menu__panel" role="menu">
-                <Link onClick={() => setProfileOpen(false)} role="menuitem" to="/app/profile">
+                <Link onClick={() => setProfileOpen(false)} role="menuitem" to="/profile">
                   <UserRound size={17} /> My profile
                 </Link>
-                <Link onClick={() => setProfileOpen(false)} role="menuitem" to="/app/sessions">
+                <Link onClick={() => setProfileOpen(false)} role="menuitem" to="/sessions">
                   <MonitorSmartphone size={17} /> Sessions
                 </Link>
                 <button onClick={handleLogout} role="menuitem" type="button">

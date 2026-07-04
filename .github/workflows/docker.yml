@@ -1,0 +1,119 @@
+name: Build & Push Backend / Frontend (Smart)
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+            backend:
+              - 'Dockerfile'
+              - 'entrypoint.sh'
+              - 'go.mod'
+              - 'go.sum'
+              - 'main.go'
+              - 'cmd/**'
+              - 'infrastructure/**'
+              - 'internal/**'
+              - 'middlewares/**'
+              - 'migrations/**'
+              - 'pkg/**'
+              - 'utils/**'
+
+  build-backend:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & Push Backend
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/gift-backend:latest
+            ghcr.io/${{ github.repository_owner }}/gift-backend:${{ github.sha }}
+
+  build-frontend:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & Push Frontend
+        uses: docker/build-push-action@v7
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/gift-frontend:latest
+            ghcr.io/${{ github.repository_owner }}/gift-frontend:${{ github.sha }}
+
+  deploy:
+    needs:
+      - detect-changes
+      - build-backend
+      - build-frontend
+    if: |
+      always() &&
+      !cancelled() &&
+      !failure() &&
+      (
+        needs.detect-changes.outputs.backend == 'true' ||
+        needs.detect-changes.outputs.frontend == 'true'
+      )
+    runs-on: ubuntu-latest
+    environment: Production
+
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /opt/apps/yourz-gift
+            if [ "${{ needs.detect-changes.outputs.backend }}" = "true" ]; then
+              docker compose pull backend
+              docker compose up -d backend
+            fi
+            if [ "${{ needs.detect-changes.outputs.frontend }}" = "true" ]; then
+              docker compose pull frontend
+              docker compose up -d frontend
+            fi

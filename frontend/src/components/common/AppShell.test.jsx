@@ -16,10 +16,10 @@ describe('common components', () => {
   it('renders owner shell navigation', () => {
     render(
       <AuthContext.Provider value={{ logout: vi.fn() }}>
-        <MemoryRouter initialEntries={['/app/lists']}>
+        <MemoryRouter initialEntries={['/lists']}>
           <Routes>
             <Route element={<AppShell />}>
-              <Route path="/app/lists" element={<div>Lists page</div>} />
+              <Route path="/lists" element={<div>Lists page</div>} />
             </Route>
           </Routes>
         </MemoryRouter>
@@ -36,10 +36,10 @@ describe('common components', () => {
   it('opens list navigation dropdown', async () => {
     render(
       <AuthContext.Provider value={{ logout: vi.fn() }}>
-        <MemoryRouter initialEntries={['/app/lists']}>
+        <MemoryRouter initialEntries={['/lists']}>
           <Routes>
             <Route element={<AppShell />}>
-              <Route path="/app/lists" element={<div>Lists page</div>} />
+              <Route path="/lists" element={<div>Lists page</div>} />
             </Route>
           </Routes>
         </MemoryRouter>
@@ -56,10 +56,10 @@ describe('common components', () => {
   it('toggles mobile navigation panel', async () => {
     render(
       <AuthContext.Provider value={{ logout: vi.fn() }}>
-        <MemoryRouter initialEntries={['/app/lists']}>
+        <MemoryRouter initialEntries={['/lists']}>
           <Routes>
             <Route element={<AppShell />}>
-              <Route path="/app/lists" element={<div>Lists page</div>} />
+              <Route path="/lists" element={<div>Lists page</div>} />
             </Route>
           </Routes>
         </MemoryRouter>
@@ -81,10 +81,10 @@ describe('common components', () => {
   it('submits header search to gift list query', async () => {
     render(
       <AuthContext.Provider value={{ logout: vi.fn() }}>
-        <MemoryRouter initialEntries={['/app/lists']}>
+        <MemoryRouter initialEntries={['/lists']}>
           <Routes>
             <Route element={<AppShell />}>
-              <Route path="/app/lists" element={<LocationView />} />
+              <Route path="/lists" element={<LocationView />} />
             </Route>
           </Routes>
         </MemoryRouter>
@@ -95,7 +95,7 @@ describe('common components', () => {
     await userEvent.type(screen.getByPlaceholderText('Search wish lists'), 'birthday')
     await userEvent.keyboard('{Enter}')
 
-    expect(screen.getByText('/app/lists?search=birthday')).toBeInTheDocument()
+    expect(screen.getByText('/lists?search=birthday')).toBeInTheDocument()
   })
 
   it('renders retry state action', () => {

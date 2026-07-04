@@ -27,7 +27,7 @@ const Login = () => {
     setSubmitting(true)
     const ok = await auth.login(form)
     setSubmitting(false)
-    if (ok) navigate('/app/lists', { replace: true })
+    if (ok) navigate('/lists', { replace: true })
   }
 
   const handleGoogleCredential = async (idToken) => {
@@ -35,7 +35,7 @@ const Login = () => {
     setGoogleSubmitting(true)
     const ok = await auth.googleLogin(idToken)
     setGoogleSubmitting(false)
-    if (ok) navigate('/app/lists', { replace: true })
+    if (ok) navigate('/lists', { replace: true })
   }
 
   return (

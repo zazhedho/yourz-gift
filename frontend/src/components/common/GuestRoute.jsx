@@ -7,7 +7,7 @@ const GuestRoute = () => {
   const auth = useAuth()
 
   if (auth.booting) return <Loading label="Checking session" />
-  if (auth.isAuthenticated) return <Navigate to="/app/lists" replace />
+  if (auth.isAuthenticated) return <Navigate to="/lists" replace />
   return <Outlet />
 }
 

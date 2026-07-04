@@ -28,16 +28,16 @@ const App = () => (
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AppShell />}>
-          <Route index element={<Navigate to="/app/lists" replace />} />
-          <Route path="/app/lists" element={<GiftList />} />
-          <Route path="/app/lists/new" element={<GiftListForm />} />
-          <Route path="/app/lists/:listId" element={<GiftListDetail />} />
-          <Route path="/app/lists/:listId/edit" element={<GiftListForm />} />
-          <Route path="/app/lists/:listId/items/new" element={<GiftItemForm />} />
-          <Route path="/app/items/:itemId/edit" element={<GiftItemForm />} />
-          <Route path="/app/gifts/received" element={<GiftReceived />} />
-          <Route path="/app/profile" element={<Profile />} />
-          <Route path="/app/sessions" element={<Sessions />} />
+          <Route index element={<Navigate to="/lists" replace />} />
+          <Route path="/lists" element={<GiftList />} />
+          <Route path="/lists/new" element={<GiftListForm />} />
+          <Route path="/lists/:listId" element={<GiftListDetail />} />
+          <Route path="/lists/:listId/edit" element={<GiftListForm />} />
+          <Route path="/lists/:listId/items/new" element={<GiftItemForm />} />
+          <Route path="/items/:itemId/edit" element={<GiftItemForm />} />
+          <Route path="/gifts/received" element={<GiftReceived />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/sessions" element={<Sessions />} />
         </Route>
       </Route>
 
@@ -45,7 +45,7 @@ const App = () => (
         <Route path="/g/:code" element={<PublicGiftList />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/app/lists" replace />} />
+      <Route path="*" element={<Navigate to="/lists" replace />} />
     </Routes>
   </Suspense>
 )

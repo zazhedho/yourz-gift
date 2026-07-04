@@ -80,11 +80,11 @@ const GiftListForm = () => {
       const payload = toPayload(form)
       if (editing) {
         await giftService.updateList(listId, payload)
-        navigate(`/app/lists/${listId}`)
+        navigate(`/lists/${listId}`)
       } else {
         const response = await giftService.createList(payload)
         const created = getResponseData(response)
-        navigate(created?.id ? `/app/lists/${created.id}` : '/app/lists')
+        navigate(created?.id ? `/lists/${created.id}` : '/lists')
       }
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to save gift list'))
@@ -103,7 +103,7 @@ const GiftListForm = () => {
           <p className="page-subtitle form-page-subtitle">Personalize your list for birthdays, weddings, or any custom occasion.</p>
         </div>
         <div className="form-page-actions">
-          <Link className="button button--ghost form-btn-cancel" to={editing ? `/app/lists/${listId}` : '/app/lists'}>Cancel</Link>
+          <Link className="button button--ghost form-btn-cancel" to={editing ? `/lists/${listId}` : '/lists'}>Cancel</Link>
           <Button isLoading={submitting} type="submit" onClick={submit} className="button form-btn-submit">{editing ? 'Save changes' : 'Create list'}</Button>
         </div>
       </div>

@@ -110,7 +110,7 @@ const GiftList = () => {
           </div>
         </div>
 
-        <Link to="/app/lists/new" className="wish-create-button">
+        <Link to="/lists/new" className="wish-create-button">
           <Plus size={20} /> New Wish List
         </Link>
       </div>
@@ -128,7 +128,7 @@ const GiftList = () => {
 
       {visibleLists.length === 0 ? (
         <EmptyState
-          action={view === 'friends' ? null : <Link className="wish-create-button" to="/app/lists/new">Create your first list</Link>}
+          action={view === 'friends' ? null : <Link className="wish-create-button" to="/lists/new">Create your first list</Link>}
           message={searchTerm ? 'Try another search term.' : view === 'friends' ? 'Accepted friends with active public lists will show here.' : 'Create a list, add gift items, and share it with your guests.'}
           title={view === 'friends' ? 'No friend lists yet' : 'No gift lists yet'}
         />
@@ -159,7 +159,7 @@ const GiftList = () => {
                 </button>
                 {view === 'mine' ? (
                   <>
-                    <button className="wish-icon-action" onClick={() => navigate(`/app/lists/${list.id}/edit`)} title="Edit List" type="button">
+                    <button className="wish-icon-action" onClick={() => navigate(`/lists/${list.id}/edit`)} title="Edit List" type="button">
                       <Edit2 size={16} />
                     </button>
                     <button className="wish-icon-action wish-icon-action--danger" onClick={() => remove(list.id)} title="Delete List" type="button">
@@ -167,7 +167,7 @@ const GiftList = () => {
                     </button>
                   </>
                 ) : null}
-                <Link className="wish-card-button" to={view === 'friends' ? `/g/${list.share_code}` : `/app/lists/${list.id}`}>
+                <Link className="wish-card-button" to={view === 'friends' ? `/g/${list.share_code}` : `/lists/${list.id}`}>
                   {view === 'friends' ? 'Open Public List' : 'View Wish List'} <ChevronRight size={18} />
                 </Link>
               </div>

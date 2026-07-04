@@ -56,7 +56,7 @@ const GiftItemForm = () => {
       } else {
         await giftService.createItem(listId, toPayload(form))
       }
-      navigate(`/app/lists/${listId}`)
+      navigate(`/lists/${listId}`)
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to save gift item'))
     } finally {
@@ -72,7 +72,7 @@ const GiftItemForm = () => {
         <p className="muted" style={{ maxWidth: '400px', margin: '0 auto 24px' }}>
           Open item edit from a gift list detail page so the current item data is available.
         </p>
-        <Link className="button" style={{ background: 'var(--color-primary)', color: 'white' }} to="/app/lists">Back to lists</Link>
+        <Link className="button" style={{ background: 'var(--color-primary)', color: 'white' }} to="/lists">Back to lists</Link>
       </section>
     )
   }
@@ -85,7 +85,7 @@ const GiftItemForm = () => {
           <p className="page-subtitle" style={{ fontSize: '15px', color: 'var(--color-shade-50)' }}>Add practical details guests need before reserving.</p>
         </div>
         <div className="gift-item-form-actions" style={{ display: 'flex', gap: '12px' }}>
-          <Link className="button button--ghost" to={`/app/lists/${listId}`} style={{ borderRadius: '99px', padding: '0 24px', minHeight: '40px', fontWeight: 600, color: 'var(--color-shade-60)', background: 'rgba(0,0,0,0.05)' }}>Cancel</Link>
+          <Link className="button button--ghost" to={`/lists/${listId}`} style={{ borderRadius: '99px', padding: '0 24px', minHeight: '40px', fontWeight: 600, color: 'var(--color-shade-60)', background: 'rgba(0,0,0,0.05)' }}>Cancel</Link>
           <Button isLoading={submitting} type="submit" onClick={submit} className="button" style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)', color: 'white', padding: '0 24px', borderRadius: '99px', minHeight: '40px', fontWeight: 600, border: 'none', boxShadow: '0 4px 12px rgba(244,63,94,0.3)', letterSpacing: '0.5px' }}>{editing ? 'Save changes' : 'Create item'}</Button>
         </div>
       </div>
