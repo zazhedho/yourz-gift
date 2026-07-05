@@ -15,6 +15,7 @@ const GiftListForm = lazy(() => import('./pages/giftlists/GiftListForm'))
 const GiftListDetail = lazy(() => import('./pages/giftlists/GiftListDetail'))
 const GiftItemForm = lazy(() => import('./pages/giftitems/GiftItemForm'))
 const GiftReceived = lazy(() => import('./pages/gifts/GiftReceived'))
+const Friends = lazy(() => import('./pages/friends/Friends'))
 const Profile = lazy(() => import('./pages/profile/Profile'))
 const Sessions = lazy(() => import('./pages/profile/Sessions'))
 const PublicGiftList = lazy(() => import('./pages/public/PublicGiftList'))
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/lists/:listId/items/new" element={<GiftItemForm />} />
           <Route path="/items/:itemId/edit" element={<GiftItemForm />} />
           <Route path="/gifts/received" element={<GiftReceived />} />
+          <Route path="/friends" element={<Friends />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/sessions" element={<Sessions />} />
         </Route>

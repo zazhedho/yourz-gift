@@ -124,6 +124,7 @@ const AppShell = () => {
     lists: [
       { icon: ClipboardList, title: 'My Lists', description: 'View and manage your wish lists', to: '/lists', tone: 'green' },
       { icon: UsersRound, title: "Friends' Lists", description: 'Browse lists from your friends', to: '/lists?friends=1', tone: 'blue' },
+      { icon: UserRound, title: 'Friends', description: 'Manage requests and connections', to: '/friends', tone: 'blue' },
       { icon: Lightbulb, title: 'Gift Ideas', description: 'Ideas saved for later', disabled: true, tone: 'amber' },
       { divider: true },
       { icon: Plus, title: 'Create List', description: 'Start a new wish list', to: '/lists/new', tone: 'solid-green' },

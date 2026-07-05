@@ -333,6 +333,10 @@ func writeGiftResult(ctx *gin.Context, status int, message string, data interfac
 		res := response.Response(http.StatusBadRequest, "Invalid friend request", logId, nil)
 		res.Error = response.Errors{Code: http.StatusBadRequest, Message: "cannot add yourself as friend"}
 		ctx.JSON(http.StatusBadRequest, res)
+	case errors.Is(err, servicegift.ErrFriendUserNotFound):
+		res := response.Response(http.StatusNotFound, "Friend user not found", logId, nil)
+		res.Error = response.Errors{Code: http.StatusNotFound, Message: "friend user not found"}
+		ctx.JSON(http.StatusNotFound, res)
 	case errors.Is(err, repositorygift.ErrInsufficientQuantity):
 		res := response.Response(http.StatusConflict, "Insufficient item quantity", logId, nil)
 		res.Error = response.Errors{Code: http.StatusConflict, Message: "insufficient item quantity"}

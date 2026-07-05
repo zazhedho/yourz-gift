@@ -41,6 +41,22 @@ describe('giftService', () => {
     expect(api.get).toHaveBeenCalledWith('/gift-lists/friends', { params: { page: 1, limit: 50, search: 'wedding' } })
   })
 
+  it('uses friend management endpoints', () => {
+    giftService.listFriends({ search: 'zaq' })
+    giftService.listFriendRequests()
+    giftService.requestFriend({ email: 'friend@example.com' })
+    giftService.acceptFriend('friend-1')
+    giftService.rejectFriend('friend-2')
+    giftService.deleteFriend('friend-3')
+
+    expect(api.get).toHaveBeenCalledWith('/friends', { params: { page: 1, limit: 50, search: 'zaq' } })
+    expect(api.get).toHaveBeenCalledWith('/friends/requests', { params: { page: 1, limit: 50 } })
+    expect(api.post).toHaveBeenCalledWith('/friends/request', { email: 'friend@example.com' })
+    expect(api.post).toHaveBeenCalledWith('/friends/friend-1/accept')
+    expect(api.post).toHaveBeenCalledWith('/friends/friend-2/reject')
+    expect(api.delete).toHaveBeenCalledWith('/friends/friend-3')
+  })
+
   it('uses owner gift item endpoints', () => {
     giftService.listItems('list-1')
     giftService.listItems('list-1', { archived: true })

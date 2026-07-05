@@ -50,6 +50,7 @@ describe('common components', () => {
 
     expect(screen.getByRole('menuitem', { name: /my lists/i })).toBeInTheDocument()
     expect(screen.getByRole('menuitem', { name: /friends' lists/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /manage requests and connections/i })).toBeInTheDocument()
     expect(screen.getByRole('menuitem', { name: /create list/i })).toBeInTheDocument()
   })
 

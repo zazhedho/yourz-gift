@@ -8,6 +8,12 @@ const listParams = (params = {}) => {
 const giftService = {
   listLists: (params) => api.get('/gift-lists', { params: listParams(params) }),
   listFriendLists: (params) => api.get('/gift-lists/friends', { params: listParams(params) }),
+  listFriends: (params) => api.get('/friends', { params: listParams(params) }),
+  listFriendRequests: (params) => api.get('/friends/requests', { params: listParams(params) }),
+  requestFriend: (payload) => api.post('/friends/request', payload),
+  acceptFriend: (friendId) => api.post(`/friends/${friendId}/accept`),
+  rejectFriend: (friendId) => api.post(`/friends/${friendId}/reject`),
+  deleteFriend: (friendId) => api.delete(`/friends/${friendId}`),
   createList: (payload) => api.post('/gift-lists', payload),
   getList: (id) => api.get(`/gift-lists/${id}`),
   updateList: (id, payload) => api.put(`/gift-lists/${id}`, payload),

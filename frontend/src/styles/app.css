@@ -2489,6 +2489,168 @@ a {
   background: rgba(240, 253, 244, 0.8);
 }
 
+.friends-page {
+  display: grid;
+  gap: 28px;
+  padding: 56px clamp(18px, 5vw, 72px) 72px;
+}
+
+.friends-page__header {
+  max-width: 760px;
+}
+
+.friends-page__header h1 {
+  color: #111827;
+  font-family: var(--font-display);
+  font-size: clamp(42px, 6vw, 72px);
+  letter-spacing: 0;
+  line-height: 0.95;
+  margin: 0 0 14px;
+}
+
+.friends-page__header p {
+  color: #475569;
+  font-size: clamp(18px, 2vw, 24px);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.friends-layout {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(320px, 1.1fr);
+}
+
+.friends-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 24px;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+}
+
+.friends-panel--wide {
+  grid-column: 1 / -1;
+}
+
+.friends-panel h2 {
+  color: #0f172a;
+  font-size: 22px;
+  letter-spacing: 0;
+  margin: 0;
+}
+
+.friends-panel__bar {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+}
+
+.friends-panel__bar p {
+  color: #64748b;
+  margin: 4px 0 0;
+}
+
+.friends-add-form {
+  align-items: center;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr auto;
+}
+
+.friends-input,
+.friends-search {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #d7dce5;
+  border-radius: 999px;
+  color: #64748b;
+  display: flex;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+}
+
+.friends-input input,
+.friends-search input {
+  border: 0;
+  color: #111827;
+  min-width: 0;
+  outline: 0;
+  width: 100%;
+}
+
+.friends-search {
+  width: min(280px, 100%);
+}
+
+.friends-list {
+  display: grid;
+  gap: 12px;
+}
+
+.friend-card {
+  align-items: center;
+  background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 18px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: auto 1fr auto;
+  padding: 14px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.02);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s;
+}
+
+.friend-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+  border-color: #cbd5e1;
+}
+
+.friend-card__avatar {
+  align-items: center;
+  background: linear-gradient(135deg, #fff1f2, #ffedd5);
+  border: 1px solid rgba(254, 202, 202, 0.8);
+  border-radius: 16px;
+  color: #f43f5e;
+  display: grid;
+  height: 44px;
+  justify-items: center;
+  width: 44px;
+}
+
+.friend-card__body {
+  min-width: 0;
+}
+
+.friend-card__body h3 {
+  color: #111827;
+  font-size: 16px;
+  margin: 0 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.friend-card__body p {
+  color: #64748b;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.friend-card__actions {
+  display: flex;
+  gap: 8px;
+}
+
 
 /* GiftListForm custom classes */
 .form-surface {
@@ -2572,6 +2734,41 @@ a {
     overflow-x: clip;
   }
 
+  .friends-page {
+    gap: 22px;
+    padding: 34px 18px 64px;
+  }
+
+  .friends-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .friends-panel {
+    border-radius: 20px;
+    padding: 18px;
+  }
+
+  .friends-add-form,
+  .friends-panel__bar {
+    align-items: stretch;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .friends-search {
+    width: 100%;
+  }
+
+  .friend-card {
+    align-items: start;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .friend-card__actions {
+    grid-column: 2;
+    justify-content: end;
+  }
+
   .app-shell *,
   .public-shell *,
   .auth-page * {
@@ -2611,8 +2808,7 @@ a {
   }
 
   .mobile-nav-toggle {
-    display: inline-flex;
-    order: 3;
+    display: none !important;
   }
 
   .app-shell__nav,

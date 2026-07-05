@@ -6,8 +6,11 @@ import (
 	"testing"
 	"time"
 	domaingift "yourz-gift/internal/domain/gift"
+	domainuser "yourz-gift/internal/domain/user"
 	"yourz-gift/internal/dto"
 	"yourz-gift/pkg/filter"
+
+	"gorm.io/gorm"
 )
 
 func TestBuildItemResponsesCalculatesRemaining(t *testing.T) {
@@ -243,6 +246,16 @@ func TestCancelReservationSetsCanceledStatusAndOwner(t *testing.T) {
 	}
 }
 
+func TestRequestFriendReturnsFriendUserNotFound(t *testing.T) {
+	fake := &fakeGiftRepo{}
+	svc := NewGiftService(fakeGiftListRepo{fake}, fakeGiftItemRepo{fake}, fakeGiftReservationRepo{fake}, fakeGiftFriendRepo{fake}, fakeUserRepo{err: gorm.ErrRecordNotFound})
+
+	_, err := svc.RequestFriend(context.Background(), "user-1", dto.GiftFriendRequest{Email: "missing@example.com"})
+	if !errors.Is(err, ErrFriendUserNotFound) {
+		t.Fatalf("err = %v, want ErrFriendUserNotFound", err)
+	}
+}
+
 type fakeGiftRepo struct {
 	list               domaingift.GiftList
 	storedList         domaingift.GiftList
@@ -258,6 +271,10 @@ type fakeGiftListRepo struct{ *fakeGiftRepo }
 type fakeGiftItemRepo struct{ *fakeGiftRepo }
 type fakeGiftReservationRepo struct{ *fakeGiftRepo }
 type fakeGiftFriendRepo struct{ *fakeGiftRepo }
+type fakeUserRepo struct {
+	user domainuser.Users
+	err  error
+}
 
 func (f fakeGiftListRepo) Store(_ context.Context, list domaingift.GiftList) error {
 	f.storedList = list
@@ -342,4 +359,23 @@ func (f fakeGiftFriendRepo) GetFriends(context.Context, string, filter.BaseParam
 }
 func (f fakeGiftFriendRepo) GetPendingRequests(context.Context, string, filter.BaseParams) ([]dto.GiftFriendResponse, int64, error) {
 	return nil, 0, nil
+}
+
+func (f fakeUserRepo) Store(context.Context, domainuser.Users) error { return nil }
+func (f fakeUserRepo) GetByID(context.Context, string) (domainuser.Users, error) {
+	return f.user, f.err
+}
+func (f fakeUserRepo) GetAll(context.Context, filter.BaseParams) ([]domainuser.Users, int64, error) {
+	return nil, 0, nil
+}
+func (f fakeUserRepo) Update(context.Context, domainuser.Users) error { return nil }
+func (f fakeUserRepo) Delete(context.Context, string) error           { return nil }
+func (f fakeUserRepo) SoftDelete(context.Context, string, string) error {
+	return nil
+}
+func (f fakeUserRepo) GetByEmail(context.Context, string) (domainuser.Users, error) {
+	return f.user, f.err
+}
+func (f fakeUserRepo) GetByPhone(context.Context, string) (domainuser.Users, error) {
+	return f.user, f.err
 }

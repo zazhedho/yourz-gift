@@ -20,6 +20,7 @@ var (
 	ErrForbiddenGiftAccess = errors.New("gift resource does not belong to user")
 	ErrGiftListNotPublic   = errors.New("gift list is not public")
 	ErrFriendSelf          = errors.New("cannot add yourself as friend")
+	ErrFriendUserNotFound  = errors.New("friend user not found")
 	ErrFriendServiceConfig = errors.New("friend service is not configured")
 )
 
@@ -295,6 +296,9 @@ func (s *GiftService) RequestFriend(ctx context.Context, userId string, req dto.
 	}
 	target, err := s.UserRepo.GetByEmail(ctx, utils.SanitizeEmail(req.Email))
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return domaingift.GiftFriend{}, ErrFriendUserNotFound
+		}
 		return domaingift.GiftFriend{}, err
 	}
 	if target.Id == userId {
