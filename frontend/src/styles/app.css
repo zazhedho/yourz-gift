@@ -2450,6 +2450,25 @@ a {
   text-align: center;
 }
 
+.profile-hero__bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px) brightness(0.9) saturate(1.2);
+  transform: scale(1.2);
+  opacity: 0.6;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.profile-hero h1,
+.profile-hero p,
+.profile-stats {
+  position: relative;
+  z-index: 1;
+}
+
 .profile-avatar-wrap {
   margin-bottom: 30px;
   position: relative;

@@ -102,6 +102,9 @@ const Profile = () => {
   return (
     <section className="profile-page">
       <div className="profile-hero">
+        {form.avatar_url && (
+          <div className="profile-hero__bg" style={{ backgroundImage: `url(${form.avatar_url})` }} />
+        )}
         <HeroBubbles />
         <div className="profile-avatar-wrap">
           <div className="profile-avatar">
