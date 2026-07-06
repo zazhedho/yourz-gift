@@ -227,6 +227,7 @@ func (r *GiftFriendRepo) getFriendUsers(ctx context.Context, userId string, para
 			users.id AS user_id,
 			users.name,
 			users.email,
+			users.avatar_url,
 			gift_friends.status`).
 		Joins(`JOIN users ON users.id = CASE
 			WHEN gift_friends.requester_id = ? THEN gift_friends.addressee_id

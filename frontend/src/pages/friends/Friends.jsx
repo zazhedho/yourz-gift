@@ -8,6 +8,12 @@ import { getErrorMessage, getListData } from '../../services/api'
 
 const friendName = (friend) => friend.name || friend.email || 'Friend'
 
+const FriendAvatar = ({ friend }) => (
+  <div className="friend-card__avatar">
+    {friend.avatar_url ? <img alt="" src={friend.avatar_url} /> : <UserRound size={20} />}
+  </div>
+)
+
 const Friends = () => {
   const [friends, setFriends] = useState([])
   const [requests, setRequests] = useState([])
@@ -110,12 +116,12 @@ const Friends = () => {
       <div className="friends-layout">
         <section className="friends-panel friends-panel--request" style={{ background: 'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)', borderColor: '#e9d5ff' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '4px' }}>
-            <div style={{ background: 'linear-gradient(135deg, #c4b5fd, #8b5cf6)', color: 'white', padding: '12px', borderRadius: '16px', boxShadow: '0 8px 16px rgba(147, 51, 234, 0.25)' }}>
+            <div style={{ background: 'linear-gradient(135deg, #a78bfa, #f9a8d4)', color: 'white', padding: '12px', borderRadius: '16px', boxShadow: '0 8px 16px rgba(167, 139, 250, 0.25)' }}>
               <MailPlus size={24} strokeWidth={2.5} />
             </div>
             <div>
-              <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#7c3aed', margin: '0 0 2px', letterSpacing: '-0.5px' }}>Invite a Friend</h2>
-              <p style={{ margin: 0, fontSize: '14px', color: '#8b5cf6', lineHeight: 1.4, fontWeight: 500 }}>Share your wish lists securely</p>
+              <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#8b5cf6', margin: '0 0 2px', letterSpacing: '-0.5px' }}>Invite a Friend</h2>
+              <p style={{ margin: 0, fontSize: '14px', color: '#a78bfa', lineHeight: 1.4, fontWeight: 500 }}>Share your wish lists securely</p>
             </div>
           </div>
           <form className="friends-add-form" onSubmit={submitRequest} style={{ gridTemplateColumns: '1fr', gap: '12px' }}>
@@ -126,10 +132,10 @@ const Friends = () => {
                 placeholder="Enter their email address..."
                 type="email"
                 value={email}
-                style={{ color: '#7c3aed', fontSize: '15px', fontWeight: 500 }}
+                style={{ color: '#8b5cf6', fontSize: '15px', fontWeight: 500 }}
               />
             </div>
-            <Button disabled={busy === 'request'} isLoading={busy === 'request'} type="submit" style={{ background: '#8b5cf6', color: 'white', border: 'none', borderRadius: '999px', height: '44px', fontWeight: 700, fontSize: '15px', boxShadow: '0 4px 12px rgba(147, 51, 234, 0.2)' }}>
+            <Button disabled={busy === 'request'} isLoading={busy === 'request'} type="submit" style={{ background: 'linear-gradient(135deg, #a78bfa, #f9a8d4)', color: 'white', border: 'none', borderRadius: '999px', height: '44px', fontWeight: 700, fontSize: '15px', boxShadow: '0 4px 12px rgba(167, 139, 250, 0.2)' }}>
               Send Invitation
             </Button>
           </form>
@@ -147,7 +153,7 @@ const Friends = () => {
           {loading ? <Loading label="Loading friends" /> : null}
           {!loading && requests.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '32px 20px', background: 'rgba(248, 250, 252, 0.5)', borderRadius: '16px', border: '1px dashed #cbd5e1' }}>
-              <div style={{ background: 'linear-gradient(135deg, #f1f5f9, #e2e8f0)', color: '#64748b', width: '56px', height: '56px', borderRadius: '50%', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)' }}>
+              <div style={{ background: 'linear-gradient(135deg, #faf5ff, #f3e8ff)', color: '#8b5cf6', width: '56px', height: '56px', borderRadius: '50%', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(168, 85, 247, 0.08)' }}>
                 <Check size={28} strokeWidth={2.5} />
               </div>
               <h3 style={{ color: '#334155', fontSize: '16px', margin: '0 0 4px', fontWeight: 700 }}>All caught up!</h3>
@@ -157,7 +163,7 @@ const Friends = () => {
           <div className="friends-list">
             {requests.map((friend) => (
               <article className="friend-card" key={friend.id}>
-                <div className="friend-card__avatar"><UserRound size={20} /></div>
+                <FriendAvatar friend={friend} />
                 <div className="friend-card__body">
                   <h3>{friendName(friend)}</h3>
                   <p>{friend.email}</p>
@@ -188,7 +194,7 @@ const Friends = () => {
           </div>
           {!loading && visibleFriends.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '60px 20px', background: 'rgba(248, 250, 252, 0.5)', borderRadius: '16px', border: '1px dashed #cbd5e1' }}>
-              <div style={{ background: 'linear-gradient(135deg, #e0e7ff, #c7d2fe)', color: '#8b5cf6', width: '72px', height: '72px', borderRadius: '50%', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(79, 70, 229, 0.15)' }}>
+              <div style={{ background: 'linear-gradient(135deg, #faf5ff, #f3e8ff)', color: '#8b5cf6', width: '72px', height: '72px', borderRadius: '50%', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(168, 85, 247, 0.15)' }}>
                 <UserRound size={36} strokeWidth={2.5} />
               </div>
               <h3 style={{ color: '#1e293b', fontSize: '18px', margin: '0 0 8px', fontWeight: 800 }}>No friends yet</h3>
@@ -198,7 +204,7 @@ const Friends = () => {
           <div className="friends-list">
             {visibleFriends.map((friend) => (
               <article className="friend-card" key={friend.id}>
-                <div className="friend-card__avatar"><UserRound size={20} /></div>
+                <FriendAvatar friend={friend} />
                 <div className="friend-card__body">
                   <h3>{friendName(friend)}</h3>
                   <p>{friend.email}</p>

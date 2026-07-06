@@ -2686,6 +2686,26 @@ a {
   gap: 12px;
 }
 
+.session-item__actions .wish-icon-action {
+  background: rgba(167, 139, 250, 0.1);
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  color: #a78bfa;
+}
+
+.session-item__actions .wish-icon-action:hover {
+  background: rgba(167, 139, 250, 0.2);
+}
+
+.session-item__actions .wish-icon-action--danger {
+  background: rgba(244, 114, 182, 0.1);
+  border: 1px solid rgba(244, 114, 182, 0.2);
+  color: #f472b6;
+}
+
+.session-item__actions .wish-icon-action--danger:hover {
+  background: rgba(244, 114, 182, 0.2);
+}
+
 .session-current {
   background: linear-gradient(135deg, #e879f9 0%, #f9a8d4 100%);
   border-radius: 999px;
@@ -2833,14 +2853,22 @@ a {
 
 .friend-card__avatar {
   align-items: center;
-  background: linear-gradient(135deg, #fff1f2, #ffedd5);
-  border: 1px solid rgba(254, 202, 202, 0.8);
+  background: linear-gradient(135deg, #faf5ff, #fdf2f8);
+  border: 1px solid #e9d5ff;
   border-radius: 16px;
   color: #a78bfa;
   display: grid;
   height: 44px;
   justify-items: center;
+  overflow: hidden;
   width: 44px;
+}
+
+.friend-card__avatar img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .friend-card__body {
@@ -2867,6 +2895,26 @@ a {
 .friend-card__actions {
   display: flex;
   gap: 8px;
+}
+
+.friend-card__actions .wish-icon-action {
+  background: rgba(167, 139, 250, 0.1);
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  color: #a78bfa;
+}
+
+.friend-card__actions .wish-icon-action:hover {
+  background: rgba(167, 139, 250, 0.2);
+}
+
+.friend-card__actions .wish-icon-action--danger {
+  background: rgba(244, 114, 182, 0.1);
+  border: 1px solid rgba(244, 114, 182, 0.2);
+  color: #f472b6;
+}
+
+.friend-card__actions .wish-icon-action--danger:hover {
+  background: rgba(244, 114, 182, 0.2);
 }
 
 
@@ -3022,15 +3070,7 @@ a {
     width: 100%;
   }
 
-  .friend-card {
-    align-items: start;
-    grid-template-columns: auto minmax(0, 1fr);
-  }
 
-  .friend-card__actions {
-    grid-column: 2;
-    justify-content: end;
-  }
 
   .app-shell *,
   .public-shell *,

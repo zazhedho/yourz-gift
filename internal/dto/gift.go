@@ -77,11 +77,12 @@ type GiftFriendRequest struct {
 }
 
 type GiftFriendResponse struct {
-	Id     string `json:"id"`
-	UserId string `json:"user_id"`
-	Name   string `json:"name"`
-	Email  string `json:"email"`
-	Status string `json:"status"`
+	Id        string `json:"id"`
+	UserId    string `json:"user_id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	AvatarURL string `json:"avatar_url"`
+	Status    string `json:"status"`
 }
 
 type GiftListPublicResponse struct {
