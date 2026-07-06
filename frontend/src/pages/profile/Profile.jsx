@@ -140,13 +140,10 @@ const Profile = () => {
               <input className="input" name="name" onChange={update} required value={form.name} />
             </FormField>
             <FormField label="Email Address">
-              <input className="input" name="email" onChange={update} required type="email" value={form.email} />
+              <input className="input" disabled name="email" onChange={update} required type="email" value={form.email} />
             </FormField>
             <FormField label="Phone Number">
               <input className="input" name="phone" onChange={update} value={form.phone || ''} />
-            </FormField>
-            <FormField label="Account Role">
-              <input className="input" disabled value={auth.user?.role || 'member'} />
             </FormField>
           </div>
 
