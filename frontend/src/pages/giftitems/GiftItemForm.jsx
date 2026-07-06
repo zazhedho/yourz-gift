@@ -155,7 +155,7 @@ const GiftItemForm = () => {
           <h3 style={{ marginTop: 0, marginBottom: '24px', fontSize: '18px', fontWeight: 700, color: '#111827' }}>Settings</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <label className="checkbox-row" style={{ fontWeight: 600, cursor: 'pointer', color: '#111827' }}>
-              <input checked={form.is_active} name="is_active" onChange={update} type="checkbox" style={{ accentColor: '#f43f5e', width: '20px', height: '20px' }} />
+              <input checked={form.is_active} name="is_active" onChange={update} type="checkbox" style={{ accentColor: '#f472b6', width: '20px', height: '20px' }} />
               Active Status (Visible to guests)
             </label>
             <label className="checkbox-row" style={{ fontWeight: 600, cursor: 'pointer', color: 'var(--color-shade-50)' }}>

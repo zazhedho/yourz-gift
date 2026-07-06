@@ -203,7 +203,7 @@ const PublicGiftList = () => {
 
         {notice ? (
           <div className="gift-detail-notice">
-            <CheckCircle2 size={18} color="#10b981" /> <strong>{notice}</strong>
+            <CheckCircle2 size={18} color="#e879f9" /> <strong>{notice}</strong>
           </div>
         ) : null}
 
@@ -222,7 +222,7 @@ const PublicGiftList = () => {
               
               return (
                 <div className="gift-detail-item" key={item.id}>
-                  <div className="gift-detail-item__status" style={{ background: canReserve ? '#10b981' : '#64748b' }}>
+                  <div className="gift-detail-item__status" style={{ background: canReserve ? '#e879f9' : '#64748b' }}>
                     <div className="gift-detail-item__status-text">
                       <Gift size={16} /> 
                       {canReserve ? `${remaining} remaining` : 'Fully reserved'}
@@ -243,7 +243,7 @@ const PublicGiftList = () => {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
                           <h2 style={{ margin: 0, flex: 1, minWidth: 0, overflowWrap: 'anywhere' }}>{item.name}</h2>
                           {item.price && (
-                            <div className="gift-detail-item__price" style={{ color: '#10b981', margin: 0, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                            <div className="gift-detail-item__price" style={{ color: '#e879f9', margin: 0, whiteSpace: 'nowrap', flexShrink: 0 }}>
                               {formatPrice(item)}
                             </div>
                           )}
@@ -265,9 +265,10 @@ const PublicGiftList = () => {
                       disabled={!canReserve} 
                       onClick={() => setSelectedItem(item)}
                       style={{ 
-                        background: canReserve ? '#10b981' : '#e2e8f0', 
+                        background: canReserve ? 'linear-gradient(135deg, #e879f9 0%, #f9a8d4 100%)' : '#e2e8f0', 
                         color: canReserve ? 'white' : '#64748b',
                         border: 'none',
+                        boxShadow: canReserve ? '0 4px 12px rgba(217, 70, 239, 0.25)' : 'none',
                         minHeight: '44px',
                         padding: '0 24px',
                         borderRadius: '99px',

@@ -326,7 +326,8 @@ func TestUpdateNormalizesEmailToLowercase(t *testing.T) {
 	}
 
 	user, err := service.Update(authContext("user-1", "Jane Doe", utils.RoleViewer), "user-1", dto.UserUpdate{
-		Email: "Jane.Doe@Example.COM",
+		AvatarURL: "https://cdn.example.com/avatar.png",
+		Email:     "Jane.Doe@Example.COM",
 	})
 	if err != nil {
 		t.Fatalf("expected success, got %v", err)
@@ -334,6 +335,9 @@ func TestUpdateNormalizesEmailToLowercase(t *testing.T) {
 
 	if user.Email != "jane.doe@example.com" {
 		t.Fatalf("expected normalized lowercase email, got %s", user.Email)
+	}
+	if user.AvatarURL != "https://cdn.example.com/avatar.png" {
+		t.Fatalf("expected avatar URL to be updated, got %s", user.AvatarURL)
 	}
 }
 

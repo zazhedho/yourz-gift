@@ -60,8 +60,8 @@ const ReservationForm = ({ code, item, onClose, onReserved }) => {
           <div style={{
             width: '48px',
             height: '48px',
-            background: 'rgba(244, 63, 94, 0.1)',
-            color: '#f43f5e',
+            background: 'rgba(168, 85, 247, 0.1)',
+            color: '#a78bfa',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
@@ -90,12 +90,12 @@ const ReservationForm = ({ code, item, onClose, onReserved }) => {
             <textarea className="textarea" name="note" onChange={update} value={form.note} placeholder="Any message for the owner?" rows={2} />
           </FormField>
           <label className="checkbox-row" style={{ marginTop: '4px', padding: '10px 14px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <input checked={form.show_name} name="show_name" onChange={update} type="checkbox" style={{ width: '18px', height: '18px', accentColor: '#f43f5e' }} />
+            <input checked={form.show_name} name="show_name" onChange={update} type="checkbox" style={{ width: '18px', height: '18px', accentColor: '#a78bfa' }} />
             <span style={{ fontSize: '14px', color: '#334155', fontWeight: 500 }}>Show my name to the owner</span>
           </label>
           <div className="actions" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '20px' }}>
             <Button variant="ghost" onClick={onClose} style={{ width: '100%', minHeight: '44px', borderRadius: '99px', fontSize: '15px', color: '#64748b', background: '#f1f5f9' }}>Cancel</Button>
-            <Button isLoading={submitting} type="submit" style={{ width: '100%', minHeight: '44px', borderRadius: '99px', background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)', color: 'white', border: 'none', fontSize: '15px', fontWeight: 700, boxShadow: '0 4px 12px rgba(244, 63, 94, 0.25)' }}>Confirm</Button>
+            <Button isLoading={submitting} type="submit" style={{ width: '100%', minHeight: '44px', borderRadius: '99px', background: 'linear-gradient(135deg, #a78bfa 0%, #e879f9 100%)', color: 'white', border: 'none', fontSize: '15px', fontWeight: 700, boxShadow: '0 4px 12px rgba(168, 85, 247, 0.25)' }}>Confirm</Button>
           </div>
         </form>
       </section>

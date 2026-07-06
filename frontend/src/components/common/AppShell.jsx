@@ -180,7 +180,7 @@ const AppShell = () => {
           color: '#111827'
         }}>
           <div style={{ 
-            background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)',
+            background: 'linear-gradient(135deg, #f472b6 0%, #f9a8d4 100%)',
             borderRadius: '10px',
             width: '36px',
             height: '36px',
@@ -273,8 +273,15 @@ const AppShell = () => {
             </button>
             {profileOpen ? (
               <div className="profile-menu__panel" role="menu">
-                <Link onClick={() => setProfileOpen(false)} role="menuitem" to="/profile">
-                  <UserRound size={17} /> My profile
+                <Link className="profile-menu__identity" onClick={() => setProfileOpen(false)} role="menuitem" to="/profile">
+                  {auth.user?.avatar_url ? <img alt="" src={auth.user.avatar_url} /> : <span>{userInitial}</span>}
+                  <div>
+                    <strong>{auth.user?.name || 'You'}</strong>
+                    <small>View profile</small>
+                  </div>
+                </Link>
+                <Link onClick={() => setProfileOpen(false)} role="menuitem" to="/friends">
+                  <UsersRound size={17} /> Friends
                 </Link>
                 <Link onClick={() => setProfileOpen(false)} role="menuitem" to="/sessions">
                   <MonitorSmartphone size={17} /> Sessions

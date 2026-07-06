@@ -351,6 +351,10 @@ func (s *ServiceUser) Update(ctx context.Context, id string, req dto.UserUpdate)
 		data.Email = utils.SanitizeEmail(req.Email)
 	}
 
+	if req.AvatarURL != "" {
+		data.AvatarURL = strings.TrimSpace(req.AvatarURL)
+	}
+
 	if reqRole := strings.TrimSpace(req.Role); reqRole != "" {
 		newRoleName := utils.NormalizeKey(reqRole)
 		canAssignRole, err := serviceshared.HasPermission(ctx, s.PermissionRepo, "users", "assign_role")

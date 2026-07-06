@@ -171,13 +171,13 @@ const GiftListForm = () => {
           </div>
           <div style={{ marginTop: '24px' }}>
             <label className="checkbox-row" style={{ fontWeight: 600, cursor: 'pointer', color: '#111827' }}>
-              <input checked={form.is_active} name="is_active" onChange={update} type="checkbox" style={{ accentColor: '#f43f5e', width: '20px', height: '20px' }} />
+              <input checked={form.is_active} name="is_active" onChange={update} type="checkbox" style={{ accentColor: '#f472b6', width: '20px', height: '20px' }} />
               List is Active
             </label>
           </div>
           <div style={{ marginTop: '16px' }}>
             <label className="checkbox-row" style={{ fontWeight: 600, cursor: 'pointer', color: '#111827' }}>
-              <input checked={form.never_expires} name="never_expires" onChange={update} type="checkbox" style={{ accentColor: '#f43f5e', width: '20px', height: '20px' }} />
+              <input checked={form.never_expires} name="never_expires" onChange={update} type="checkbox" style={{ accentColor: '#f472b6', width: '20px', height: '20px' }} />
               Active forever
             </label>
           </div>

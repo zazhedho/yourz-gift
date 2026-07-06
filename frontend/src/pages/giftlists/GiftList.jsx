@@ -143,7 +143,7 @@ const GiftList = () => {
                   <img alt="" src={list.cover_image_url || 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=180&q=80'} />
                   {isGiftListCurrent(list) && (
                     <div className="wish-list-card__badge">
-                      <CheckCircle size={14} color="#10b981" />
+                      <CheckCircle size={14} color="#f472b6" />
                     </div>
                   )}
                 </div>

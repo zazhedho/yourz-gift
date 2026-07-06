@@ -33,10 +33,11 @@ type GoogleLogin struct {
 }
 
 type UserUpdate struct {
-	Name  string `json:"name" binding:"omitempty,min=3,max=100"`
-	Email string `json:"email" binding:"omitempty,email"`
-	Phone string `json:"phone" binding:"omitempty,min=9,max=15"`
-	Role  string `json:"role" binding:"omitempty"`
+	Name      string `json:"name" binding:"omitempty,min=3,max=100"`
+	Email     string `json:"email" binding:"omitempty,email"`
+	Phone     string `json:"phone" binding:"omitempty,min=9,max=15"`
+	Role      string `json:"role" binding:"omitempty"`
+	AvatarURL string `json:"avatar_url" binding:"omitempty,url,max=1000"`
 }
 
 type ChangePassword struct {

@@ -28,7 +28,7 @@ const PublicShell = () => {
           color: '#111827'
         }}>
           <div style={{ 
-            background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)',
+            background: 'linear-gradient(135deg, #a78bfa 0%, #f9a8d4 100%)',
             borderRadius: '10px',
             width: '36px',
             height: '36px',
@@ -36,7 +36,7 @@ const PublicShell = () => {
             alignItems: 'center',
             justifyContent: 'center',
             color: 'white',
-            boxShadow: '0 4px 12px rgba(244, 63, 94, 0.25)'
+            boxShadow: '0 4px 12px rgba(168, 85, 247, 0.25)'
           }}>
             <Gift size={20} strokeWidth={2.5} />
           </div>
@@ -88,14 +88,14 @@ const PublicShell = () => {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          background: linear-gradient(135deg, #e879f9 0%, #a78bfa 100%);
           color: #ffffff;
           text-decoration: none;
           font-weight: 700;
           font-size: 15px;
           padding: 10px 24px;
           border-radius: 999px;
-          box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+          box-shadow: 0 6px 20px rgba(217, 70, 239, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
           border: 1px solid rgba(255, 255, 255, 0.1);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;

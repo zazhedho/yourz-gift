@@ -74,7 +74,7 @@ const ImageUploadField = ({ folder, label, onChange, value }) => {
             onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
             onClick={() => inputRef.current?.click()}
             style={{
-              border: `2px dashed ${dragActive ? '#f43f5e' : 'rgba(0,0,0,0.15)'}`,
+              border: `2px dashed ${dragActive ? '#f472b6' : 'rgba(0,0,0,0.15)'}`,
               borderRadius: '16px',
               padding: '32px 20px',
               textAlign: 'center',
@@ -90,12 +90,12 @@ const ImageUploadField = ({ folder, label, onChange, value }) => {
             <input ref={inputRef} accept="image/*" disabled={uploading} onChange={upload} type="file" style={{ display: 'none' }} />
             {uploading ? (
               <>
-                <Loader2 size={32} className="spinner" color="#f43f5e" />
+                <Loader2 size={32} className="spinner" color="#f472b6" />
                 <span style={{ color: '#64748b', fontSize: '14px', fontWeight: 500 }}>Uploading your image...</span>
               </>
             ) : (
               <>
-                <div style={{ background: '#ffffff', padding: '12px', borderRadius: '50%', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', color: '#f43f5e' }}>
+                <div style={{ background: '#ffffff', padding: '12px', borderRadius: '50%', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', color: '#f472b6' }}>
                   <ImagePlus size={24} />
                 </div>
                 <div>
@@ -111,12 +111,12 @@ const ImageUploadField = ({ folder, label, onChange, value }) => {
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
             onDrop={handleDrop}
-            style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', border: `1px solid ${dragActive ? '#f43f5e' : 'rgba(0,0,0,0.1)'}`, background: '#f8fafc' }}
+            style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', border: `1px solid ${dragActive ? '#f472b6' : 'rgba(0,0,0,0.1)'}`, background: '#f8fafc' }}
           >
             <img alt="Uploaded preview" src={value} style={{ width: '100%', maxHeight: '300px', objectFit: 'contain', display: 'block' }} />
             {uploading ? (
               <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', background: 'rgba(255,255,255,0.72)' }}>
-                <Loader2 size={28} className="spinner" color="#f43f5e" />
+                <Loader2 size={28} className="spinner" color="#f472b6" />
               </div>
             ) : null}
             <input ref={inputRef} accept="image/*" disabled={uploading || deleting} onChange={upload} type="file" style={{ display: 'none' }} />

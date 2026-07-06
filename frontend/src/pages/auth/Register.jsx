@@ -181,7 +181,7 @@ const Register = () => {
       <main className="auth-page">
         <section className="auth-card">
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
-            <div style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)', borderRadius: '16px', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)' }}>
+            <div style={{ background: 'linear-gradient(135deg, #f472b6 0%, #f9a8d4 100%)', borderRadius: '16px', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)' }}>
               <Gift size={32} strokeWidth={2.5} />
             </div>
           </div>
@@ -199,7 +199,7 @@ const Register = () => {
       <main className="auth-page auth-page-otp">
         <section className="auth-card otp-card">
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
-            <div style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)', borderRadius: '16px', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)' }}>
+            <div style={{ background: 'linear-gradient(135deg, #f472b6 0%, #f9a8d4 100%)', borderRadius: '16px', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)' }}>
               <Gift size={32} strokeWidth={2.5} />
             </div>
           </div>
@@ -242,7 +242,7 @@ const Register = () => {
     <main className="auth-page">
       <section className="auth-card">
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
-          <div style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)', borderRadius: '16px', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)' }}>
+          <div style={{ background: 'linear-gradient(135deg, #f472b6 0%, #f9a8d4 100%)', borderRadius: '16px', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)' }}>
             <Gift size={32} strokeWidth={2.5} />
           </div>
         </div>

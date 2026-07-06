@@ -15,13 +15,13 @@
   --color-hairline-light: #e2e8f0;
   --color-hairline-dark: #334155;
   
-  /* Vibrant Accents */
-  --color-primary: #6366f1;
-  --color-primary-hover: #4f46e5;
-  --color-secondary: #ec4899;
-  --color-accent: #8b5cf6;
-  --color-success: #10b981;
-  --color-danger: #f43f5e;
+  /* Soft Accents */
+  --color-primary: #a78bfa; /* Soft Violet */
+  --color-primary-hover: #8b5cf6;
+  --color-secondary: #f9a8d4; /* Soft Pink */
+  --color-accent: #f472b6; /* Pink */
+  --color-success: #e879f9; /* Soft Fuchsia */
+  --color-danger: #fb7185;
   
   /* Gradients */
   --gradient-main: linear-gradient(135deg, var(--color-primary), var(--color-accent));

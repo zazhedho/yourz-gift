@@ -49,7 +49,7 @@ const ReservationsModal = ({
         
         <div style={{ position: 'relative', zIndex: 1 }}>
           <h2 style={{ fontSize: '28px', margin: '0 0 24px', display: 'flex', alignItems: 'center', gap: '12px', color: '#0f172a', fontWeight: 800, letterSpacing: '-0.02em' }}>
-            <div style={{ background: 'linear-gradient(135deg, #10b981, #059669)', padding: '10px', borderRadius: '14px', display: 'flex', boxShadow: '0 8px 16px rgba(16, 185, 129, 0.2)' }}>
+            <div style={{ background: 'linear-gradient(135deg, #f472b6, #e879f9)', padding: '10px', borderRadius: '14px', display: 'flex', boxShadow: '0 8px 16px rgba(16, 185, 129, 0.2)' }}>
               <Package size={24} color="#ffffff" />
             </div>
             Reservations
@@ -88,7 +88,7 @@ const ReservationsModal = ({
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flex: 1 }}>
                     <div style={{ 
                       flexShrink: 0,
-                      background: 'linear-gradient(135deg, #6366f1, #a855f7)', 
+                      background: 'linear-gradient(135deg, #a78bfa, #a78bfa)', 
                       color: '#ffffff', width: '40px', height: '40px', borderRadius: '14px', 
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       boxShadow: '0 8px 16px rgba(99, 102, 241, 0.25)'
@@ -101,8 +101,8 @@ const ReservationsModal = ({
                       </strong>
                       <div style={{ color: '#64748b', fontSize: '13px', display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: reservation.status === 'confirmed' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)', padding: '2px 8px', borderRadius: '99px' }}>
-                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: reservation.status === 'confirmed' ? '#10b981' : '#f59e0b', flexShrink: 0 }} />
-                          <span style={{ textTransform: 'capitalize', color: reservation.status === 'confirmed' ? '#059669' : '#d97706', fontWeight: 600 }}>{reservation.status}</span>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: reservation.status === 'confirmed' ? '#f472b6' : '#f59e0b', flexShrink: 0 }} />
+                          <span style={{ textTransform: 'capitalize', color: reservation.status === 'confirmed' ? '#e879f9' : '#d97706', fontWeight: 600 }}>{reservation.status}</span>
                         </span>
                         {(reservation.created_at || reservation.updated_at) && (
                           <>
