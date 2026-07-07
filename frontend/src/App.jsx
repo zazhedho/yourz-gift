@@ -19,19 +19,20 @@ const Friends = lazy(() => import('./pages/friends/Friends'))
 const Profile = lazy(() => import('./pages/profile/Profile'))
 const Sessions = lazy(() => import('./pages/profile/Sessions'))
 const PublicGiftList = lazy(() => import('./pages/public/PublicGiftList'))
+const Landing = lazy(() => import('./pages/public/Landing'))
 
 const App = () => (
   <Suspense fallback={<Loading />}>
     <ScrollToTop />
     <Routes>
       <Route element={<GuestRoute />}>
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Route>
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AppShell />}>
-          <Route index element={<Navigate to="/lists" replace />} />
           <Route path="/lists" element={<GiftList />} />
           <Route path="/lists/new" element={<GiftListForm />} />
           <Route path="/lists/:listId" element={<GiftListDetail />} />
@@ -49,7 +50,7 @@ const App = () => (
         <Route path="/g/:code" element={<PublicGiftList />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/lists" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </Suspense>
 )

@@ -3,7 +3,6 @@ import {
   ChevronDown,
   ChevronUp,
   ClipboardList,
-  Gift,
   Lightbulb,
   LogOut,
   Menu,
@@ -168,31 +167,9 @@ const AppShell = () => {
   return (
     <div className="app-shell">
       <header className={`app-shell__header ${scrolled ? 'header-capsule' : ''}`}>
-        <Link className="brand-logo" to="/lists" style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          textDecoration: 'none',
-          fontFamily: "'Outfit', 'Inter', system-ui, sans-serif",
-          fontSize: '26px',
-          fontWeight: 800,
-          letterSpacing: '-0.03em',
-          color: '#111827'
-        }}>
-          <div style={{ 
-            background: 'linear-gradient(135deg, #f472b6 0%, #f9a8d4 100%)',
-            borderRadius: '10px',
-            width: '36px',
-            height: '36px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            boxShadow: '0 4px 12px rgba(244, 63, 94, 0.25)'
-          }}>
-            <Gift size={20} strokeWidth={2.5} />
-          </div>
-          Yourz<span style={{ fontWeight: 300, color: '#6b7280' }}>Gift</span>
+        <Link className="brand-logo" to="/lists">
+          <span className="brand-logo__mark"><img alt="Yourz Gift" src="/logo-nobg.png" /></span>
+          <span className="brand-logo__text">Yourz <span>Gift</span></span>
         </Link>
         <button
           aria-expanded={mobileNavOpen}

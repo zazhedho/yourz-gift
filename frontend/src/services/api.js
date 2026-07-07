@@ -45,9 +45,22 @@ api.interceptors.response.use(
         localStorage.removeItem('token')
         localStorage.removeItem('refresh_token')
         localStorage.removeItem('session_id')
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login'
+        }
         return Promise.reject(refreshError)
       }
     }
+
+    if (error.response?.status === 401 && original?._retry) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('refresh_token')
+      localStorage.removeItem('session_id')
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
+    }
+
     return Promise.reject(error)
   },
 )

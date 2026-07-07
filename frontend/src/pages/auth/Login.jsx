@@ -42,9 +42,7 @@ const Login = () => {
     <main className="auth-page">
       <section className="auth-card">
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
-          <div style={{ background: 'linear-gradient(135deg, #f472b6 0%, #f9a8d4 100%)', borderRadius: '16px', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)' }}>
-            <Gift size={32} strokeWidth={2.5} />
-          </div>
+          <img src="/logo-nobg.png" alt="Yourz Gift" style={{ width: '56px', height: '56px', objectFit: 'contain' }} />
         </div>
         <h1 className="page-title">Welcome back</h1>
         <p className="page-subtitle">Sign in to manage your gift lists.</p>

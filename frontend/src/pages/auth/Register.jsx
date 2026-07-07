@@ -180,11 +180,9 @@ const Register = () => {
     return (
       <main className="auth-page">
         <section className="auth-card">
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
-            <div style={{ background: 'linear-gradient(135deg, #f472b6 0%, #f9a8d4 100%)', borderRadius: '16px', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)' }}>
-              <Gift size={32} strokeWidth={2.5} />
-            </div>
-          </div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+          <img src="/logo-nobg.png" alt="Yourz Gift" style={{ width: '56px', height: '56px', objectFit: 'contain' }} />
+        </div>
           <h1 className="page-title">Registration closed</h1>
           <p className="page-subtitle">New accounts cannot be created right now.</p>
           <ErrorBanner message={statusError || 'Public registration is currently disabled.'} />
@@ -198,11 +196,9 @@ const Register = () => {
     return (
       <main className="auth-page auth-page-otp">
         <section className="auth-card otp-card">
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
-            <div style={{ background: 'linear-gradient(135deg, #f472b6 0%, #f9a8d4 100%)', borderRadius: '16px', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)' }}>
-              <Gift size={32} strokeWidth={2.5} />
-            </div>
-          </div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+          <img src="/logo-nobg.png" alt="Yourz Gift" style={{ width: '56px', height: '56px', objectFit: 'contain' }} />
+        </div>
           <p className="meta" style={{ marginTop: 0, marginBottom: '8px' }}>Email verification</p>
           <h1 className="page-title">Check your email</h1>
           <p className="page-subtitle">Enter the 6 digit OTP code sent to {form.email}.</p>
@@ -242,9 +238,7 @@ const Register = () => {
     <main className="auth-page">
       <section className="auth-card">
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
-          <div style={{ background: 'linear-gradient(135deg, #f472b6 0%, #f9a8d4 100%)', borderRadius: '16px', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)' }}>
-            <Gift size={32} strokeWidth={2.5} />
-          </div>
+          <img src="/logo-nobg.png" alt="Yourz Gift" style={{ width: '56px', height: '56px', objectFit: 'contain' }} />
         </div>
         <h1 className="page-title">Create account</h1>
         <p className="page-subtitle">Start a reusable gift list for any occasion.</p>
