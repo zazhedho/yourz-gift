@@ -17,6 +17,7 @@ import { Link, Outlet, useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 
 import useAuth from '../../hooks/useAuth'
+import Footer from './Footer'
 
 const AppShell = () => {
   const auth = useAuth()
@@ -271,9 +272,10 @@ const AppShell = () => {
           </div>
         </div>
       </header>
-      <main className="app-shell__main" style={{ paddingTop: '92px' }}>
+      <main className="app-shell__main" style={{ paddingTop: '92px', flex: 1 }}>
         <Outlet />
       </main>
+      <Footer />
 
       <style dangerouslySetInnerHTML={{__html: `
         .app-shell__header {

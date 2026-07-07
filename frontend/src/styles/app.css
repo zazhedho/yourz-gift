@@ -33,6 +33,8 @@ a {
 .app-shell {
   min-height: 100vh;
   background: linear-gradient(180deg, #f9d8e2 0%, #fff8fb 245px, #ffffff 560px);
+  display: flex;
+  flex-direction: column;
 }
 
 .app-shell__header,

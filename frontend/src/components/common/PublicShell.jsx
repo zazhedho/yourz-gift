@@ -1,5 +1,6 @@
 import { Link, Outlet } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import Footer from './Footer'
 
 const PublicShell = () => {
   const [scrolled, setScrolled] = useState(false)
@@ -25,9 +26,10 @@ const PublicShell = () => {
           </Link>
         </div>
       </header>
-      <main className="app-shell__main" style={{ paddingTop: '92px' }}>
+      <main className="app-shell__main" style={{ paddingTop: '92px', flex: 1 }}>
         <Outlet />
       </main>
+      <Footer />
 
       <style dangerouslySetInnerHTML={{__html: `
         .app-shell__header {

@@ -2,6 +2,7 @@ import { Link, Navigate } from 'react-router-dom'
 import { Gift, Heart, Share2, Sparkles, Star } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import HeroBubbles from '../../components/common/HeroBubbles'
+import Footer from '../../components/common/Footer'
 import useAuth from '../../hooks/useAuth'
 
 const Landing = () => {
@@ -99,15 +100,7 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer style={{ background: '#4c1d95', padding: '64px 24px', textAlign: 'center', color: '#e9d5ff' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '24px' }}>
-          <img alt="Yourz Gift" src="/logo-nobg.png" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
-          <span style={{ fontSize: '24px', fontWeight: 800, color: 'white' }}>Yourz Gift</span>
-        </div>
-        <p style={{ opacity: 0.8, marginBottom: '32px' }}>Making giving and receiving gifts a joyful experience.</p>
-        <p style={{ fontSize: '14px', opacity: 0.6 }}>&copy; {new Date().getFullYear()} Yourz Gift. All rights reserved.</p>
-      </footer>
+      <Footer />
 
       <style dangerouslySetInnerHTML={{__html: `
         .landing-header {
