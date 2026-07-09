@@ -60,12 +60,12 @@ func (s *GiftService) CreateList(ctx context.Context, ownerId string, req dto.Gi
 	list := domaingift.GiftList{
 		Id:                    utils.CreateUUID(),
 		OwnerId:               ownerId,
-		Title:                 req.Title,
-		Description:           req.Description,
+		Title:                 utils.TitleCase(utils.StripHTML(req.Title)),
+		Description:           utils.StripHTML(req.Description),
 		OccasionType:          utils.StringOrDefault(req.OccasionType, "custom"),
 		ShareCode:             utils.RandomCode(8, "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"),
 		CoverImageUrl:         req.CoverImageUrl,
-		ShippingNote:          req.ShippingNote,
+		ShippingNote:          utils.StripHTML(req.ShippingNote),
 		Visibility:            utils.StringOrDefault(req.Visibility, domaingift.ListVisibilityPublic),
 		ReservationVisibility: utils.StringOrDefault(req.ReservationVisibility, "immediately"),
 		IsActive:              true,
@@ -100,10 +100,10 @@ func (s *GiftService) UpdateList(ctx context.Context, ownerId, listId string, re
 		return domaingift.GiftList{}, err
 	}
 	if req.Title != "" {
-		list.Title = req.Title
+		list.Title = utils.TitleCase(utils.StripHTML(req.Title))
 	}
 	if req.Description != "" {
-		list.Description = req.Description
+		list.Description = utils.StripHTML(req.Description)
 	}
 	if req.OccasionType != "" {
 		list.OccasionType = req.OccasionType
@@ -112,7 +112,7 @@ func (s *GiftService) UpdateList(ctx context.Context, ownerId, listId string, re
 		list.CoverImageUrl = req.CoverImageUrl
 	}
 	if req.ShippingNote != "" {
-		list.ShippingNote = req.ShippingNote
+		list.ShippingNote = utils.StripHTML(req.ShippingNote)
 	}
 	if req.Visibility != "" {
 		list.Visibility = req.Visibility
@@ -154,8 +154,8 @@ func (s *GiftService) CreateItem(ctx context.Context, ownerId, listId string, re
 	item := domaingift.GiftItem{
 		Id:          utils.CreateUUID(),
 		ListId:      listId,
-		Name:        req.Name,
-		Description: req.Description,
+		Name:        utils.TitleCase(utils.StripHTML(req.Name)),
+		Description: utils.StripHTML(req.Description),
 		ProductUrl:  req.ProductUrl,
 		ImageUrl:    req.ImageUrl,
 		Price:       req.Price,
@@ -185,10 +185,10 @@ func (s *GiftService) UpdateItem(ctx context.Context, ownerId, itemId string, re
 		return domaingift.GiftItem{}, err
 	}
 	if req.Name != "" {
-		item.Name = req.Name
+		item.Name = utils.TitleCase(utils.StripHTML(req.Name))
 	}
 	if req.Description != "" {
-		item.Description = req.Description
+		item.Description = utils.StripHTML(req.Description)
 	}
 	if req.ProductUrl != "" {
 		item.ProductUrl = req.ProductUrl
@@ -278,7 +278,7 @@ func (s *GiftService) CancelReservation(ctx context.Context, ownerId, reservatio
 	reservation.Status = domaingift.ReservationStatusCanceled
 	reservation.CanceledAt = &now
 	reservation.CanceledBy = &ownerId
-	reservation.CancelReason = req.CancelReason
+	reservation.CancelReason = utils.StripHTML(req.CancelReason)
 	reservation.UpdatedAt = &now
 	if err := s.ReservationRepo.Update(ctx, reservation); err != nil {
 		return domaingift.GiftReservation{}, err
@@ -427,10 +427,10 @@ func (s *GiftService) CreatePublicReservation(ctx context.Context, shareCode, it
 	reservation := domaingift.GiftReservation{
 		Id:         utils.CreateUUID(),
 		ItemId:     itemId,
-		GuestEmail: strings.ToLower(strings.TrimSpace(req.GuestEmail)),
-		GuestName:  strings.TrimSpace(req.GuestName),
+		GuestEmail: utils.SanitizeEmail(req.GuestEmail),
+		GuestName:  utils.StripHTML(strings.TrimSpace(req.GuestName)),
 		Quantity:   req.Quantity,
-		Note:       req.Note,
+		Note:       utils.StripHTML(req.Note),
 		ShowName:   showName,
 		Status:     domaingift.ReservationStatusConfirmed,
 		CreatedAt:  time.Now(),

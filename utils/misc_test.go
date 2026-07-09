@@ -51,6 +51,13 @@ func TestJSONAndStringHelpers(t *testing.T) {
 	}
 }
 
+func TestStripHTML(t *testing.T) {
+	input := `<p>Hello&nbsp;<strong>Jane</strong></p><br><script>alert(1)</script><style>.x{}</style><span>Done</span>`
+	if got := StripHTML(input); got != "Hello Jane Done" {
+		t.Fatalf("unexpected stripped HTML: %q", got)
+	}
+}
+
 func TestGenerateLogIdAndRequestID(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())

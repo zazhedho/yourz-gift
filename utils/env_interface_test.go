@@ -153,4 +153,10 @@ func TestNormalizePhoneAndEmail(t *testing.T) {
 	if got := SanitizeEmail(" Jane.Doe@Example.COM "); got != "jane.doe@example.com" {
 		t.Fatalf("unexpected email sanitization: %q", got)
 	}
+	if got := SanitizeEmail("Jane <jane@example.com>"); got != "" {
+		t.Fatalf("expected display-name email to be rejected, got %q", got)
+	}
+	if got := SanitizeEmail("jane@example.com\r\nbcc:evil@example.com"); got != "" {
+		t.Fatalf("expected header injection email to be rejected, got %q", got)
+	}
 }

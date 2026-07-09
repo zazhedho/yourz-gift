@@ -142,6 +142,8 @@ func TestCreatePublicReservationDefaultsShowName(t *testing.T) {
 
 	got, err := svc.CreatePublicReservation(context.Background(), "ABC12345", "item-1", dto.GiftReservationCreate{
 		GuestEmail: "TEST@Example.COM",
+		GuestName:  "<b>Jane</b>",
+		Note:       "<p>Please wrap it</p><script>alert(1)</script>",
 		Quantity:   1,
 	})
 	if err != nil {
@@ -152,6 +154,12 @@ func TestCreatePublicReservationDefaultsShowName(t *testing.T) {
 	}
 	if !got.ShowName {
 		t.Fatalf("ShowName = false, want true")
+	}
+	if got.GuestName != "Jane" {
+		t.Fatalf("GuestName = %q, want Jane", got.GuestName)
+	}
+	if got.Note != "Please wrap it" {
+		t.Fatalf("Note = %q, want sanitized note", got.Note)
 	}
 }
 
@@ -225,7 +233,7 @@ func TestCancelReservationSetsCanceledStatusAndOwner(t *testing.T) {
 	}
 	svc := NewGiftService(fakeGiftListRepo{fake}, fakeGiftItemRepo{fake}, fakeGiftReservationRepo{fake}, nil, nil)
 
-	got, err := svc.CancelReservation(context.Background(), "owner-1", "reservation-1", dto.GiftReservationCancel{CancelReason: "Guest changed plan"})
+	got, err := svc.CancelReservation(context.Background(), "owner-1", "reservation-1", dto.GiftReservationCancel{CancelReason: "<b>Guest</b> changed plan<script>alert(1)</script>"})
 	if err != nil {
 		t.Fatalf("CancelReservation error = %v", err)
 	}

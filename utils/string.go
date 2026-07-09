@@ -2,7 +2,9 @@ package utils
 
 import (
 	"crypto/rand"
+	"html"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -13,6 +15,19 @@ import (
 func TitleCase(s string) string {
 	titleCaser := cases.Title(language.English)
 	return titleCaser.String(s)
+}
+
+var (
+	htmlScript = regexp.MustCompile(`(?is)<script[^>]*>.*?</script>`)
+	htmlStyle  = regexp.MustCompile(`(?is)<style[^>]*>.*?</style>`)
+	htmlTag    = regexp.MustCompile(`<[^>]*>`)
+)
+
+func StripHTML(s string) string {
+	s = htmlScript.ReplaceAllString(s, " ")
+	s = htmlStyle.ReplaceAllString(s, " ")
+	s = htmlTag.ReplaceAllString(s, " ")
+	return strings.Join(strings.Fields(html.UnescapeString(s)), " ")
 }
 
 func StringPtrIfNotEmpty(value string) *string {
