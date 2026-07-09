@@ -1,6 +1,9 @@
 package handlermedia
 
 import (
+	"errors"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"strings"
 	"yourz-gift/pkg/messages"
@@ -12,6 +15,13 @@ import (
 )
 
 const maxImageSize = 5 << 20
+
+var allowedImageContentTypes = map[string]struct{}{
+	"image/gif":  {},
+	"image/jpeg": {},
+	"image/png":  {},
+	"image/webp": {},
+}
 
 type MediaHandler struct {
 	Storage storage.StorageProvider
@@ -46,12 +56,13 @@ func (h *MediaHandler) UploadImage(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, res)
 		return
 	}
-	contentType := strings.ToLower(header.Header.Get("Content-Type"))
-	if !strings.HasPrefix(contentType, "image/") {
+	contentType, ok := detectAllowedImageContentType(file)
+	if !ok {
 		res := response.ErrorResponse(http.StatusBadRequest, messages.InvalidRequest, logId, "file must be an image")
 		ctx.JSON(http.StatusBadRequest, res)
 		return
 	}
+	header.Header.Set("Content-Type", contentType)
 
 	folder := strings.Trim(ctx.PostForm("folder"), "/")
 	if folder == "" {
@@ -64,6 +75,21 @@ func (h *MediaHandler) UploadImage(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, response.Response(http.StatusOK, "Image uploaded successfully", logId, gin.H{"url": url}))
+}
+
+func detectAllowedImageContentType(file multipart.File) (string, bool) {
+	head := make([]byte, 512)
+	n, err := file.Read(head)
+	if err != nil && !errors.Is(err, io.EOF) {
+		return "", false
+	}
+	if _, err := file.Seek(0, io.SeekStart); err != nil {
+		return "", false
+	}
+
+	contentType := strings.ToLower(http.DetectContentType(head[:n]))
+	_, ok := allowedImageContentTypes[contentType]
+	return contentType, ok
 }
 
 func (h *MediaHandler) DeleteImage(ctx *gin.Context) {

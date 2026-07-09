@@ -15,11 +15,13 @@ import (
 )
 
 type mediaStorageStub struct {
-	url        string
-	deletedURL string
+	url         string
+	contentType string
+	deletedURL  string
 }
 
 func (s *mediaStorageStub) UploadFile(ctx context.Context, file multipart.File, fileHeader *multipart.FileHeader, folder string) (string, error) {
+	s.contentType = fileHeader.Header.Get("Content-Type")
 	return s.url, nil
 }
 
@@ -39,18 +41,17 @@ func (s *mediaStorageStub) DownloadFile(ctx context.Context, objectName string) 
 
 var _ storage.StorageProvider = (*mediaStorageStub)(nil)
 
-func TestUploadImageReturnsUploadedURL(t *testing.T) {
-	gin.SetMode(gin.TestMode)
+func imageUploadRequest(t *testing.T, contentType string, data []byte) (*http.Request, *mediaStorageStub) {
 	var body bytes.Buffer
 	writer := multipart.NewWriter(&body)
 	header := make(textproto.MIMEHeader)
 	header.Set("Content-Disposition", `form-data; name="file"; filename="gift.png"`)
-	header.Set("Content-Type", "image/png")
+	header.Set("Content-Type", contentType)
 	part, err := writer.CreatePart(header)
 	if err != nil {
 		t.Fatalf("create form file: %v", err)
 	}
-	if _, err := part.Write([]byte("png")); err != nil {
+	if _, err := part.Write(data); err != nil {
 		t.Fatalf("write file: %v", err)
 	}
 	if err := writer.WriteField("folder", "gift-lists"); err != nil {
@@ -60,12 +61,19 @@ func TestUploadImageReturnsUploadedURL(t *testing.T) {
 		t.Fatalf("close writer: %v", err)
 	}
 
-	router := gin.New()
-	handler := NewMediaHandler(&mediaStorageStub{url: "https://cdn.example.com/gift.png"})
-	router.POST("/api/media/upload", handler.UploadImage)
-
 	req := httptest.NewRequest(http.MethodPost, "/api/media/upload", &body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
+	return req, &mediaStorageStub{url: "https://cdn.example.com/gift.png"}
+}
+
+func TestUploadImageReturnsUploadedURL(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	req, storage := imageUploadRequest(t, "image/png", []byte{0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n'})
+
+	router := gin.New()
+	handler := NewMediaHandler(storage)
+	router.POST("/api/media/upload", handler.UploadImage)
+
 	rec := httptest.NewRecorder()
 
 	router.ServeHTTP(rec, req)
@@ -75,6 +83,40 @@ func TestUploadImageReturnsUploadedURL(t *testing.T) {
 	}
 	if !bytes.Contains(rec.Body.Bytes(), []byte("https://cdn.example.com/gift.png")) {
 		t.Fatalf("expected uploaded URL in response, got %s", rec.Body.String())
+	}
+	if storage.contentType != "image/png" {
+		t.Fatalf("expected detected content type image/png, got %q", storage.contentType)
+	}
+}
+
+func TestUploadImageRejectsSVGAndFakeImage(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	tests := []struct {
+		name        string
+		contentType string
+		data        []byte
+	}{
+		{name: "svg", contentType: "image/svg+xml", data: []byte(`<svg><script>alert(1)</script></svg>`)},
+		{name: "fake png", contentType: "image/png", data: []byte("not an image")},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req, storage := imageUploadRequest(t, tt.contentType, tt.data)
+			router := gin.New()
+			router.POST("/api/media/upload", NewMediaHandler(storage).UploadImage)
+			rec := httptest.NewRecorder()
+
+			router.ServeHTTP(rec, req)
+
+			if rec.Code != http.StatusBadRequest {
+				t.Fatalf("expected 400, got %d: %s", rec.Code, rec.Body.String())
+			}
+			if storage.contentType != "" {
+				t.Fatalf("expected storage upload not called, got content type %q", storage.contentType)
+			}
+		})
 	}
 }
 

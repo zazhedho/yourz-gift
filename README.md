@@ -137,6 +137,7 @@ Minimum required variables:
 
 Optional but recommended:
 - Redis settings for sessions and rate limiting. These stay optional; when any Redis env is set, `REDIS_URL`, `REDIS_PORT`, and `REDIS_DB` format is validated.
+- Public reservation throttling uses Redis when available. Tune with `PUBLIC_RESERVATION_RATE_LIMIT` and `PUBLIC_RESERVATION_RATE_WINDOW_SECONDS` (defaults: `10` per `60` seconds per IP).
 - Permission cache settings such as `PERMISSION_CACHE_TTL` or `PERMISSION_CACHE_TTL_SECONDS` (default `5m`). These only apply when Redis is available; otherwise permission checks read from the database. Cache entries are invalidated after role-permission, permission, user-role, and user-delete mutations; TTL remains the fallback when Redis invalidation fails.
 - Location Service settings: `LOCATION_SERVICE_BASE_URL` (default `https://location-service-y7si.onrender.com`) and `LOCATION_SERVICE_TIMEOUT_SECONDS` (default `20`). Location sync imports from this shared service.
 - storage settings for file upload use cases. These stay optional; when storage connection env is set, provider and required storage credentials are validated.

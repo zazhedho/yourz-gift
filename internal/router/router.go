@@ -332,12 +332,18 @@ func (r *Routes) GiftRoutes() {
 	h := giftHandler.NewGiftHandler(svc, r.auditService())
 	pRepo := r.permissionRepo()
 	mdw := r.middleware(pRepo)
+	redisClient := database.GetRedisClient()
+	reservationLimiter := middlewares.EndpointRateLimitMiddleware(
+		redisClient,
+		utils.GetEnv("PUBLIC_RESERVATION_RATE_LIMIT", 10),
+		time.Duration(utils.GetEnv("PUBLIC_RESERVATION_RATE_WINDOW_SECONDS", 60))*time.Second,
+	)
 
 	public := r.App.Group("/api/public/gift-lists")
 	{
 		public.GET("/:code", h.GetPublicList)
 		public.GET("/:code/items", h.GetPublicItems)
-		public.POST("/:code/items/:item_id/reservations", h.CreatePublicReservation)
+		public.POST("/:code/items/:item_id/reservations", reservationLimiter, h.CreatePublicReservation)
 	}
 
 	lists := r.App.Group("/api/gift-lists").Use(mdw.AuthMiddleware())
