@@ -137,7 +137,15 @@ const PublicGiftList = () => {
         <HeroBubbles />
         <div className="gift-detail-hero__content">
           <div className="gift-detail-hero__copy">
-            <span className="gift-detail-hero__eyebrow">{formatOccasion(list.occasion_type)}</span>
+            <span className="gift-detail-hero__eyebrow">
+              <span>{formatOccasion(list.occasion_type)}</span>
+              {list.owner_name ? (
+                <>
+                  <span aria-hidden="true">·</span>
+                  <span className="gift-detail-hero__owner">by {list.owner_name}</span>
+                </>
+              ) : null}
+            </span>
             <h1>{list.title}</h1>
             <p>{list.description || 'Choose a gift and reserve it for the owner.'}</p>
             {showReadMore ? (

@@ -1795,11 +1795,22 @@ a {
   background: rgba(255, 255, 255, 0.16);
   border: 1px solid rgba(255, 255, 255, 0.24);
   border-radius: 999px;
+  display: inline-flex;
   font-size: 12px;
   font-weight: 700;
+  gap: 5px;
   letter-spacing: 0.08em;
+  max-width: 100%;
   padding: 6px 12px;
   text-transform: uppercase;
+  flex-wrap: wrap;
+  overflow-wrap: anywhere;
+}
+
+.gift-detail-hero__owner {
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .gift-detail-hero h1 {

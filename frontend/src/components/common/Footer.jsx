@@ -1,5 +1,3 @@
-import React from 'react'
-
 const Footer = () => {
   return (
     <footer style={{ 
@@ -15,7 +13,7 @@ const Footer = () => {
         <span style={{ fontSize: '24px', fontWeight: 800, color: '#4c1d95', letterSpacing: '-0.5px' }}>Yourz Gift</span>
       </div>
       <p style={{ opacity: 0.9, marginBottom: '32px', color: '#6b21a8' }}>Making giving and receiving gifts a joyful experience.</p>
-      <p style={{ fontSize: '14px', opacity: 0.7, color: '#6b21a8' }}>&copy; {new Date().getFullYear()} Yourz Gift. All rights reserved.</p>
+      <p style={{ fontSize: '14px', opacity: 0.7, color: '#6b21a8' }}>&copy; {new Date().getFullYear()} Yourz Gift · Zaqia &amp; Zaidus. All rights reserved.</p>
     </footer>
   )
 }

@@ -121,6 +121,32 @@ func TestGetPublicListRejectsExpiredList(t *testing.T) {
 	}
 }
 
+func TestGetPublicListIncludesOwnerName(t *testing.T) {
+	fake := &fakeGiftRepo{list: domaingift.GiftList{
+		Id:           "list-1",
+		OwnerId:      "owner-1",
+		ShareCode:    "ABC12345",
+		Visibility:   domaingift.ListVisibilityPublic,
+		IsActive:     true,
+		NeverExpires: true,
+	}}
+	svc := NewGiftService(
+		fakeGiftListRepo{fake},
+		fakeGiftItemRepo{fake},
+		fakeGiftReservationRepo{fake},
+		nil,
+		fakeUserRepo{user: domainuser.Users{Id: "owner-1", Name: "Zaqia & Zaidus"}},
+	)
+
+	got, err := svc.GetPublicList(context.Background(), "ABC12345")
+	if err != nil {
+		t.Fatalf("GetPublicList error = %v", err)
+	}
+	if got.OwnerName != "Zaqia & Zaidus" {
+		t.Fatalf("OwnerName = %q, want Zaqia & Zaidus", got.OwnerName)
+	}
+}
+
 func TestCreatePublicReservationDefaultsShowName(t *testing.T) {
 	fake := &fakeGiftRepo{
 		list: domaingift.GiftList{

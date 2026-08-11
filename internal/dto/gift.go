@@ -88,6 +88,7 @@ type GiftFriendResponse struct {
 type GiftListPublicResponse struct {
 	Id                    string     `json:"id"`
 	Title                 string     `json:"title"`
+	OwnerName             string     `json:"owner_name"`
 	Description           string     `json:"description"`
 	OccasionType          string     `json:"occasion_type"`
 	ShareCode             string     `json:"share_code"`

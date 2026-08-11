@@ -372,6 +372,14 @@ func (s *GiftService) GetPublicList(ctx context.Context, shareCode string) (dto.
 	if err != nil {
 		return dto.GiftListPublicResponse{}, err
 	}
+	ownerName := ""
+	if s.UserRepo != nil {
+		owner, err := s.UserRepo.GetByID(ctx, list.OwnerId)
+		if err != nil {
+			return dto.GiftListPublicResponse{}, err
+		}
+		ownerName = owner.Name
+	}
 	items, err := s.buildItemResponses(ctx, list.Id, false)
 	if err != nil {
 		return dto.GiftListPublicResponse{}, err
@@ -387,6 +395,7 @@ func (s *GiftService) GetPublicList(ctx context.Context, shareCode string) (dto.
 	return dto.GiftListPublicResponse{
 		Id:                    list.Id,
 		Title:                 list.Title,
+		OwnerName:             ownerName,
 		Description:           list.Description,
 		OccasionType:          list.OccasionType,
 		ShareCode:             list.ShareCode,
