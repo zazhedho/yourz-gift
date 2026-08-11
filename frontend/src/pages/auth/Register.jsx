@@ -1,12 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useId, useState } from 'react'
-import { Eye, EyeOff, Gift } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 
 import Button from '../../components/common/Button'
 import ErrorBanner from '../../components/common/ErrorBanner'
 import FormField from '../../components/common/FormField'
 import GoogleIdentityButton from '../../components/common/GoogleIdentityButton'
 import Loading from '../../components/common/Loading'
+import TurnstileWidget from '../../components/common/TurnstileWidget'
 import useAuth from '../../hooks/useAuth'
 import useRegisterStatus from '../../hooks/useRegisterStatus'
 import authService from '../../services/authService'
@@ -43,6 +44,8 @@ const Register = () => {
   const [otpStep, setOtpStep] = useState(() => sessionStorage.getItem('register_otp_step') === 'true')
   const [cooldown, setCooldown] = useState(getStoredOTPCooldown)
   const [submitting, setSubmitting] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState('')
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const passwordId = useId()
@@ -51,6 +54,13 @@ const Register = () => {
   const passwordValidation = validatePassword(form.password)
   const strength = passwordStrength(passwordValidation)
   const passwordsMatch = form.confirm_password && form.password === form.confirm_password
+
+  const resetTurnstile = () => {
+    setTurnstileToken('')
+    setTurnstileResetKey((value) => value + 1)
+  }
+
+  const withTurnstileToken = (payload) => turnstileToken ? { ...payload, turnstile_token: turnstileToken } : payload
 
   useEffect(() => {
     sessionStorage.setItem('register_form', JSON.stringify(form))
@@ -74,11 +84,15 @@ const Register = () => {
   }
 
   const requestRegisterOTP = async () => {
-    await authService.sendRegisterOTP({ email: form.email, phone: form.phone })
-    const cooldownTime = Number(otpCooldown || 60)
-    setCooldown(cooldownTime)
-    storeOTPCooldown(cooldownTime)
-    setOtpStep(true)
+    try {
+      await authService.sendRegisterOTP(withTurnstileToken({ email: form.email, phone: form.phone }))
+      const cooldownTime = Number(otpCooldown || 60)
+      setCooldown(cooldownTime)
+      storeOTPCooldown(cooldownTime)
+      setOtpStep(true)
+    } finally {
+      resetTurnstile()
+    }
   }
 
   const resendOTP = async () => {
@@ -94,6 +108,7 @@ const Register = () => {
     setError('')
     setOtpStep(false)
     setCooldown(0)
+    resetTurnstile()
     setForm((current) => ({ ...current, otp_code: '' }))
     sessionStorage.removeItem('register_otp_step')
     sessionStorage.removeItem('register_otp_cooldown')
@@ -131,7 +146,7 @@ const Register = () => {
         return
       }
 
-      const payload = { ...form }
+      const payload = withTurnstileToken({ ...form })
       delete payload.confirm_password
       if (!otpEnabled || !payload.otp_code.trim()) delete payload.otp_code
       const ok = await auth.register(payload)
@@ -154,6 +169,7 @@ const Register = () => {
       setError(getErrorMessage(err, otpEnabled && !otpStep ? 'Failed to send OTP' : 'Registration failed'))
     } finally {
       setSubmitting(false)
+      resetTurnstile()
     }
   }
 
@@ -161,9 +177,10 @@ const Register = () => {
     setError('')
     setGoogleError('')
     setGoogleSubmitting(true)
-    const ok = await auth.googleLogin(idToken)
+    const ok = await auth.googleLogin(idToken, turnstileToken)
     setGoogleSubmitting(false)
     if (ok) navigate('/lists', { replace: true })
+    else resetTurnstile()
   }
 
   if (loading) {
@@ -227,6 +244,7 @@ const Register = () => {
                 </button>
               </div>
             </div>
+            <TurnstileWidget action="auth" onError={setError} onToken={setTurnstileToken} resetKey={turnstileResetKey} />
             <Button isLoading={submitting} type="submit">Verify and register</Button>
           </form>
         </section>
@@ -304,6 +322,7 @@ const Register = () => {
               {passwordsMatch ? 'Passwords match' : 'Passwords do not match'}
             </div>
           ) : null}
+          <TurnstileWidget action="auth" onError={setError} onToken={setTurnstileToken} resetKey={turnstileResetKey} />
           <Button isLoading={submitting} type="submit">{otpEnabled ? 'Send OTP' : 'Register'}</Button>
         </form>
         <p className="meta">Already registered? <Link to="/login">Sign in</Link>.</p>

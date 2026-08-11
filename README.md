@@ -142,6 +142,7 @@ Optional but recommended:
 - Location Service settings: `LOCATION_SERVICE_BASE_URL` (default `https://location-service-y7si.onrender.com`) and `LOCATION_SERVICE_TIMEOUT_SECONDS` (default `20`). Location sync imports from this shared service.
 - storage settings for file upload use cases. These stay optional; when storage connection env is set, provider and required storage credentials are validated.
 - `GOOGLE_CLIENT_ID` or `GOOGLE_CLIENT_IDS` for Google login
+- `TURNSTILE_SECRET_KEY` for server-side Cloudflare Turnstile validation on login and registration
 - SMTP settings for register OTP and password reset email flows. These stay optional; when SMTP connection env is set, `SMTP_HOST`, `SMTP_PASS`, `SMTP_FROM`, and `SMTP_PORT` format are validated.
 
 ## Run Locally
@@ -302,6 +303,7 @@ Default frontend URL:
 
 Required environment:
 - `VITE_API_URL=http://localhost:8080/api`
+- `VITE_TURNSTILE_SITE_KEY` for the Turnstile widget on login and registration
 
 Useful routes:
 - `/login`

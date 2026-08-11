@@ -1,11 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { Gift } from 'lucide-react'
 
 import Button from '../../components/common/Button'
 import ErrorBanner from '../../components/common/ErrorBanner'
 import FormField from '../../components/common/FormField'
 import GoogleIdentityButton from '../../components/common/GoogleIdentityButton'
+import TurnstileWidget from '../../components/common/TurnstileWidget'
 import useAuth from '../../hooks/useAuth'
 import useRegisterStatus from '../../hooks/useRegisterStatus'
 import { getGoogleClientId } from '../../utils/runtimeConfig'
@@ -18,24 +18,34 @@ const Login = () => {
   const [googleError, setGoogleError] = useState('')
   const [googleSubmitting, setGoogleSubmitting] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState('')
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0)
   const googleClientId = getGoogleClientId()
+
+  const resetTurnstile = () => {
+    setTurnstileToken('')
+    setTurnstileResetKey((value) => value + 1)
+  }
 
   const update = (event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }))
 
   const submit = async (event) => {
     event.preventDefault()
     setSubmitting(true)
-    const ok = await auth.login(form)
+    const payload = turnstileToken ? { ...form, turnstile_token: turnstileToken } : form
+    const ok = await auth.login(payload)
     setSubmitting(false)
     if (ok) navigate('/lists', { replace: true })
+    else resetTurnstile()
   }
 
   const handleGoogleCredential = async (idToken) => {
     setGoogleError('')
     setGoogleSubmitting(true)
-    const ok = await auth.googleLogin(idToken)
+    const ok = await auth.googleLogin(idToken, turnstileToken)
     setGoogleSubmitting(false)
     if (ok) navigate('/lists', { replace: true })
+    else resetTurnstile()
   }
 
   return (
@@ -63,6 +73,7 @@ const Login = () => {
           <FormField label="Password">
             <input className="input" name="password" onChange={update} placeholder="Enter your password" required type="password" value={form.password} />
           </FormField>
+          <TurnstileWidget action="auth" onError={setGoogleError} onToken={setTurnstileToken} resetKey={turnstileResetKey} />
           <Button isLoading={submitting} type="submit">Login</Button>
         </form>
         {registerEnabled !== false ? (

@@ -31,8 +31,11 @@ import (
 	"yourz-gift/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
+
+type TurnstileVerifyFunc func(context.Context, string, string, string, string) error
 
 type HandlerUser struct {
 	Service       interfaceuser.ServiceUserInterface
@@ -40,9 +43,10 @@ type HandlerUser struct {
 	SessionSvc    interfacesession.ServiceSessionInterface
 	LoginLimiter  security.LoginLimiter
 	handlercommon.AuditWriter
-	AppConfigService interfaceappconfig.ServiceAppConfigInterface
-	OTPService       interfaceotp.ServiceOTPInterface
-	ResetService     interfacereset.ServicePasswordResetInterface
+	AppConfigService  interfaceappconfig.ServiceAppConfigInterface
+	OTPService        interfaceotp.ServiceOTPInterface
+	ResetService      interfacereset.ServicePasswordResetInterface
+	TurnstileVerifier TurnstileVerifyFunc
 }
 
 func NewUserHandler(
@@ -56,15 +60,30 @@ func NewUserHandler(
 	resetService interfacereset.ServicePasswordResetInterface,
 ) *HandlerUser {
 	return &HandlerUser{
-		Service:          s,
-		BlacklistRepo:    blacklistRepo,
-		SessionSvc:       sessionSvc,
-		LoginLimiter:     limiter,
-		AuditWriter:      handlercommon.NewAuditWriter(auditService, "UserHandler"),
-		AppConfigService: appConfigService,
-		OTPService:       otpService,
-		ResetService:     resetService,
+		Service:           s,
+		BlacklistRepo:     blacklistRepo,
+		SessionSvc:        sessionSvc,
+		LoginLimiter:      limiter,
+		AuditWriter:       handlercommon.NewAuditWriter(auditService, "UserHandler"),
+		AppConfigService:  appConfigService,
+		OTPService:        otpService,
+		ResetService:      resetService,
+		TurnstileVerifier: security.VerifyTurnstile,
 	}
+}
+
+func (h *HandlerUser) verifyTurnstile(ctx *gin.Context, logId uuid.UUID, token, action string) bool {
+	secret := strings.TrimSpace(utils.GetEnv("TURNSTILE_SECRET_KEY", ""))
+	if secret == "" {
+		return true
+	}
+	if h.TurnstileVerifier == nil || h.TurnstileVerifier(ctx.Request.Context(), secret, token, ctx.ClientIP(), action) != nil {
+		logger.WriteLogWithContext(ctx, logger.LogLevelWarn, "[UserHandler]; Turnstile verification failed")
+		res := response.ErrorResponse(http.StatusBadRequest, messages.MsgSomethingWrong, logId, "Captcha verification failed.")
+		ctx.JSON(http.StatusBadRequest, res)
+		return false
+	}
+	return true
 }
 
 func (h *HandlerUser) Register(ctx *gin.Context) {
@@ -88,7 +107,14 @@ func (h *HandlerUser) Register(ctx *gin.Context) {
 	if !handlercommon.BindJSON(ctx, logId, logPrefix, &req) {
 		return
 	}
-	logger.WriteLogWithContext(ctx, logger.LogLevelDebug, fmt.Sprintf("%s; Request: %+v;", logPrefix, utils.JsonEncode(req)))
+	if !h.verifyTurnstile(ctx, logId, req.TurnstileToken, "auth") {
+		return
+	}
+	logger.WriteLogWithContext(ctx, logger.LogLevelDebug, fmt.Sprintf("%s; Request: %+v;", logPrefix, utils.JsonEncode(map[string]interface{}{
+		"name":  req.Name,
+		"email": req.Email,
+		"phone": req.Phone,
+	})))
 
 	otpEnabled, err := h.isRuntimeConfigEnabled(reqCtx, utils.GetEnv("CONFIG_REGISTER_OTP", defaultConfigRegisterOTPEnabled), false)
 	if err != nil {
@@ -228,6 +254,9 @@ func (h *HandlerUser) SendRegisterOTP(ctx *gin.Context) {
 	if !handlercommon.BindJSON(ctx, logId, logPrefix, &req) {
 		return
 	}
+	if !h.verifyTurnstile(ctx, logId, req.TurnstileToken, "auth") {
+		return
+	}
 
 	otpEnabled, err := h.isRuntimeConfigEnabled(reqCtx, utils.GetEnv("CONFIG_REGISTER_OTP", defaultConfigRegisterOTPEnabled), false)
 	if err != nil {
@@ -330,7 +359,12 @@ func (h *HandlerUser) AdminCreateUser(ctx *gin.Context) {
 	if !handlercommon.BindJSON(ctx, logId, logPrefix, &req) {
 		return
 	}
-	logger.WriteLogWithContext(ctx, logger.LogLevelDebug, fmt.Sprintf("%s; Request: %+v;", logPrefix, utils.JsonEncode(req)))
+	logger.WriteLogWithContext(ctx, logger.LogLevelDebug, fmt.Sprintf("%s; Request: %+v;", logPrefix, utils.JsonEncode(map[string]interface{}{
+		"name":  req.Name,
+		"email": req.Email,
+		"phone": req.Phone,
+		"role":  req.Role,
+	})))
 
 	data, err := h.Service.AdminCreateUser(reqCtx, req)
 	if err != nil {
@@ -380,7 +414,13 @@ func (h *HandlerUser) Login(ctx *gin.Context) {
 	if !handlercommon.BindJSON(ctx, logId, logPrefix, &req) {
 		return
 	}
-	logger.WriteLogWithContext(ctx, logger.LogLevelDebug, fmt.Sprintf("%s; Request: %+v;", logPrefix, utils.JsonEncode(req)))
+	if !h.verifyTurnstile(ctx, logId, req.TurnstileToken, "auth") {
+		return
+	}
+	logger.WriteLogWithContext(ctx, logger.LogLevelDebug, fmt.Sprintf("%s; Request: %+v;", logPrefix, utils.JsonEncode(map[string]interface{}{
+		"identifier": req.Identifier,
+		"email":      req.Email,
+	})))
 
 	normalizedIdentifier, err := serviceuser.ResolveLoginIdentifier(req)
 	if err != nil {
@@ -537,6 +577,9 @@ func (h *HandlerUser) GoogleLogin(ctx *gin.Context) {
 	logPrefix := "[UserHandler][GoogleLogin]"
 	reqCtx := ctx.Request.Context()
 	if !handlercommon.BindJSON(ctx, logId, logPrefix, &req) {
+		return
+	}
+	if !h.verifyTurnstile(ctx, logId, req.TurnstileToken, "auth") {
 		return
 	}
 

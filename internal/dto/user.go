@@ -1,12 +1,13 @@
 package dto
 
 type UserRegister struct {
-	Name          string `json:"name" binding:"required,min=3,max=100"`
-	Email         string `json:"email" binding:"required,email"`
-	Phone         string `json:"phone" binding:"required,min=9,max=15"`
-	Password      string `json:"password" binding:"required,min=8,max=64"`
-	OTPCode       string `json:"otp_code" binding:"omitempty,len=6,numeric"`
-	EmailVerified bool   `json:"-"`
+	Name           string `json:"name" binding:"required,min=3,max=100"`
+	Email          string `json:"email" binding:"required,email"`
+	Phone          string `json:"phone" binding:"required,min=9,max=15"`
+	Password       string `json:"password" binding:"required,min=8,max=64"`
+	OTPCode        string `json:"otp_code" binding:"omitempty,len=6,numeric"`
+	TurnstileToken string `json:"turnstile_token" binding:"omitempty,max=2048"`
+	EmailVerified  bool   `json:"-"`
 }
 
 type AdminCreateUser struct {
@@ -18,9 +19,10 @@ type AdminCreateUser struct {
 }
 
 type Login struct {
-	Identifier string `json:"identifier" binding:"omitempty,min=3,max=100"`
-	Email      string `json:"email" binding:"omitempty,min=3,max=100"`
-	Password   string `json:"password" binding:"required,min=8,max=64"`
+	Identifier     string `json:"identifier" binding:"omitempty,min=3,max=100"`
+	Email          string `json:"email" binding:"omitempty,min=3,max=100"`
+	Password       string `json:"password" binding:"required,min=8,max=64"`
+	TurnstileToken string `json:"turnstile_token" binding:"omitempty,max=2048"`
 }
 
 type LoginMetadata struct {
@@ -29,7 +31,8 @@ type LoginMetadata struct {
 }
 
 type GoogleLogin struct {
-	IDToken string `json:"id_token" binding:"required"`
+	IDToken        string `json:"id_token" binding:"required"`
+	TurnstileToken string `json:"turnstile_token" binding:"omitempty,max=2048"`
 }
 
 type UserUpdate struct {
@@ -59,6 +62,7 @@ type RefreshTokenRequest struct {
 }
 
 type SendRegisterOTPRequest struct {
-	Email string `json:"email" binding:"required,email"`
-	Phone string `json:"phone" binding:"omitempty,min=9,max=15"`
+	Email          string `json:"email" binding:"required,email"`
+	Phone          string `json:"phone" binding:"omitempty,min=9,max=15"`
+	TurnstileToken string `json:"turnstile_token" binding:"omitempty,max=2048"`
 }

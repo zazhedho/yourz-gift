@@ -362,6 +362,34 @@ func TestNewUserHandlerWiresDependencies(t *testing.T) {
 	}
 }
 
+func TestUserHandlerRejectsInvalidTurnstileOnAuthEndpoints(t *testing.T) {
+	t.Setenv("TURNSTILE_SECRET_KEY", "test-secret")
+
+	tests := []struct {
+		name string
+		path string
+		body string
+		call func(*HandlerUser, *gin.Context)
+	}{
+		{name: "login", path: "/login", body: `{"identifier":"jane@example.com","password":"secret123"}`, call: (*HandlerUser).Login},
+		{name: "google login", path: "/google/login", body: `{"id_token":"google-token"}`, call: (*HandlerUser).GoogleLogin},
+		{name: "register", path: "/register", body: `{"name":"Jane Doe","email":"new@example.com","phone":"628123456789","password":"secret123"}`, call: (*HandlerUser).Register},
+		{name: "send register otp", path: "/register/otp/send", body: `{"email":"new@example.com","phone":"628123456789"}`, call: (*HandlerUser).SendRegisterOTP},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			handler := newUserHandlerForTest()
+			handler.TurnstileVerifier = func(context.Context, string, string, string, string) error {
+				return errors.New("invalid Turnstile token")
+			}
+			ctx, rec := newUserHandlerTestContext(t, http.MethodPost, tt.path, tt.body, nil)
+			tt.call(handler, ctx)
+			assertUserHandlerStatus(t, rec, http.StatusBadRequest)
+		})
+	}
+}
+
 func TestUserHandlerPublicAndAdminFlows(t *testing.T) {
 	handler := newUserHandlerForTest()
 

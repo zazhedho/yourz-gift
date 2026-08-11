@@ -30,6 +30,10 @@ vi.mock('../../services/authService', () => ({
   },
 }))
 
+vi.mock('../../components/common/TurnstileWidget', () => ({
+  default: ({ onToken }) => <button type="button" onClick={() => onToken('turnstile-token')}>Mock Turnstile</button>,
+}))
+
 describe('Register', () => {
   beforeEach(() => {
     sessionStorage.clear()
@@ -52,11 +56,13 @@ describe('Register', () => {
     await userEvent.type(screen.getByLabelText('Phone'), '628123456789')
     await userEvent.type(screen.getByLabelText('Password'), 'Password123!')
     await userEvent.type(screen.getByLabelText('Confirm password'), 'Password123!')
+    await userEvent.click(screen.getByRole('button', { name: 'Mock Turnstile' }))
     await userEvent.click(screen.getByRole('button', { name: 'Send OTP' }))
 
     await waitFor(() => expect(authService.sendRegisterOTP).toHaveBeenCalledWith({
       email: 'jane@example.com',
       phone: '628123456789',
+      turnstile_token: 'turnstile-token',
     }))
     expect(screen.getByRole('heading', { name: 'Check your email' })).toBeInTheDocument()
     expect(screen.getByLabelText('OTP code')).toBeInTheDocument()

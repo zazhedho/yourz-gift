@@ -47,10 +47,12 @@ export const AuthProvider = ({ children }) => {
     }
   }, [applyAuthResponse])
 
-  const googleLogin = useCallback(async (idToken) => {
+  const googleLogin = useCallback(async (idToken, turnstileToken) => {
     setError('')
     try {
-      const response = await authService.googleLogin({ id_token: idToken })
+      const payload = { id_token: idToken }
+      if (turnstileToken) payload.turnstile_token = turnstileToken
+      const response = await authService.googleLogin(payload)
       await applyAuthResponse(response)
       return true
     } catch (err) {

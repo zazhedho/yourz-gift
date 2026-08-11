@@ -9,6 +9,7 @@ import authService from '../services/authService'
 vi.mock('../services/authService', () => ({
   default: {
     login: vi.fn(),
+    googleLogin: vi.fn(),
     register: vi.fn(),
     me: vi.fn(),
     logout: vi.fn(),
@@ -22,6 +23,7 @@ const Consumer = () => {
       <p>{auth.isAuthenticated ? 'signed in' : 'guest'}</p>
       <p>{auth.error}</p>
       <button type="button" onClick={() => auth.login({ identifier: 'a@b.test', password: 'secret' })}>login</button>
+      <button type="button" onClick={() => auth.googleLogin('google-token', 'turnstile-token')}>google</button>
     </div>
   )
 }
@@ -56,5 +58,22 @@ describe('AuthProvider', () => {
     await userEvent.click(screen.getByRole('button', { name: /login/i }))
 
     await waitFor(() => expect(screen.getByText('invalid credentials')).toBeInTheDocument())
+  })
+
+  it('forwards the Turnstile token with Google login', async () => {
+    authService.googleLogin.mockResolvedValue({
+      data: { data: { access_token: 'token-2' } },
+    })
+    authService.me.mockResolvedValue({
+      data: { data: { id: 'user-2', email: 'owner@example.com' } },
+    })
+
+    render(<AuthProvider><Consumer /></AuthProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'google' }))
+
+    await waitFor(() => expect(authService.googleLogin).toHaveBeenCalledWith({
+      id_token: 'google-token',
+      turnstile_token: 'turnstile-token',
+    }))
   })
 })
