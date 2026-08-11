@@ -5,6 +5,7 @@ import { formatOccasion, isGiftListCurrent } from './giftDisplay'
 describe('formatOccasion', () => {
   it('formats known occasion values for display', () => {
     expect(formatOccasion('baby_shower')).toBe('Baby shower')
+    expect(formatOccasion('baby_registry')).toBe('Baby registry')
     expect(formatOccasion('housewarming')).toBe('Housewarming')
   })
 

@@ -122,6 +122,7 @@ const GiftListForm = () => {
                 <option value="birthday"><Cake size={18} aria-hidden="true" /> Birthday</option>
                 <option value="wedding"><Heart size={18} aria-hidden="true" /> Wedding</option>
                 <option value="baby_shower"><Baby size={18} aria-hidden="true" /> Baby shower</option>
+                <option value="baby_registry"><Baby size={18} aria-hidden="true" /> Baby registry</option>
                 <option value="housewarming"><Home size={18} aria-hidden="true" /> Housewarming</option>
                 <option value="holiday"><PartyPopper size={18} aria-hidden="true" /> Holiday</option>
               </select>

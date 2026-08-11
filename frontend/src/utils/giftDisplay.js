@@ -1,4 +1,5 @@
 const occasionLabels = {
+  baby_registry: 'Baby registry',
   baby_shower: 'Baby shower',
   birthday: 'Birthday',
   custom: 'Gift list',
