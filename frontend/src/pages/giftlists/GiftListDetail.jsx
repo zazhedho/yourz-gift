@@ -17,6 +17,7 @@ import { createPortal } from 'react-dom'
 
 import Loading from '../../components/common/Loading'
 import RetryState from '../../components/common/RetryState'
+import ScrollUpButton from '../../components/common/ScrollUpButton'
 import giftService from '../../services/giftService'
 import { getErrorMessage, getListData, getResponseData } from '../../services/api'
 import { flattenDescription, formatOccasion } from '../../utils/giftDisplay'
@@ -362,6 +363,8 @@ const GiftListDetail = () => {
         </div>,
         document.body
       )}
+
+      <ScrollUpButton />
 
       <ReservationsModal 
         item={items.find(i => i.id === expandedItemId)}

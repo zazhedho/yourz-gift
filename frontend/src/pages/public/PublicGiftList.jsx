@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom'
 
 import Button from '../../components/common/Button'
 import Loading from '../../components/common/Loading'
+import ScrollUpButton from '../../components/common/ScrollUpButton'
 import giftService from '../../services/giftService'
 import { getErrorMessage, getListData, getResponseData } from '../../services/api'
 import { flattenDescription, formatOccasion } from '../../utils/giftDisplay'
@@ -307,6 +308,8 @@ const PublicGiftList = () => {
           onReserved={reserved}
         />
       ) : null}
+
+      <ScrollUpButton />
 
       {showShipping && (
         <ShippingModal note={list.shipping_note} onClose={() => setShowShipping(false)} />

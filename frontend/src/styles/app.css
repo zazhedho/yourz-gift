@@ -2343,6 +2343,110 @@ a {
   border-color: #f472b6;
 }
 
+.gift-detail-scroll-up {
+  align-items: center;
+  appearance: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 999px;
+  bottom: calc(28px + env(safe-area-inset-bottom));
+  box-shadow: 0 4px 16px -2px rgba(147, 51, 234, 0.1), 0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+  color: rgba(124, 58, 237, 0.65);
+  cursor: pointer;
+  display: inline-flex;
+  height: 44px;
+  justify-content: center;
+  line-height: 1;
+  opacity: 0;
+  padding: 0;
+  pointer-events: none;
+  position: fixed;
+  right: max(24px, env(safe-area-inset-right));
+  transform: translateY(16px) scale(0.88);
+  transition: opacity 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease;
+  visibility: hidden;
+  width: 44px;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 9999;
+}
+
+@keyframes scrollUpFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.gift-detail-scroll-up.is-visible {
+  animation: scrollUpFloat 3.5s ease-in-out infinite;
+  opacity: 0.6;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+  visibility: visible;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gift-detail-scroll-up.is-visible:hover {
+    animation-play-state: paused;
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.92);
+    border-color: rgba(255, 255, 255, 1);
+    box-shadow: 0 12px 28px -2px rgba(147, 51, 234, 0.28), 0 4px 10px -2px rgba(0, 0, 0, 0.08), inset 0 1.5px 2px rgba(255, 255, 255, 1);
+    color: #7c3aed;
+    transform: translateY(-4px) scale(1.05) !important;
+  }
+}
+
+.gift-detail-scroll-up.is-visible:active {
+  animation-play-state: paused;
+  opacity: 0.9;
+  transform: translateY(0) scale(0.96) !important;
+  box-shadow: 0 4px 12px -2px rgba(147, 51, 234, 0.2);
+}
+
+.gift-detail-scroll-up:focus:not(:focus-visible) {
+  outline: none;
+  opacity: 0.6;
+}
+
+.gift-detail-scroll-up:focus-visible {
+  outline: 2px solid rgba(147, 51, 234, 0.4);
+  outline-offset: 2px;
+}
+
+/* Float neatly above bottom actionbar when present */
+body:has(.gift-detail-actionbar) .gift-detail-scroll-up {
+  bottom: calc(92px + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 760px) {
+  .gift-detail-scroll-up {
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    height: 44px;
+    right: max(16px, env(safe-area-inset-right));
+    width: 44px;
+  }
+
+  body:has(.gift-detail-actionbar) .gift-detail-scroll-up {
+    bottom: calc(84px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gift-detail-scroll-up,
+  .gift-detail-scroll-up.is-visible,
+  .gift-detail-scroll-up.is-visible:hover,
+  .gift-detail-scroll-up.is-visible:active {
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 .received-page {
   margin: 0 auto;
   max-width: 900px;
@@ -4229,13 +4333,15 @@ a {
   }
 
   .form-page-actions {
-    background: rgba(255, 255, 255, 0.72);
-    border: 1px solid rgba(226, 232, 240, 0.86);
-    border-radius: 999px;
+    align-items: stretch;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
     display: grid;
     gap: 8px;
     grid-template-columns: 0.86fr 1fr;
-    padding: 6px;
+    padding: 0;
     width: 100%;
   }
 
@@ -4245,6 +4351,19 @@ a {
     padding: 0 12px;
     width: 100%;
     justify-content: center;
+  }
+
+  .form-page-actions .form-btn-cancel,
+  .gift-item-form-actions .form-btn-cancel {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    color: #475569;
+  }
+
+  .form-page-actions .form-btn-submit,
+  .gift-item-form-actions .form-btn-submit {
+    box-shadow: 0 8px 18px rgba(244, 63, 94, 0.22);
   }
 
   .form-container {
@@ -4302,13 +4421,15 @@ a {
   }
 
   .gift-item-form-actions {
-    background: rgba(255, 255, 255, 0.72);
-    border: 1px solid rgba(226, 232, 240, 0.86);
-    border-radius: 999px;
+    align-items: stretch;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
     display: grid !important;
     gap: 8px !important;
     grid-template-columns: 0.86fr 1fr;
-    padding: 6px;
+    padding: 0;
     width: 100%;
   }
 
