@@ -1836,6 +1836,7 @@ a {
   max-width: 620px;
   overflow: hidden;
   overflow-wrap: anywhere;
+  white-space: pre-line;
   word-break: break-word;
 }
 
@@ -2220,6 +2221,7 @@ a {
   font-size: 13px;
   font-weight: 500;
   margin: 4px 0 10px;
+  white-space: pre-line;
 }
 
 .gift-detail-online {

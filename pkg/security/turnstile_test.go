@@ -45,3 +45,19 @@ func TestVerifyTurnstileRejectsFailedResponse(t *testing.T) {
 		t.Fatal("expected failed Turnstile response error")
 	}
 }
+
+func TestVerifyTurnstileAcceptsCloudflareTestingResponseWithoutAction(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"success":true,"metadata":{"result_with_testing_key":true}}`))
+	}))
+	defer server.Close()
+
+	previousURL := turnstileSiteVerifyURL
+	turnstileSiteVerifyURL = server.URL
+	defer func() { turnstileSiteVerifyURL = previousURL }()
+
+	if err := VerifyTurnstile(context.Background(), "secret", "XXXX.DUMMY.TOKEN.XXXX", "", "auth"); err != nil {
+		t.Fatalf("VerifyTurnstile error = %v", err)
+	}
+}

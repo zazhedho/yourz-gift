@@ -18,6 +18,8 @@ export const formatOccasion = (occasion) => {
     .join(' ')
 }
 
+export const flattenDescription = (value) => String(value || '').replace(/\s*\r?\n\s*/g, ' ')
+
 export const isGiftListCurrent = (list, now = new Date()) => {
   if (!list?.is_active) return false
   if (list.never_expires !== false) return true

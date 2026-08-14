@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatOccasion, isGiftListCurrent } from './giftDisplay'
+import { flattenDescription, formatOccasion, isGiftListCurrent } from './giftDisplay'
+
+describe('flattenDescription', () => {
+  it('replaces line breaks with spaces for collapsed previews', () => {
+    expect(flattenDescription('First line\n\nSecond line')).toBe('First line Second line')
+  })
+})
 
 describe('formatOccasion', () => {
   it('formats known occasion values for display', () => {

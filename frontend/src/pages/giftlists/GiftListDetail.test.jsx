@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -57,6 +58,8 @@ describe('GiftListDetail', () => {
             quantity: 1,
             quantity_remaining: 0,
             is_active: true,
+            priority: 0,
+            created_at: '2026-08-01T10:00:00Z',
           },
         ],
       },
@@ -90,5 +93,66 @@ describe('GiftListDetail', () => {
     expect(screen.getByText(/You have 1 active reservation/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /view online/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /view reservations/i })).toBeInTheDocument()
+  })
+
+  it('sorts items by newest without refetching', async () => {
+    const user = userEvent.setup()
+    giftService.listItems.mockResolvedValueOnce({
+      data: {
+        data: [
+          {
+            id: 'item-1',
+            name: 'Kompor Gas Rinnai 2 Tungku',
+            description: 'Rinnai RI 712 TG',
+            product_url: 'https://shopee.co.id/product/1',
+            price: 833700,
+            currency: 'IDR',
+            quantity: 1,
+            quantity_remaining: 0,
+            is_active: true,
+            priority: 0,
+            created_at: '2026-08-01T10:00:00Z',
+          },
+          {
+            id: 'item-2',
+            name: 'New Gift',
+            description: 'New gift item',
+            price: 100,
+            currency: 'IDR',
+            quantity: 1,
+            quantity_remaining: 1,
+            is_active: true,
+            priority: 1,
+            created_at: '2026-08-14T10:00:00Z',
+          },
+        ],
+      },
+    })
+    renderDetail()
+
+    const sort = await screen.findByLabelText('Sort by')
+    await user.selectOptions(sort, 'newest')
+
+    expect([...document.querySelectorAll('.gift-detail-item--owner h2')].map((node) => node.textContent.trim())).toEqual([
+      'New Gift',
+      'Kompor Gas Rinnai 2 Tungku',
+    ])
+    expect(giftService.listItems).toHaveBeenCalledTimes(1)
+  })
+
+  it('flattens the description preview but preserves line breaks in Read more', async () => {
+    const description = 'First line\n\nSecond line\nThird line'
+    giftService.getList.mockResolvedValueOnce({
+      data: {
+        data: { title: "ZZ's Wedding", description },
+      },
+    })
+    renderDetail()
+
+    await screen.findByText("ZZ's Wedding")
+    expect(document.querySelector('.gift-detail-hero__copy > p').textContent).toBe('First line Second line Third line')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Read more' }))
+    expect(screen.getByRole('dialog', { name: 'Gift list description' }).querySelector('p').textContent).toBe(description)
   })
 })

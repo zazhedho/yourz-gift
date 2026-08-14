@@ -58,6 +58,13 @@ func TestStripHTML(t *testing.T) {
 	}
 }
 
+func TestStripHTMLPreservesNewlines(t *testing.T) {
+	input := "First line\n\n\n  Second <strong>line</strong><script>alert(1)</script>"
+	if got := StripHTMLPreserveNewlines(input); got != "First line\n\nSecond line" {
+		t.Fatalf("unexpected multiline stripped HTML: %q", got)
+	}
+}
+
 func TestGenerateLogIdAndRequestID(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())

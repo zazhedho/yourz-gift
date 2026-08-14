@@ -19,7 +19,7 @@ import Loading from '../../components/common/Loading'
 import RetryState from '../../components/common/RetryState'
 import giftService from '../../services/giftService'
 import { getErrorMessage, getListData, getResponseData } from '../../services/api'
-import { formatOccasion } from '../../utils/giftDisplay'
+import { flattenDescription, formatOccasion } from '../../utils/giftDisplay'
 import HeroBubbles from '../../components/common/HeroBubbles'
 import ShippingModal from './ShippingModal'
 import ReservationsModal from './ReservationsModal'
@@ -177,6 +177,7 @@ const GiftListDetail = () => {
     return [...filtered].sort((a, b) => {
       if (sortBy === 'price_asc') return Number(a.price || 0) - Number(b.price || 0)
       if (sortBy === 'price_desc') return Number(b.price || 0) - Number(a.price || 0)
+      if (sortBy === 'newest') return new Date(b.created_at || 0) - new Date(a.created_at || 0)
       if (sortBy === 'name') return String(a.name).localeCompare(String(b.name))
       if (sortBy === 'reserved') return reservationQuantity(reservations, b.id) - reservationQuantity(reservations, a.id)
       return Number(a.priority || 0) - Number(b.priority || 0)
@@ -202,7 +203,7 @@ const GiftListDetail = () => {
           <div className="gift-detail-hero__copy">
             <span className="gift-detail-hero__eyebrow">{formatOccasion(list.occasion_type)}</span>
             <h1>{list.title}</h1>
-            <p>{list.description || 'Share this list with friends and family so they can reserve the right gift.'}</p>
+            <p>{flattenDescription(list.description) || 'Share this list with friends and family so they can reserve the right gift.'}</p>
             {showReadMore ? (
               <button className="gift-detail-description-button" onClick={() => setShowDescription(true)} type="button">
                 Read more
@@ -269,10 +270,11 @@ const GiftListDetail = () => {
           <span>Sort by</span>
           <select aria-label="Sort by" className="gift-detail-sort" onChange={(event) => setSortBy(event.target.value)} value={sortBy}>
             <option value="preferred">Preferred</option>
+            <option value="newest">Newest</option>
+            <option value="name">Name (A-Z)</option>
             <option value="reserved">Reserved first</option>
             <option value="price_asc">Price low to high</option>
             <option value="price_desc">Price high to low</option>
-            <option value="name">Name</option>
           </select>
         </label>
       </div>

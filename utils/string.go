@@ -23,11 +23,38 @@ var (
 	htmlTag    = regexp.MustCompile(`<[^>]*>`)
 )
 
-func StripHTML(s string) string {
+func stripHTMLTags(s string) string {
 	s = htmlScript.ReplaceAllString(s, " ")
 	s = htmlStyle.ReplaceAllString(s, " ")
 	s = htmlTag.ReplaceAllString(s, " ")
-	return strings.Join(strings.Fields(html.UnescapeString(s)), " ")
+	return html.UnescapeString(s)
+}
+
+func StripHTML(s string) string {
+	return strings.Join(strings.Fields(stripHTMLTags(s)), " ")
+}
+
+func StripHTMLPreserveNewlines(s string) string {
+	s = strings.ReplaceAll(stripHTMLTags(s), "\r\n", "\n")
+	s = strings.ReplaceAll(s, "\r", "\n")
+	lines := strings.Split(s, "\n")
+	cleanLines := make([]string, 0, len(lines))
+	blankLine := false
+	for _, line := range lines {
+		line = strings.Join(strings.Fields(line), " ")
+		if line == "" {
+			if len(cleanLines) > 0 {
+				blankLine = true
+			}
+			continue
+		}
+		if blankLine {
+			cleanLines = append(cleanLines, "")
+			blankLine = false
+		}
+		cleanLines = append(cleanLines, line)
+	}
+	return strings.TrimSpace(strings.Join(cleanLines, "\n"))
 }
 
 func StringPtrIfNotEmpty(value string) *string {

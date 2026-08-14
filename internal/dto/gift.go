@@ -102,19 +102,20 @@ type GiftListPublicResponse struct {
 }
 
 type GiftItemPublicResponse struct {
-	Id                string   `json:"id"`
-	Name              string   `json:"name"`
-	Description       string   `json:"description"`
-	ProductUrl        string   `json:"product_url"`
-	UrlHost           string   `json:"url_host"`
-	ImageUrl          string   `json:"image_url"`
-	Price             *float64 `json:"price"`
-	Currency          string   `json:"currency"`
-	Quantity          int      `json:"quantity"`
-	QuantityRemaining int      `json:"quantity_remaining"`
-	DisplayQuantity   string   `json:"display_quantity"`
-	Priority          int      `json:"priority"`
-	CanReserve        bool     `json:"can_reserve"`
-	IsReserved        bool     `json:"is_reserved"`
-	IsArchived        bool     `json:"is_archived"`
+	Id                string    `json:"id"`
+	Name              string    `json:"name"`
+	Description       string    `json:"description"`
+	ProductUrl        string    `json:"product_url"`
+	UrlHost           string    `json:"url_host"`
+	ImageUrl          string    `json:"image_url"`
+	Price             *float64  `json:"price"`
+	Currency          string    `json:"currency"`
+	Quantity          int       `json:"quantity"`
+	QuantityRemaining int       `json:"quantity_remaining"`
+	DisplayQuantity   string    `json:"display_quantity"`
+	Priority          int       `json:"priority"`
+	CreatedAt         time.Time `json:"created_at"`
+	CanReserve        bool      `json:"can_reserve"`
+	IsReserved        bool      `json:"is_reserved"`
+	IsArchived        bool      `json:"is_archived"`
 }

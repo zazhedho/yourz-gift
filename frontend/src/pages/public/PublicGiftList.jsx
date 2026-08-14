@@ -7,7 +7,7 @@ import Button from '../../components/common/Button'
 import Loading from '../../components/common/Loading'
 import giftService from '../../services/giftService'
 import { getErrorMessage, getListData, getResponseData } from '../../services/api'
-import { formatOccasion } from '../../utils/giftDisplay'
+import { flattenDescription, formatOccasion } from '../../utils/giftDisplay'
 import HeroBubbles from '../../components/common/HeroBubbles'
 import ReservationForm from './ReservationForm'
 import ShippingModal from '../giftlists/ShippingModal'
@@ -122,6 +122,7 @@ const PublicGiftList = () => {
       if (sortBy === 'price-asc') return Number(a.price || 0) - Number(b.price || 0)
       if (sortBy === 'price-desc') return Number(b.price || 0) - Number(a.price || 0)
       if (sortBy === 'newest') return new Date(b.created_at || 0) - new Date(a.created_at || 0)
+      if (sortBy === 'name') return String(a.name || '').localeCompare(String(b.name || ''))
       return Number(a.priority || 0) - Number(b.priority || 0)
     })
 
@@ -147,7 +148,7 @@ const PublicGiftList = () => {
               ) : null}
             </span>
             <h1>{list.title}</h1>
-            <p>{list.description || 'Choose a gift and reserve it for the owner.'}</p>
+            <p>{flattenDescription(list.description) || 'Choose a gift and reserve it for the owner.'}</p>
             {showReadMore ? (
               <button className="gift-detail-description-button" onClick={() => setShowDescription(true)} type="button">
                 Read more
@@ -205,6 +206,7 @@ const PublicGiftList = () => {
               <option value="price-asc">Price (Low to High)</option>
               <option value="price-desc">Price (High to Low)</option>
               <option value="newest">Newest</option>
+              <option value="name">Name (A-Z)</option>
             </select>
           </label>
         </div>

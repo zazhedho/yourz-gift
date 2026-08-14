@@ -14,14 +14,16 @@ import (
 )
 
 func TestBuildItemResponsesCalculatesRemaining(t *testing.T) {
+	createdAt := time.Date(2026, time.August, 14, 10, 30, 0, 0, time.UTC)
 	fake := &fakeGiftRepo{
 		items: []domaingift.GiftItem{{
-			Id:       "item-1",
-			ListId:   "list-1",
-			Name:     "Piring",
-			Quantity: 6,
-			Currency: "IDR",
-			IsActive: true,
+			Id:        "item-1",
+			ListId:    "list-1",
+			Name:      "Piring",
+			Quantity:  6,
+			Currency:  "IDR",
+			IsActive:  true,
+			CreatedAt: createdAt,
 		}},
 		reserved: map[string]int{"item-1": 2},
 	}
@@ -39,6 +41,9 @@ func TestBuildItemResponsesCalculatesRemaining(t *testing.T) {
 	}
 	if !got[0].CanReserve {
 		t.Fatalf("CanReserve = false, want true")
+	}
+	if !got[0].CreatedAt.Equal(createdAt) {
+		t.Fatalf("created_at = %v, want %v", got[0].CreatedAt, createdAt)
 	}
 }
 
@@ -100,6 +105,22 @@ func TestCreateListDefaultsToNeverExpires(t *testing.T) {
 	}
 	if !fake.storedList.NeverExpires {
 		t.Fatalf("stored NeverExpires = false, want true")
+	}
+}
+
+func TestCreateListPreservesDescriptionNewlines(t *testing.T) {
+	fake := &fakeGiftRepo{}
+	svc := NewGiftService(fakeGiftListRepo{fake}, fakeGiftItemRepo{fake}, fakeGiftReservationRepo{fake}, nil, nil)
+
+	got, err := svc.CreateList(context.Background(), "owner-1", dto.GiftListCreate{
+		Title:       "Birthday",
+		Description: "First line\nSecond <strong>line</strong>",
+	})
+	if err != nil {
+		t.Fatalf("CreateList error = %v", err)
+	}
+	if got.Description != "First line\nSecond line" {
+		t.Fatalf("Description = %q, want preserved newline", got.Description)
 	}
 }
 

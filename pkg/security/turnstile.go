@@ -45,13 +45,16 @@ func VerifyTurnstile(ctx context.Context, secret, token, remoteIP, action string
 	}
 
 	var result struct {
-		Success bool   `json:"success"`
-		Action  string `json:"action"`
+		Success  bool   `json:"success"`
+		Action   string `json:"action"`
+		Metadata struct {
+			ResultWithTestingKey bool `json:"result_with_testing_key"`
+		} `json:"metadata"`
 	}
 	if err := json.NewDecoder(io.LimitReader(resp.Body, 64<<10)).Decode(&result); err != nil {
 		return err
 	}
-	if !result.Success || (action != "" && result.Action != action) {
+	if !result.Success || (action != "" && result.Action != action && !result.Metadata.ResultWithTestingKey) {
 		return fmt.Errorf("Turnstile verification failed")
 	}
 	return nil

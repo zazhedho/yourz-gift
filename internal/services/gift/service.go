@@ -61,7 +61,7 @@ func (s *GiftService) CreateList(ctx context.Context, ownerId string, req dto.Gi
 		Id:                    utils.CreateUUID(),
 		OwnerId:               ownerId,
 		Title:                 utils.TitleCase(utils.StripHTML(req.Title)),
-		Description:           utils.StripHTML(req.Description),
+		Description:           utils.StripHTMLPreserveNewlines(req.Description),
 		OccasionType:          utils.StringOrDefault(req.OccasionType, "custom"),
 		ShareCode:             utils.RandomCode(8, "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"),
 		CoverImageUrl:         req.CoverImageUrl,
@@ -103,7 +103,7 @@ func (s *GiftService) UpdateList(ctx context.Context, ownerId, listId string, re
 		list.Title = utils.TitleCase(utils.StripHTML(req.Title))
 	}
 	if req.Description != "" {
-		list.Description = utils.StripHTML(req.Description)
+		list.Description = utils.StripHTMLPreserveNewlines(req.Description)
 	}
 	if req.OccasionType != "" {
 		list.OccasionType = req.OccasionType
@@ -155,7 +155,7 @@ func (s *GiftService) CreateItem(ctx context.Context, ownerId, listId string, re
 		Id:          utils.CreateUUID(),
 		ListId:      listId,
 		Name:        utils.TitleCase(utils.StripHTML(req.Name)),
-		Description: utils.StripHTML(req.Description),
+		Description: utils.StripHTMLPreserveNewlines(req.Description),
 		ProductUrl:  req.ProductUrl,
 		ImageUrl:    req.ImageUrl,
 		Price:       req.Price,
@@ -188,7 +188,7 @@ func (s *GiftService) UpdateItem(ctx context.Context, ownerId, itemId string, re
 		item.Name = utils.TitleCase(utils.StripHTML(req.Name))
 	}
 	if req.Description != "" {
-		item.Description = utils.StripHTML(req.Description)
+		item.Description = utils.StripHTMLPreserveNewlines(req.Description)
 	}
 	if req.ProductUrl != "" {
 		item.ProductUrl = req.ProductUrl
@@ -533,6 +533,7 @@ func (s *GiftService) buildItemResponses(ctx context.Context, listId string, inc
 			QuantityRemaining: remaining,
 			DisplayQuantity:   fmt.Sprintf("%d of %d available", remaining, item.Quantity),
 			Priority:          item.Priority,
+			CreatedAt:         item.CreatedAt,
 			CanReserve:        remaining > 0 && item.IsActive && !item.IsArchived,
 			IsReserved:        remaining == 0,
 			IsArchived:        item.IsArchived,
