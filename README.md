@@ -1,427 +1,374 @@
-# Yourz Gift Backend
+<p align="center">
+  <img src="frontend/public/logo-nobg.png" alt="Yourz Gift" width="180">
+</p>
 
-Backend service for generic gift lists and reservations:
-- Gin HTTP router
-- PostgreSQL via GORM
-- JWT authentication
-- permission-first RBAC
-- runtime application configurations from database
-- optional Redis-based session management and rate limiting
+<h1 align="center">Yourz Gift</h1>
 
-The main business module is a public gift-list flow: owners manage lists and items after login, while guests can view public lists and reserve available item quantities without an account.
+<p align="center">
+  A thoughtful gift-list platform for moments that matter.
+</p>
 
-## Core Principles
+<p align="center">
+  <a href="https://go.dev/"><img src="https://img.shields.io/badge/Go-1.26.3-00ADD8?logo=go&logoColor=white" alt="Go 1.26.3"></a>
+  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=111827" alt="React 19"></a>
+  <a href="https://vite.dev/"><img src="https://img.shields.io/badge/Vite-frontend-646CFF?logo=vite&logoColor=white" alt="Vite"></a>
+  <a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/PostgreSQL-database-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL"></a>
+</p>
 
-### Permission-First RBAC
+> Yourz Gift was created specially for the birth of our first child. What began as a personal family milestone became a simple and thoughtful way to share gifts, avoid duplicates, and make every contribution feel meaningful.
+>
+> Dibuat khusus untuk menyambut kelahiran anak pertama kami.
 
-RBAC in this backend is designed with these rules:
-- `permission` is the runtime source of truth for access control
-- `role` is a label and a grouping mechanism for permissions
-- `superadmin` is the only exception and bypasses permission checks
-- menu visibility is derived from permissions, not from manual menu assignment
+## Contents
 
-Practical implications:
-- endpoint access is checked by `PermissionMiddleware(resource, action)`
-- `/api/menus/me` is built from the permissions owned by the current user
-- if a role has at least one permission for a module resource, the menu for that module can appear automatically
-- parent menus are included automatically when a permitted child menu exists
+<details open>
+<summary>Jump to a section</summary>
 
-### Runtime Configuration
+- [What It Does](#what-it-does)
+- [Architecture](#architecture)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+- [Product Flows](#product-flows)
+- [API Surface](#api-surface)
+- [Development](#development)
+- [MVP Scope](#mvp-scope)
+- [Design Notes](#design-notes)
 
-Application configuration values can be stored in `app_configs` and changed without restarting the service.
+</details>
 
-Use this for values such as:
-- external URLs
-- feature toggles
-- integration settings
-- module-specific runtime configuration
+## What It Does
 
-Built-in auth feature flags:
-- `auth.public_registration_enabled`: enable or disable public self-registration endpoints
-- `auth.register_otp_enabled`: require OTP verification for public registration
-- `auth.password_reset_email_enabled`: send password reset tokens through the email sender instead of returning a development token in the API response
+Yourz Gift supports generic gift lists for weddings, birthdays, baby registries, baby showers, housewarmings, holidays, and custom occasions.
 
-This backend includes a typed helper on top of `app_configs`, so services do not need to parse raw strings manually for common cases such as:
-- `GetString`
-- `GetBool`
-- `GetInt`
-- `GetDuration`
-- `IsEnabled`
-- `DecodeJSON`
+| Area | Available now |
+| --- | --- |
+| Gift lists | Create, edit, share, expire, and manage personalized lists. |
+| Gift items | Add product links, images, prices, quantities, priorities, and descriptions. Reorder, archive, and restore items. |
+| Reservations | Guests reserve quantities from a public link without creating an account. Owners can review, thank, and cancel reservation records. |
+| Public sharing | Shareable public list codes with item availability, search, sorting, and reservation flow. |
+| Identity | Email/password authentication, Google login, OTP registration, password reset, Turnstile validation, and optional session management. |
+| Friends | Create friend connections and browse gift lists shared by friends. |
+| Media | Upload and delete list or item images through the configured object storage provider. |
+| Responsive UI | React frontend designed for both desktop and mobile workflows. |
 
-Behavior:
-- if a config key does not exist, the helper returns the provided fallback
-- if a config exists but `is_active = false`, the helper also returns the fallback
-- parsing errors are returned only when an active config exists but contains an invalid value
+## Architecture
 
-For feature flags, `is_active` controls whether the stored config overrides the code fallback. The actual on/off value is stored in `value`.
+~~~mermaid
+flowchart LR
+    Browser["Owner or guest browser"] --> Frontend["React + Vite frontend"]
+    Frontend --> API["Gin HTTP API"]
+    API --> Auth["JWT and permission middleware"]
+    API --> Services["Domain services"]
+    Services --> Database[("PostgreSQL")]
+    Services -. optional .-> Redis[("Redis sessions and rate limits")]
+    Services --> Storage[("MinIO or Cloudflare R2")]
+    API -. optional .-> Mail["SMTP email"]
+~~~
 
-Public registration example:
-- missing config: allowed, because code fallback is `true`
-- `is_active = false`: allowed, because the config is ignored and fallback `true` is used
-- `is_active = true`, `value = true`: allowed
-- `is_active = true`, `value = false`: disabled
+The backend follows a predictable flow:
 
-Default auth config rows are seeded by the existing app config migration:
-- `auth.public_registration_enabled`: active, value `true`
-- `auth.register_otp_enabled`: active, value `false`
-- `auth.password_reset_email_enabled`: active, value `false`
+~~~text
+route -> handler -> service -> repository -> database
+~~~
 
-## Current Modules
+Common CRUD behavior uses the generic repository layer. Module repositories stay focused on business-specific queries, joins, aggregates, and transactional operations.
 
-System modules currently included:
-- Authentication and user profile
-- Users
-- Roles
-- Permissions
-- Menus
-- Configurations
-- Locations
-- Sessions when Redis is enabled
+## Tech Stack
 
-Business modules currently included:
-- Gift lists
-- Gift items
-- Gift reservations
+| Layer | Technology |
+| --- | --- |
+| API | Go, Gin, GORM |
+| Database | PostgreSQL |
+| Authentication | JWT, Google OAuth, OTP, Cloudflare Turnstile |
+| Authorization | Permission-first RBAC |
+| Frontend | React, Vite, React Router, Axios |
+| Object storage | MinIO for local development, Cloudflare R2 as an option |
+| Optional infrastructure | Redis for sessions, caching, and rate limiting; SMTP for email flows |
+| Verification | Go tests, Vitest, Testing Library, Playwright |
 
 ## Project Structure
 
-Main backend layout:
-
-```text
+~~~text
 yourz-gift/
-├── infrastructure/
+├── cmd/                    # CLI helpers such as module seed generation
+├── frontend/               # React and Vite application
+├── infrastructure/         # Database and external service setup
 ├── internal/
-│   ├── domain/
-│   ├── dto/
-│   ├── handlers/http/
-│   ├── interfaces/
-│   ├── repositories/
-│   ├── router/
-│   └── services/
-├── middlewares/
-├── migrations/
-├── pkg/
-├── utils/
-└── main.go
-```
+│   ├── domain/             # Domain models
+│   ├── dto/                # Request and response contracts
+│   ├── handlers/http/      # HTTP handlers
+│   ├── interfaces/         # Repository and service contracts
+│   ├── repositories/       # Generic and module repositories
+│   ├── router/             # API route registration
+│   └── services/           # Business logic
+├── migrations/             # Database migrations and seed data
+├── middlewares/            # Authentication, permission, and request middleware
+├── pkg/                    # Reusable packages such as security and storage
+├── utils/                  # Small shared utilities
+├── main.go
+└── Makefile
+~~~
 
-Pattern for each module:
+## Quick Start
 
-```text
-route -> handler -> service -> repository -> database
-```
+### Prerequisites
 
-Repository layer convention:
-- use the generic repository in `internal/repositories/generic` for common CRUD and list query behavior
-- keep module repository files focused on custom query cases only, such as joins, aggregates, or transactional assignment logic
+- Go 1.26.3 or newer
+- Node.js and npm
+- PostgreSQL
+- Redis and MinIO are optional for a minimal local run, but recommended when testing sessions and image uploads
 
-## Environment
+### 1. Start the backend
 
-Copy `.env.example` to `.env` and adjust the values as needed.
+~~~bash
+cp .env.example .env
+~~~
 
-Minimum required variables:
-- `APP_NAME`
-- `APP_ENV`
-- `PORT`
-- `DATABASE_URL`, or these database parts when `DATABASE_URL` is empty:
-  - `DB_HOST`
-  - `DB_PORT`
-  - `DB_USERNAME`
-  - `DB_NAME`
-  - `DB_PASS`
-  - `DB_SSLMODE`
-- `JWT_KEY` (minimum 32 characters; use a random secret for production)
-- `JWT_EXP`
-- `PATH_MIGRATE`
+Set the local database, JWT secret, and storage values in .env. For local image uploads, use:
 
-Optional but recommended:
-- Redis settings for sessions and rate limiting. These stay optional; when any Redis env is set, `REDIS_URL`, `REDIS_PORT`, and `REDIS_DB` format is validated.
-- Public reservation throttling uses Redis when available. Tune with `PUBLIC_RESERVATION_RATE_LIMIT` and `PUBLIC_RESERVATION_RATE_WINDOW_SECONDS` (defaults: `10` per `60` seconds per IP).
-- Permission cache settings such as `PERMISSION_CACHE_TTL` or `PERMISSION_CACHE_TTL_SECONDS` (default `5m`). These only apply when Redis is available; otherwise permission checks read from the database. Cache entries are invalidated after role-permission, permission, user-role, and user-delete mutations; TTL remains the fallback when Redis invalidation fails.
-- Location Service settings: `LOCATION_SERVICE_BASE_URL` (default `https://location-service-y7si.onrender.com`) and `LOCATION_SERVICE_TIMEOUT_SECONDS` (default `20`). Location sync imports from this shared service.
-- storage settings for file upload use cases. These stay optional; when storage connection env is set, provider and required storage credentials are validated.
-- `GOOGLE_CLIENT_ID` or `GOOGLE_CLIENT_IDS` for Google login
-- `TURNSTILE_SECRET_KEY` for server-side Cloudflare Turnstile validation on login and registration
-- SMTP settings for register OTP and password reset email flows. These stay optional; when SMTP connection env is set, `SMTP_HOST`, `SMTP_PASS`, `SMTP_FROM`, and `SMTP_PORT` format are validated.
+~~~dotenv
+STORAGE_PROVIDER=minio
+~~~
 
-## Run Locally
+Then install and run the API with migrations:
 
-Install dependencies and prepare `.env`, then:
-
-```bash
+~~~bash
+go mod download
 go run . -migrate
-```
+~~~
 
-Or run migration and server separately:
+The API is available at http://localhost:8080.
 
-```bash
-go run . -migrate
+Health check:
+
+~~~text
+GET http://localhost:8080/healthcheck
+~~~
+
+After the first migration, start the API without migration when needed:
+
+~~~bash
 go run .
-```
+~~~
 
-Default health check:
+### 2. Start the frontend
 
-```text
-GET /healthcheck
-```
-
-## Main Routes
-
-The current route set includes:
-
-- `POST /api/user/register`
-- `POST /api/user/register/otp/send`
-- `POST /api/user/login`
-- `POST /api/user/google/login`
-- `POST /api/user/refresh-token`
-- `POST /api/user/forgot-password`
-- `POST /api/user/reset-password`
-- `POST /api/user/logout`
-- `GET /api/user`
-- `GET /api/users`
-
-- `GET /api/roles`
-- `POST /api/role`
-- `GET /api/role/:id`
-- `PUT /api/role/:id`
-- `DELETE /api/role/:id`
-- `POST /api/role/:id/permissions`
-
-- `GET /api/permissions`
-- `GET /api/permissions/me`
-- `POST /api/permission`
-- `GET /api/permission/:id`
-- `PUT /api/permission/:id`
-- `DELETE /api/permission/:id`
-
-- `GET /api/menus/active`
-- `GET /api/menus/me`
-- `GET /api/menus`
-- `GET /api/menu/:id`
-- `PUT /api/menu/:id`
-
-- `GET /api/configs`
-- `GET /api/config/:id`
-- `PUT /api/config/:id`
-
-- `GET /api/location/province`
-- `GET /api/location/city?province_code=11`
-- `GET /api/location/district?city_code=1101`
-- `GET /api/location/village?district_code=110101`
-- `POST /api/location/sync`
-- `GET /api/location/sync/:id`
-
-- `GET /api/audits`
-- `GET /api/audit/:id`
-
-- `GET /api/gift-lists`
-- `POST /api/gift-lists`
-- `GET /api/gift-lists/friends`
-- `GET /api/gift-lists/:id`
-- `PUT /api/gift-lists/:id`
-- `DELETE /api/gift-lists/:id`
-- `GET /api/gift-lists/:id/items`
-- `POST /api/gift-lists/:id/items`
-- `POST /api/gift-lists/:id/items/reorder`
-- `GET /api/gift-lists/:id/reservations`
-- `PUT /api/gift-items/:id`
-- `DELETE /api/gift-items/:id`
-
-- `GET /api/public/gift-lists/:code`
-- `GET /api/public/gift-lists/:code/items`
-- `POST /api/public/gift-lists/:code/items/:item_id/reservations`
-
-- `GET /api/friends`
-- `GET /api/friends/requests`
-- `POST /api/friends/request`
-- `POST /api/friends/:id/accept`
-- `POST /api/friends/:id/reject`
-- `DELETE /api/friends/:id`
-
-- `POST /api/media/upload`
-
-Additional session routes are registered only when Redis is available:
-- `GET /api/user/sessions`
-- `DELETE /api/user/session/:session_id`
-- `POST /api/user/sessions/revoke-others`
-
-## Gift List MVP Flow
-
-Gift list terminology is intentionally generic. Wedding, birthday, baby shower, housewarming, holiday, and custom lists all use the same tables and endpoints.
-
-Core tables:
-- `gift_lists`: owner, title, description, occasion type, public share code, cover image, shipping note, visibility, reservation visibility
-- `gift_items`: list, product URL, image URL, price, currency, quantity, priority, active/archive flags
-- `gift_reservations`: item, guest email/name, quantity, note, name visibility, status
-
-Owner flow:
-1. Login and use the returned `access_token`.
-2. Create a gift list with `POST /api/gift-lists`.
-3. Create items with `POST /api/gift-lists/:id/items`.
-4. Share the returned `share_code` with guests.
-5. View reservations with `GET /api/gift-lists/:id/reservations`.
-
-Public guest flow:
-1. Open `GET /api/public/gift-lists/:code`.
-2. Load items with `GET /api/public/gift-lists/:code/items`.
-3. Reserve an item with `POST /api/public/gift-lists/:code/items/:item_id/reservations`.
-
-Reservation rules:
-- reservation quantity cannot exceed remaining item quantity
-- reservation writes use a database transaction and row lock
-- public reservation currently creates `confirmed` reservations directly
-- no email confirmation, guest edit/cancel, purchased, or received workflow is included in the MVP
-
-Public reservation example:
-
-```json
-{
-  "guest_email": "guest@example.com",
-  "guest_name": "Guest Name",
-  "quantity": 1,
-  "note": "Hope you like it",
-  "show_name": true
-}
-```
-
-## Frontend
-
-The frontend MVP lives in `frontend/`.
-
-Setup:
-
-```bash
+~~~bash
 cd frontend
 npm install
 cp .env.example .env
 npm run dev
-```
+~~~
 
-Default frontend URL:
-- `http://localhost:5173`
+The frontend is available at http://localhost:5173 and expects:
 
-Required environment:
-- `VITE_API_URL=http://localhost:8080/api`
-- `VITE_TURNSTILE_SITE_KEY` for the Turnstile widget on login and registration
+~~~dotenv
+VITE_API_URL=http://localhost:8080/api
+~~~
 
-Useful routes:
-- `/login`
-- `/register`
-- `/app/lists`
-- `/g/:share_code`
+Useful pages:
 
-Location architecture:
-- PostgreSQL is the source of truth for provinces, cities, districts, and villages
-- Redis is used only as runtime cache
-- shared Location Service is used only for sync/import to the database
-- location sync runs asynchronously; start the job with `POST /api/location/sync` and poll its status via `GET /api/location/sync/:id`
-- use scoped sync for regular updates; `level=all` is intended for initial bootstrap because it performs a full hierarchical import
+| Page | Route |
+| --- | --- |
+| Login | /login |
+| Registration | /register |
+| Owner lists | /lists |
+| Friends | /friends |
+| Public list | /g/:share_code |
 
-## Module Seed Helper
+## Configuration
 
-To avoid writing menu and permission seed SQL manually for every new module, this backend includes a helper command:
+Copy the example files before starting local development:
 
-```bash
+~~~bash
+cp .env.example .env
+cp frontend/.env.example frontend/.env
+~~~
+
+<details>
+<summary>Backend configuration</summary>
+
+Required values depend on the selected infrastructure:
+
+- APP_NAME, APP_ENV, PORT, and GIN_MODE
+- DATABASE_URL, or the individual DB_* variables
+- JWT_KEY with a strong secret of at least 32 characters
+- JWT_EXP
+- PATH_MIGRATE
+
+Optional integrations:
+
+- Redis: sessions, permission cache, and rate limiting
+- MinIO or Cloudflare R2: image upload and deletion
+- Google: Google login
+- Cloudflare Turnstile: login and registration protection
+- SMTP: registration OTP and password reset email
+- Location Service: location synchronization
+
+Never commit .env, production secrets, access tokens, or private keys.
+
+</details>
+
+<details>
+<summary>Frontend configuration</summary>
+
+~~~dotenv
+VITE_API_URL=http://localhost:8080/api
+VITE_TURNSTILE_SITE_KEY=your-turnstile-site-key
+~~~
+
+The Turnstile test keys from the example file are intended for local testing only. Use keys configured for the actual production hostname in production.
+
+</details>
+
+## Product Flows
+
+### Owner flow
+
+1. Register or sign in.
+2. Create a list and choose an occasion.
+3. Add gift items, images, quantities, and priorities.
+4. Share the public link.
+5. Review reservations and manage their lifecycle.
+
+### Guest flow
+
+1. Open the public list link.
+2. Search or sort the available items.
+3. Choose a quantity and reserve without an account.
+4. The remaining quantity is updated transactionally so reservations cannot exceed availability.
+
+### Permission model
+
+Permissions are the runtime source of truth. Roles group permissions, while menu visibility is derived from the permissions available to the current user. superadmin is the only role with a global bypass.
+
+## API Surface
+
+The API is grouped by capability and uses /api as its protected and authenticated prefix.
+
+<details>
+<summary>Authentication and identity</summary>
+
+~~~text
+GET  /api/user/register/status
+POST /api/user/register
+POST /api/user/register/otp/send
+POST /api/user/login
+POST /api/user/google/login
+POST /api/user/refresh-token
+POST /api/user/forgot-password
+POST /api/user/reset-password
+POST /api/user/logout
+GET  /api/user
+~~~
+
+</details>
+
+<details>
+<summary>Gift lists, items, and reservations</summary>
+
+~~~text
+GET  /api/gift-lists
+POST /api/gift-lists
+GET  /api/gift-lists/:id
+PUT  /api/gift-lists/:id
+DELETE /api/gift-lists/:id
+GET  /api/gift-lists/:id/items
+POST /api/gift-lists/:id/items
+POST /api/gift-lists/:id/items/reorder
+GET  /api/gift-lists/:id/reservations
+PUT  /api/gift-items/:id
+DELETE /api/gift-items/:id
+
+GET  /api/public/gift-lists/:code
+GET  /api/public/gift-lists/:code/items
+POST /api/public/gift-lists/:code/items/:item_id/reservations
+
+POST /api/gift-reservations/:id/thank
+POST /api/gift-reservations/:id/cancel
+~~~
+
+</details>
+
+<details>
+<summary>Friends, media, and optional sessions</summary>
+
+~~~text
+GET  /api/friends
+GET  /api/friends/requests
+POST /api/friends/request
+POST /api/friends/:id/accept
+POST /api/friends/:id/reject
+DELETE /api/friends/:id
+
+POST   /api/media/upload
+DELETE /api/media
+
+GET  /api/user/sessions
+DELETE /api/user/session/:session_id
+POST /api/user/sessions/revoke-others
+~~~
+
+Session routes are registered only when Redis is available.
+
+</details>
+
+The API also includes system foundations for roles, permissions, menus, runtime configurations, locations, and audit logs.
+
+## Development
+
+Backend checks:
+
+~~~bash
+go test ./...
+make lint
+~~~
+
+Frontend checks:
+
+~~~bash
+cd frontend
+npm test -- --run
+npm run lint
+npm run build
+~~~
+
+For a new module, keep the existing pattern: add domain and DTO contracts, reuse the generic repository for common CRUD, add custom repository methods only for business queries, register routes, and seed matching menu and permission resources.
+
+Generate menu and permission seed SQL with:
+
+~~~bash
 go run ./cmd/module-seed \
   --name projects \
   --display-name "Projects" \
   --path /projects \
   --icon bi-folder \
   --order-index 905
-```
+~~~
 
-The command prints SQL for:
-- one `menu_items` row
-- matching `permissions` rows for the same resource
-- optional default `role_permissions` grants
+## MVP Scope
 
-This helps prevent mismatch bugs such as:
-- `menu_items.name = projects`
-- `permissions.resource = project`
+| Included | Deliberately outside the current MVP |
+| --- | --- |
+| Authenticated list ownership and management | Payment processing |
+| Public no-account reservation | Guest account and reservation editing |
+| Item availability and transactional quantity checks | Email confirmation for every reservation |
+| Thank, cancel, archive, and restore flows | Notification center |
+| Friend connections and shared-list browsing | Exchanges and exchange-specific workflows |
+| Responsive desktop and mobile UI | Marketplace or seller integrations |
 
-Optional flags:
-- `--parent-name education`
-- `--resource reports`
-- `--actions list,view,export`
-- `--grant-roles admin,superadmin`
+This keeps the product focused on the core loop: create a list, share it, reserve a gift, and manage the result.
 
-For nested menus, `--parent-name` generates a `parent_id` subquery so the migration stays declarative and consistent.
+## Design Notes
 
-## How To Add A New Module
+- [Shopify-inspired visual direction](DESIGN-shopify.md)
+- [Backend MVP plan](docs/superpowers/plans/2026-07-01-yourz-gift-backend-mvp.md)
+- [Frontend MVP plan](docs/superpowers/plans/2026-07-01-yourz-gift-frontend-mvp.md)
 
-When adding a new module, keep it aligned with the permission-first design.
-
-### 1. Add the backend layers
-
-Create these parts:
-- `internal/domain/<module>`
-- `internal/dto`
-- `internal/interfaces/<module>`
-- `internal/repositories/<module>`
-- `internal/services/<module>`
-- `internal/handlers/http/<module>`
-- route registration in `internal/router/router.go`
-
-For repository implementation:
-- reuse `internal/repositories/generic.GenericRepository[T]` for `Store`, `GetByID`, `GetAll`, `Update`, and `Delete`
-- embed `interfacegeneric.GenericRepository[T]` in module repository interfaces for the common contract
-- configure searchable columns, allowed filters, and sortable columns through `repositorygeneric.QueryOptions`
-- add custom methods in the module repo only when the query is business-specific
-
-### 2. Add migration
-
-For a new business module, create:
-- the business table(s)
-- one `menu_items` row for the module
-- the required `permissions` rows for the same resource name
-- optional default `role_permissions` seed if needed
-
-Important:
-- use the same resource name across menu and permissions
-- example:
-  - menu name: `projects`
-  - permission resource: `projects`
-
-This is what allows menus to be derived automatically from permissions.
-
-Tip:
-- use `go run ./cmd/module-seed ...` to generate the menu and permission seed block before pasting it into the migration
-
-### 3. Protect routes with permissions
-
-Use:
-
-```go
-mdw.PermissionMiddleware("projects", "list")
-mdw.PermissionMiddleware("projects", "view")
-mdw.PermissionMiddleware("projects", "create")
-mdw.PermissionMiddleware("projects", "update")
-mdw.PermissionMiddleware("projects", "delete")
-```
-
-Avoid using role-name checks for module access unless the case is explicitly special like `superadmin`.
-
-## Role Management Flow
-
-Recommended admin flow:
-
-1. Create a role.
-2. Assign permissions to the role.
-3. Do not assign menus manually.
-4. Let menu visibility be derived from permissions automatically.
-
-Menu management note:
-- `menus` is code-defined, but selected presentation fields may still be updated at runtime
-- do not create or delete menus through admin API
-- structural changes such as adding new menus should still go through code and migration
-
-This prevents drift between:
-- what a user can see
-- what a user can actually access
-
-## Notes
-
-- `role_menus` still exists in the base schema for compatibility, but runtime access control does not depend on it.
-- For new modules, prefer permission-based design from the start.
-- If you introduce nested menus, parent menu visibility will be resolved automatically when the child menu is permitted.
+<p align="center">
+  Built specially for the arrival of our first child.
+  <br>
+  Zaqia &amp; Zaidus
+</p>
