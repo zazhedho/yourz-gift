@@ -296,7 +296,7 @@ const GiftListDetail = () => {
             const receivedInFull = Number(item.quantity_remaining) === 0 || (item.quantity && reservedQty >= item.quantity)
             const host = sourceHost(item.product_url)
             return (
-              <article className="gift-detail-item gift-detail-item--owner" key={item.id}>
+              <article className={`gift-detail-item gift-detail-item--owner ${receivedInFull ? 'gift-detail-item--reserved' : ''}`} key={item.id}>
                 <div className="gift-detail-item__status">
                   <div className="gift-detail-item__status-text">
                     <CheckCircle2 size={16} /> 

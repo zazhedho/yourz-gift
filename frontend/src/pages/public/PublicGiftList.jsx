@@ -232,7 +232,7 @@ const PublicGiftList = () => {
               const host = sourceHost(item.product_url)
               
               return (
-                <div className="gift-detail-item" key={item.id}>
+                <div className={`gift-detail-item ${!canReserve ? 'gift-detail-item--reserved' : ''}`} key={item.id}>
                   <div className="gift-detail-item__status" style={{ background: canReserve ? '#e879f9' : '#64748b' }}>
                     <div className="gift-detail-item__status-text">
                       <Gift size={16} /> 
