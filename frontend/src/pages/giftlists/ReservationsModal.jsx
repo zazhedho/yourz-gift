@@ -62,7 +62,7 @@ const ReservationsModal = ({
           
           <div style={{ display: 'grid', gap: '16px' }}>
             {reservations.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '48px 24px', background: 'rgba(255,255,255,0.4)', borderRadius: '20px', border: '2px dashed rgba(203, 213, 225, 0.5)' }}>
+              <div className="reservations-empty-state" style={{ textAlign: 'center', padding: '48px 24px', background: 'rgba(255,255,255,0.4)', borderRadius: '20px', border: '2px dashed rgba(203, 213, 225, 0.5)' }}>
                 <Package size={40} color="#94a3b8" style={{ margin: '0 auto 12px', opacity: 0.5 }} />
                 <p style={{ color: '#64748b', margin: 0, fontSize: '15px', fontWeight: 500 }}>No reservations for this item yet.</p>
               </div>
@@ -117,6 +117,11 @@ const ReservationsModal = ({
                       {isCanceled && reservation.cancel_reason ? (
                         <p style={{ color: '#64748b', fontSize: '13px', margin: '8px 0 0', lineHeight: 1.4 }}>
                           Reason: {reservation.cancel_reason}
+                        </p>
+                      ) : null}
+                      {reservation.note ? (
+                        <p style={{ color: '#475569', fontSize: '13px', margin: '8px 0 0', lineHeight: 1.4, overflowWrap: 'anywhere' }}>
+                          <strong>Note:</strong> {reservation.note}
                         </p>
                       ) : null}
                     </div>
