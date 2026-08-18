@@ -99,6 +99,24 @@ describe('common components', () => {
     expect(screen.getByText('/lists?search=birthday')).toBeInTheDocument()
   })
 
+  it('exposes received gifts from the profile menu', async () => {
+    render(
+      <AuthContext.Provider value={{ logout: vi.fn() }}>
+        <MemoryRouter initialEntries={['/lists']}>
+          <Routes>
+            <Route element={<AppShell />}>
+              <Route path="/lists" element={<div>Lists page</div>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AuthContext.Provider>,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: 'Open profile menu' }))
+
+    expect(screen.getByRole('menuitem', { name: 'Received' })).toHaveAttribute('href', '/gifts/received')
+  })
+
   it('renders retry state action', () => {
     render(<RetryState message="Cannot load" onRetry={vi.fn()} />)
 

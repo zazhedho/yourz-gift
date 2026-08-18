@@ -261,6 +261,9 @@ const AppShell = () => {
                 <Link onClick={() => setProfileOpen(false)} role="menuitem" to="/friends">
                   <UsersRound size={17} /> Friends
                 </Link>
+                <Link onClick={() => setProfileOpen(false)} role="menuitem" to="/gifts/received">
+                  <Check size={17} /> Received
+                </Link>
                 <Link onClick={() => setProfileOpen(false)} role="menuitem" to="/sessions">
                   <MonitorSmartphone size={17} /> Sessions
                 </Link>

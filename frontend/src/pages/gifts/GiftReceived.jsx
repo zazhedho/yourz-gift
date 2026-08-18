@@ -21,6 +21,11 @@ const sourceHost = (url) => {
   }
 }
 
+const reservationDisplayName = (reservation) => {
+  if (reservation.show_name === false) return 'Anonymous guest'
+  return reservation.guest_name?.trim() || reservation.guest_email || 'Guest'
+}
+
 const GiftReceived = () => {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
@@ -123,17 +128,25 @@ const GiftReceived = () => {
         <div className="received-page__items">
           {visibleRows.map((row) => {
             const host = sourceHost(row.item.product_url)
+            const thanked = row.reservations.every((reservation) => Boolean(reservation.thanked_at))
+            const StatusIcon = row.receivedInFull ? CheckCircle2 : Package
             return (
-              <article className="gift-detail-item" key={row.id}>
+              <article className={`gift-detail-item received-page__card ${row.receivedInFull ? 'is-received' : 'is-reserved'}`} key={row.id}>
                 <div className="gift-detail-item__status">
                   <div className="gift-detail-item__status-text">
-                    <CheckCircle2 size={16} />
-                    <span>You have {row.reservations.length} active reservation{row.reservations.length === 1 ? '' : 's'} &bull; {row.receivedInFull ? 'Item received in full' : `${row.remaining} still pending`}</span>
+                    <span className="received-page__status-icon"><StatusIcon size={16} /></span>
+                    <span className="received-page__status-copy">
+                      <strong>{row.receivedInFull ? 'Fully reserved' : 'Reservation in progress'}</strong>
+                      <small>{row.reservations.length} active reservation{row.reservations.length === 1 ? '' : 's'}</small>
+                    </span>
                   </div>
+                  <span className="received-page__status-badge">{row.receivedInFull ? 'Complete' : `${row.remaining} left`}</span>
                 </div>
                 <div className="gift-detail-item__body">
-                  <div className="gift-detail-item__source">{host || 'manual item'}</div>
-                  <p className="received-page__from">From <Link to={`/lists/${row.list.id}`}>{row.list.title}</Link></p>
+                  <div className="received-page__meta">
+                    <div className="gift-detail-item__source">{host || 'manual item'}</div>
+                    <p className="received-page__from">From <Link to={`/lists/${row.list.id}`}>{row.list.title}</Link></p>
+                  </div>
                   <div className="gift-detail-item__main gift-detail-item__main--received">
                     <div className="gift-detail-item__image">
                       {row.item.image_url ? <img alt="" src={row.item.image_url} /> : <Package size={24} />}
@@ -142,7 +155,6 @@ const GiftReceived = () => {
                       <h2>{row.item.name}</h2>
                       <div className="gift-detail-item__price">
                         {formatPrice(row.item)}
-                        {row.receivedInFull ? <span>Item received in full</span> : null}
                       </div>
                       <p>{row.item.description || row.item.name}</p>
                       {row.item.product_url ? (
@@ -152,11 +164,22 @@ const GiftReceived = () => {
                       ) : null}
                     </div>
                   </div>
+                  <div aria-label="Reservation details" className="received-page__reservations">
+                    <span className="received-page__reservations-label">Reserved by</span>
+                    <div className="received-page__reservation-list">
+                      {row.reservations.map((reservation) => (
+                        <div className="received-page__reservation" key={reservation.id}>
+                          <span>{reservationDisplayName(reservation)}</span>
+                          <small>{reservation.guest_email || 'No email'} &bull; Qty {reservation.quantity}</small>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
                 <div className="gift-detail-item__footer">
-                  <div />
-                  <button className="text-green" onClick={() => markThanked(row)} type="button">
-                    {row.reservations.every((reservation) => Boolean(reservation.thanked_at)) ? 'Thanked' : 'Mark thanked'}
+                  <span className="received-page__thank-copy">{thanked ? 'Thanks recorded for this item' : 'Remember to thank the contributor'}</span>
+                  <button className="text-green" disabled={thanked} onClick={() => markThanked(row)} type="button">
+                    {thanked ? <><CheckCircle2 size={15} /> Thanked</> : 'Mark thanked'}
                   </button>
                 </div>
               </article>

@@ -2584,6 +2584,207 @@ body:has(.gift-detail-actionbar) .gift-detail-scroll-up {
   grid-template-columns: 72px minmax(0, 1fr);
 }
 
+.received-page__card {
+  border-color: rgba(226, 232, 240, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07), 0 2px 6px rgba(15, 23, 42, 0.03);
+}
+
+.received-page__card:hover {
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.1), 0 4px 8px rgba(15, 23, 42, 0.04);
+  transform: translateY(-2px);
+}
+
+.received-page__card .gift-detail-item__status {
+  min-height: 64px;
+  padding: 12px 18px;
+}
+
+.received-page__card.is-received .gift-detail-item__status {
+  background: linear-gradient(135deg, #16a34a 0%, #059669 100%);
+}
+
+.received-page__card.is-reserved .gift-detail-item__status {
+  background: linear-gradient(135deg, #d97706 0%, #ea580c 100%);
+}
+
+.received-page__card .gift-detail-item__status-text {
+  gap: 10px;
+  min-width: 0;
+}
+
+.received-page__status-icon {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 10px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 32px;
+  justify-content: center;
+  width: 32px;
+}
+
+.received-page__status-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.received-page__status-copy strong {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.received-page__status-copy small {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.received-page__status-badge {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 6px 10px;
+}
+
+.received-page__card .gift-detail-item__body {
+  padding: 18px 20px 16px;
+}
+
+.received-page__meta {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.received-page__meta .gift-detail-item__source {
+  margin-bottom: 0;
+}
+
+.received-page__meta .received-page__from {
+  font-size: 13px;
+  margin: 0;
+  text-align: left;
+}
+
+.received-page__card .gift-detail-item__main--received {
+  gap: 16px;
+  grid-template-columns: 84px minmax(0, 1fr);
+}
+
+.received-page__card .gift-detail-item__image {
+  border-radius: 16px;
+  height: 84px;
+  width: 84px;
+}
+
+.received-page__card .gift-detail-item__text h2 {
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.received-page__card .gift-detail-online {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #2563eb;
+  margin-top: 8px;
+}
+
+.received-page__card .received-page__reservations {
+  margin-top: 18px;
+  padding-top: 15px;
+}
+
+.received-page__card .gift-detail-item__footer {
+  align-items: center;
+  background: #fbfdff;
+  gap: 12px;
+  padding: 12px 20px;
+}
+
+.received-page__thank-copy {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 0;
+}
+
+.received-page__card .gift-detail-item__footer > button {
+  align-items: center;
+  background: #ecfdf5;
+  border: 1px solid #bbf7d0;
+  border-radius: 999px;
+  color: #047857;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 6px;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  text-decoration: none;
+}
+
+.received-page__card .gift-detail-item__footer > button:disabled {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #64748b;
+  cursor: default;
+}
+
+.received-page__reservations {
+  border-top: 1px solid #eef2f7;
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+}
+
+.received-page__reservations-label {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.received-page__reservation-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.received-page__reservation {
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  color: #334155;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 700;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0 10px;
+}
+
+.received-page__reservation small {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  max-width: min(52vw, 280px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .account-page {
   margin: 0 auto;
   max-width: 860px;
@@ -4293,6 +4494,64 @@ body:has(.gift-detail-actionbar) .gift-detail-scroll-up {
 
   .gift-detail-item__main--received {
     grid-template-columns: 64px minmax(0, 1fr);
+  }
+
+  .received-page__card {
+    border-radius: 18px;
+  }
+
+  .received-page__card:hover {
+    transform: none;
+  }
+
+  .received-page__card .gift-detail-item__status {
+    min-height: 58px;
+    padding: 10px 14px;
+  }
+
+  .received-page__card .gift-detail-item__body {
+    padding: 14px;
+  }
+
+  .received-page__card .gift-detail-item__main--received {
+    gap: 12px;
+    grid-template-columns: 64px minmax(0, 1fr);
+  }
+
+  .received-page__card .gift-detail-item__image {
+    border-radius: 14px;
+    height: 64px;
+    width: 64px;
+  }
+
+  .received-page__card .gift-detail-item__text h2 {
+    font-size: 16px;
+  }
+
+  .received-page__card .gift-detail-item__footer {
+    flex-direction: row;
+    padding: 11px 14px;
+  }
+
+  .received-page__card .gift-detail-item__footer > button {
+    font-size: 12px;
+    min-height: 36px;
+    padding: 0 11px;
+    white-space: nowrap;
+  }
+
+  .received-page__card .received-page__reservation-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .received-page__card .received-page__reservation {
+    justify-content: space-between;
+    min-width: 0;
+  }
+
+  .received-page__card .received-page__reservation small {
+    max-width: 55%;
   }
 
   .account-page {

@@ -2,6 +2,11 @@ import { createPortal } from 'react-dom'
 import { Loader2, Package, User, X } from 'lucide-react'
 import { useState } from 'react'
 
+const reservationDisplayName = (reservation) => {
+  if (reservation.show_name === false) return 'Anonymous guest'
+  return reservation.guest_name || reservation.guest_email || 'Guest'
+}
+
 const ReservationsModal = ({
   cancelingReservationId = '',
   item,
@@ -97,8 +102,9 @@ const ReservationsModal = ({
                     </div>
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <strong style={{ display: 'block', color: '#0f172a', fontSize: '15px', marginBottom: '4px', letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {reservation.guest_name || reservation.guest_email || 'Guest'}
+                        {reservationDisplayName(reservation)}
                       </strong>
+                      {reservation.guest_email ? <span style={{ display: 'block', color: '#64748b', fontSize: '12px', marginBottom: '6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{reservation.guest_email}</span> : null}
                       <div style={{ color: '#64748b', fontSize: '13px', display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: reservation.status === 'confirmed' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)', padding: '2px 8px', borderRadius: '99px' }}>
                           <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: reservation.status === 'confirmed' ? '#f472b6' : '#f59e0b', flexShrink: 0 }} />

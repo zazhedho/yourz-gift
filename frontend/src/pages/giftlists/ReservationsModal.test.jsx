@@ -35,4 +35,25 @@ describe('ReservationsModal', () => {
 
     expect(screen.getByText('Please include a handwritten card.')).toBeInTheDocument()
   })
+
+  it('hides the guest identity when the guest opts out', () => {
+    render(
+      <ReservationsModal
+        item={{ id: 'item-1', name: 'Baby stroller' }}
+        onClose={vi.fn()}
+        reservations={[{
+          guest_email: 'secret@example.com',
+          guest_name: 'Secret Name',
+          id: 'reservation-1',
+          quantity: 1,
+          show_name: false,
+          status: 'confirmed',
+        }]}
+      />,
+    )
+
+    expect(screen.getByText('Anonymous guest')).toBeInTheDocument()
+    expect(screen.queryByText('Secret Name')).not.toBeInTheDocument()
+    expect(screen.getByText('secret@example.com')).toBeInTheDocument()
+  })
 })
