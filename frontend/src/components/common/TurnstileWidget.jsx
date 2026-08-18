@@ -48,6 +48,7 @@ const TurnstileWidget = ({ action = 'auth', onError, onToken, resetKey = 0 }) =>
         widgetId = window.turnstile.render(containerRef.current, {
           sitekey: siteKey,
           action,
+          theme: 'light',
           callback: (token) => onTokenRef.current?.(token),
           'expired-callback': () => onTokenRef.current?.(''),
           'error-callback': () => {

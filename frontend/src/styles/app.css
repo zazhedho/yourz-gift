@@ -938,6 +938,14 @@ a {
   gap: 16px;
 }
 
+.turnstile-widget {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 65px;
+  width: 100%;
+}
+
 .auth-card .field {
   display: grid;
   gap: 6px;

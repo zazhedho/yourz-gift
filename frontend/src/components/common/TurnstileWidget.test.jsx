@@ -19,6 +19,7 @@ describe('TurnstileWidget', () => {
         expect(container).toBeInstanceOf(HTMLElement)
         expect(options.sitekey).toBe('site-key')
         expect(options.action).toBe('auth')
+        expect(options.theme).toBe('light')
         options.callback('turnstile-token')
         return 'widget-1'
       }),
